@@ -6,7 +6,8 @@ import {
 } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
-import LoginView from "./views/LoginView.tsx";
+import SignInView from "./views/SignInView.tsx";
+import SignUpView from "./views/SignUpView.tsx";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginView />
+    element: <SignInView />
+  },
+  {
+    path: "/register",
+    element: <SignUpView />
   }
 ]);
 
