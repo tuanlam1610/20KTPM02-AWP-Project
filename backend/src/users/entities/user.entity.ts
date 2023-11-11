@@ -17,11 +17,13 @@ export class UserEntity implements User {
   dob: Date;
 
   @ApiProperty()
-  password: string;
+  hash: string;
 
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
   updatedAt: Date;
+
+  hashedRt: string;
 }

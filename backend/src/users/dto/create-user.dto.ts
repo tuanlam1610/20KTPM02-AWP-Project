@@ -8,7 +8,7 @@ export class CreateUserDto {
   name?: string;
 
   @ApiProperty()
-  password: string;
+  hash: string;
 
   @ApiProperty({ required: false })
   dob?: Date;
