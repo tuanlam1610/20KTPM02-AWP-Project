@@ -1,5 +1,5 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input, Spin } from 'antd';
+import { Button, DatePicker, Form, Input, } from 'antd';
 import loginImg from '../assets/imgs/Login-amico.png';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
@@ -50,13 +50,14 @@ export default function SignUpPage() {
         </div>
         {/* Left Section */}
         <div className="flex flex-col flex-1 justify-center items-center">
-          {isSubmitting && <Spin />}
           <h1 className="uppercase font-semibold text-xl text-center my-4">
             Sign Up
           </h1>
           <Form
             form={form}
             className="mt-4"
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 16 }}
             name="basic"
             initialValues={{ remember: true }}
             onFinish={onFinish}
@@ -114,6 +115,7 @@ export default function SignUpPage() {
                 type="primary"
                 htmlType="submit"
                 className="bg-blue-500 rounded-full px-8 flex justify-center items-center"
+                loading={isSubmitting}
               >
                 <span>Sign Up</span>
                 <ArrowRightOutlined className="text-sm flex justify-center items-center leading-none" />
