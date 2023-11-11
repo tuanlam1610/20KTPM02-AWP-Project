@@ -1,38 +1,38 @@
-import { Button, Carousel } from "antd";
-import { Link } from "react-router-dom";
-import Logo from "../assets/imgs/Logo.png";
-import contentImg from "../assets/imgs/contentImg.png";
-import carouselImg1 from "../assets/imgs/Online-education-laptop.jpg";
-import carouselImg2 from "../assets/imgs/IDC_SocialShareIcon_1200x630.webp";
-import carouselImg3 from "../assets/imgs/teenage-students-in-classroom--141090063-5af498bc6bf0690036889c1b.jpg";
+import { Button, Carousel } from 'antd';
+import { Link } from 'react-router-dom';
+import Logo from '../assets/imgs/Logo.png';
+import contentImg from '../assets/imgs/contentImg.png';
+import carouselImg1 from '../assets/imgs/Online-education-laptop.jpg';
+import carouselImg2 from '../assets/imgs/IDC_SocialShareIcon_1200x630.webp';
+import carouselImg3 from '../assets/imgs/teenage-students-in-classroom--141090063-5af498bc6bf0690036889c1b.jpg';
 import {
   FacebookOutlined,
   GoogleOutlined,
   InstagramOutlined,
   LinkedinOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
 
 export default function HomeView() {
   const listContent = [
     {
-      title: "Online Learning",
+      title: 'Online Learning',
       imgSrc: contentImg,
-      summary: "Lorem ipsum dolor sit amet, consectetur",
+      summary: 'Lorem ipsum dolor sit amet, consectetur',
     },
     {
-      title: "Education & Training",
+      title: 'Education & Training',
       imgSrc: contentImg,
-      summary: "Lorem ipsum dolor sit amet, consectetur",
+      summary: 'Lorem ipsum dolor sit amet, consectetur',
     },
     {
-      title: "Online Learning",
+      title: 'Online Learning',
       imgSrc: contentImg,
-      summary: "Lorem ipsum dolor sit amet, consectetur",
+      summary: 'Lorem ipsum dolor sit amet, consectetur',
     },
     {
-      title: "Education & Training",
+      title: 'Education & Training',
       imgSrc: contentImg,
-      summary: "Lorem ipsum dolor sit amet, consectetur",
+      summary: 'Lorem ipsum dolor sit amet, consectetur',
     },
   ];
   return (
@@ -149,35 +149,35 @@ export default function HomeView() {
               <h2 className="text-2xl">Information</h2>
               <div className="border-2 border-indigo-500 w-1/2 my-2"></div>
               <div className="my-2 px-8 py-2 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-500 duration-300">
-                <Link to={"/"}>About Us</Link>
+                <Link to={'/'}>About Us</Link>
               </div>
               <div className="my-2 px-8 py-2 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-500 duration-300">
-                <Link to={"/"}>Contact Us</Link>
+                <Link to={'/'}>Contact Us</Link>
               </div>
               <div className="my-2 px-8 py-2 border-b-2 border-transparent hover:border-indigo-500 hover:text-indigo-500 duration-300">
-                <Link to={"/"}>FAQ</Link>
+                <Link to={'/'}>FAQ</Link>
               </div>
             </div>
             <div className="py-8 ">
               <h2 className="text-2xl">Follow Us</h2>
               <div className="border-2 border-indigo-500 w-1/2 mt-2 mb-4"></div>
               <div className="flex gap-4">
-                <Link to={"/"}>
+                <Link to={'/'}>
                   <Button className="h-8 w-8 text-lg text-indigo-300 bg-white flex justify-center items-center rounded-full">
                     <GoogleOutlined />
                   </Button>
                 </Link>
-                <Link to={"/"}>
+                <Link to={'/'}>
                   <Button className="h-8 w-8 text-lg text-indigo-300 bg-white flex justify-center items-center rounded-full">
                     <LinkedinOutlined />
                   </Button>
                 </Link>
-                <Link to={"/"}>
+                <Link to={'/'}>
                   <Button className="h-8 w-8 text-lg text-indigo-300 bg-white flex justify-center items-center rounded-full">
                     <FacebookOutlined />
                   </Button>
                 </Link>
-                <Link to={"/"}>
+                <Link to={'/'}>
                   <Button className="h-8 w-8 text-lg text-indigo-300 bg-white flex justify-center items-center rounded-full">
                     <InstagramOutlined />
                   </Button>
