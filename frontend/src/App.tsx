@@ -1,5 +1,7 @@
+import HomeView from "./views/HomeView";
+
 function App() {
-  return <div className="text-red-800">hello</div>;
+  return <HomeView />;
 }
 
 export default App;
