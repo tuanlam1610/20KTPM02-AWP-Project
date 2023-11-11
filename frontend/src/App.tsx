@@ -1,28 +1,24 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { Route, Routes } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 import LandingPage from './pages/LandingPage';
+import Navbar from './pages/Navbar';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
-import { Provider } from 'react-redux';
 import { appStore } from './redux/store';
+import UserProfilePage from './pages/UserProfilePage';
 
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <LandingPage />,
-  },
-  {
-    path: '/login',
-    element: <SignInPage />,
-  },
-  {
-    path: '/register',
-    element: <SignUpPage />,
-  },
-]);
 function App() {
   return (
     <Provider store={appStore}>
-      <RouterProvider router={router} />
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path='/home' element={<HomePage />} />
+        <Route path="/login" element={<SignInPage />} />
+        <Route path="/register" element={<SignUpPage />} />
+        <Route path='/profile' element={<UserProfilePage />} />
+      </Routes>
     </Provider>
   );
 }

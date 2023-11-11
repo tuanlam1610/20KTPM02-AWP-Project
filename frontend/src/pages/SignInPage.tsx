@@ -1,9 +1,9 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Spin } from 'antd';
-import { Link } from 'react-router-dom';
-import loginImg from '../assets/imgs/Login-amico.png';
+import { Button, Checkbox, Form, Input } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import loginImg from '../assets/imgs/Login-amico.png';
 
 type FieldType = {
   email?: string;
@@ -12,16 +12,19 @@ type FieldType = {
 };
 
 export default function SignInPage() {
+  const navigate = useNavigate()
   const [form] = useForm();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const onFinish = async (values: FieldType) => {
     setIsSubmitting(true);
+    document.body.style.cursor = 'wait'
     console.log('Success:', values);
     await new Promise((r) => setTimeout(r, 3000));
     setIsSubmitting(false);
+    document.body.style.cursor = 'default'
     form.resetFields();
+    navigate('/home')
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
@@ -32,7 +35,7 @@ export default function SignInPage() {
     <div className="h-screen w-screen flex justify-center items-center">
       {/* Content */}
       <div className="flex flex-row w-7/12 h-2/3 rounded-xl border-2 border-gray-300 shadow-xl overflow-auto">
-        {/* Right Section */}
+        {/* Left Section */}
         <div className="w-2/5 flex flex-col justify-start items-center bg-blue-200">
           <div className="w-full flex justify-start my-4">
             <Link to={'/'}>
@@ -47,10 +50,9 @@ export default function SignInPage() {
           <p className=" mt-2 mb-4 text-sm text-center">Welcome to HQL</p>
           <img src={loginImg} className="object-contain box-border px-8" />
         </div>
-        {/* <Divider type="vertical" className='bg-black h-full' /> */}
-        {/* Left Section */}
+        {/* Right Section */}
         <div className="flex flex-col flex-1 justify-center items-center">
-          {isSubmitting && <Spin />}
+          {/* {isSubmitting && <Spin />} */}
           <h1 className="uppercase font-semibold text-2xl text-center my-4">
             Sign In
           </h1>
@@ -96,6 +98,7 @@ export default function SignInPage() {
                 type="primary"
                 htmlType="submit"
                 className="bg-blue-500 rounded-full px-8 flex justify-center items-center"
+                loading={isSubmitting}
               >
                 <span>Sign In</span>
                 <ArrowRightOutlined className="text-sm flex justify-center items-center leading-none" />

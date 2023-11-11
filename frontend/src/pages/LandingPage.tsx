@@ -1,16 +1,16 @@
-import { Button, Carousel } from 'antd';
-import { Link } from 'react-router-dom';
-import Logo from '../assets/imgs/Logo.png';
-import contentImg from '../assets/imgs/contentImg.png';
-import carouselImg1 from '../assets/imgs/Online-education-laptop.jpg';
-import carouselImg2 from '../assets/imgs/IDC_SocialShareIcon_1200x630.webp';
-import carouselImg3 from '../assets/imgs/teenage-students-in-classroom--141090063-5af498bc6bf0690036889c1b.jpg';
 import {
   FacebookOutlined,
   GoogleOutlined,
   InstagramOutlined,
   LinkedinOutlined,
 } from '@ant-design/icons';
+import { Button, Carousel } from 'antd';
+import { Link } from 'react-router-dom';
+import carouselImg2 from '../assets/imgs/IDC_SocialShareIcon_1200x630.webp';
+import Logo from '../assets/imgs/Logo.png';
+import carouselImg1 from '../assets/imgs/Online-education-laptop.jpg';
+import contentImg from '../assets/imgs/contentImg.png';
+import carouselImg3 from '../assets/imgs/teenage-students-in-classroom--141090063-5af498bc6bf0690036889c1b.jpg';
 
 export default function LandingPage() {
   const listContent = [
@@ -37,23 +37,6 @@ export default function LandingPage() {
   ];
   return (
     <div className="flex flex-col">
-      {/* Top Nav Bar */}
-      <div className="flex items-center justify-between h-12 shadow-lg">
-        <div className="flex h-full items-center gap-2 mx-4">
-          <img
-            src={Logo}
-            alt="Logo"
-            className="h-full object-contain box-border py-2"
-          />
-          <h1 className="uppercase font-semibold text-lg">Edu</h1>
-        </div>
-        <div className="flex gap-2 justify-between mx-4">
-          <Button type="primary" className="bg-indigo-500 px-8 rounded-full">
-            <Link to={`login`}>Sign In</Link>
-          </Button>
-        </div>
-      </div>
-      {/* <Divider className='bg-black m-0 shadow-sm' /> */}
       {/* Content */}
       <div className="flex flex-col">
         <div className="h-[80vh] mb-12 border-dashed border-b-2 border-indigo-300">
