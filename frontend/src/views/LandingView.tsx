@@ -7,7 +7,7 @@ import carouselImg2 from '../assets/imgs/IDC_SocialShareIcon_1200x630.webp'
 import carouselImg3 from '../assets/imgs/teenage-students-in-classroom--141090063-5af498bc6bf0690036889c1b.jpg'
 import { FacebookOutlined, GoogleOutlined, InstagramOutlined, LinkedinOutlined } from '@ant-design/icons'
 
-export default function HomeView() {
+export default function LandingView() {
     const listContent = [
         {
             title: "Online Learning",
@@ -39,7 +39,7 @@ export default function HomeView() {
                     <h1 className='uppercase font-semibold text-lg'>Edu</h1>
                 </div>
                 <div className='flex gap-2 justify-between mx-4'>
-                    <Button type="primary" className='bg-indigo-500 px-8 rounded-full'><Link to={`login`}>Sign In</Link></Button>
+                    <Link to={`login`}><Button type="primary" className='bg-indigo-500 px-8 rounded-full'>Sign In</Button></Link>
                 </div>
             </div>
             {/* <Divider className='bg-black m-0 shadow-sm' /> */}
@@ -75,7 +75,7 @@ export default function HomeView() {
                     {/* Horizontal View */}
                     <div className='flex w-9/12 mx-8 gap-8'>
                         {listContent.map((content, index) => (
-                            <div key={index} className='w-1/4 h-[50vh] px-2 py-12 border-2 border-indigo-300 rounded-xl flex flex-col items-center
+                            <div key={index} className='w-1/4 h-[50vh] px-2 py-12 border-2 border-indigo-300 rounded-xl flex flex-col items-center cursor-pointer
                             hover:shadow-xl hover:bg-indigo-100' >
                                 <img src={content.imgSrc} alt='content' className='object-contain w-1/3 flex-1 flex justify-center' />
                                 <h3 className='mb-4 font-semibold text-lg'>{content.title}</h3>

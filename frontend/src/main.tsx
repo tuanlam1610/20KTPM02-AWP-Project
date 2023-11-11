@@ -8,6 +8,7 @@ import App from "./App.tsx";
 import "./index.css";
 import SignInView from "./views/SignInView.tsx";
 import SignUpView from "./views/SignUpView.tsx";
+import HomePage from "./views/HomePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,14 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <SignUpView />
+  },
+  {
+    path: "/home",
+    element: <HomePage />,
+  },
+  {
+    path: "*",
+    element: <h1>404</h1>,
   }
 ]);
 
