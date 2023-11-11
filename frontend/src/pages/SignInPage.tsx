@@ -1,23 +1,33 @@
-import { Button, Checkbox, Form, Input } from 'antd';
-import loginImg from '../assets/imgs/Login-amico.png';
-import { Link } from 'react-router-dom';
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Form, Input, Spin } from 'antd';
+import { Link } from 'react-router-dom';
+import loginImg from '../assets/imgs/Login-amico.png';
+import useForm from 'antd/es/form/hooks/useForm';
+import { useState } from 'react';
 
-export default function SignInView() {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const onFinish = (values: any) => {
+type FieldType = {
+  email?: string;
+  password?: string;
+  remember?: string;
+};
+
+export default function SignInPage() {
+  const [form] = useForm();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onFinish = async (values: FieldType) => {
+    setIsSubmitting(true);
     console.log('Success:', values);
+    await new Promise((r) => setTimeout(r, 3000));
+    setIsSubmitting(false);
+    form.resetFields();
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
 
-  type FieldType = {
-    email?: string;
-    password?: string;
-    remember?: string;
-  };
   return (
     <div className="h-screen w-screen flex justify-center items-center">
       {/* Content */}
@@ -40,10 +50,12 @@ export default function SignInView() {
         {/* <Divider type="vertical" className='bg-black h-full' /> */}
         {/* Left Section */}
         <div className="flex flex-col flex-1 justify-center items-center">
+          {isSubmitting && <Spin />}
           <h1 className="uppercase font-semibold text-2xl text-center my-4">
             Sign In
           </h1>
           <Form
+            form={form}
             className="mt-4"
             name="basic"
             labelCol={{ span: 8 }}
@@ -55,26 +67,26 @@ export default function SignInView() {
           >
             <Form.Item<FieldType>
               label="Email"
-              name="email"
               rules={[{ required: true, message: 'Please input your email!' }]}
+              name={'email'}
             >
               <Input />
             </Form.Item>
 
             <Form.Item<FieldType>
               label="Password"
-              name="password"
               rules={[
                 { required: true, message: 'Please input your password!' },
               ]}
+              name={'password'}
             >
               <Input.Password />
             </Form.Item>
 
             <Form.Item<FieldType>
-              name="remember"
               valuePropName="checked"
               wrapperCol={{ offset: 8, span: 16 }}
+              name={'remember'}
             >
               <Checkbox>Remember me</Checkbox>
             </Form.Item>

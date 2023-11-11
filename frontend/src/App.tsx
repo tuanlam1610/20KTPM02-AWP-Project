@@ -1,7 +1,7 @@
-import HomeView from './pages/LandingPage';
+import LandingPage from './pages/LandingPage';
 
 function App() {
-  return <HomeView />;
+  return <LandingPage />;
 }
 
 export default App;
