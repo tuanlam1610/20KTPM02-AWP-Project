@@ -1,25 +1,35 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input } from 'antd';
+import { Button, DatePicker, Form, Input, Spin } from 'antd';
 import loginImg from '../assets/imgs/Login-amico.png';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import useForm from 'antd/es/form/hooks/useForm';
 
-export default function SignUpView() {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const onFinish = (values: any) => {
+type FieldType = {
+  fullname?: string;
+  email?: string;
+  dob?: string;
+  password?: string;
+  confirmPassword?: string;
+};
+
+export default function SignUpPage() {
+  const [form] = useForm();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onFinish = async (values: FieldType) => {
+    setIsSubmitting(true);
     console.log('Success:', values);
+    await new Promise((r) => setTimeout(r, 3000));
+    setIsSubmitting(false);
+    form.resetFields();
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
 
-  type FieldType = {
-    fullname?: string;
-    email?: string;
-    dob?: string;
-    password?: string;
-    confirmPassword?: string;
-  };
   return (
     <div className="h-screen w-screen flex justify-center items-center ">
       <div className="flex flex-row w-7/12 h-2/3 rounded-xl border-2 border-gray-300 shadow-xl overflow-auto">
@@ -40,10 +50,12 @@ export default function SignUpView() {
         </div>
         {/* Left Section */}
         <div className="flex flex-col flex-1 justify-center items-center">
+          {isSubmitting && <Spin />}
           <h1 className="uppercase font-semibold text-xl text-center my-4">
             Sign Up
           </h1>
           <Form
+            form={form}
             className="mt-4"
             name="basic"
             initialValues={{ remember: true }}

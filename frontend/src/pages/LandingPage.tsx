@@ -12,7 +12,7 @@ import {
   LinkedinOutlined,
 } from '@ant-design/icons';
 
-export default function HomeView() {
+export default function LandingPage() {
   const listContent = [
     {
       title: 'Online Learning',
