@@ -1,4 +1,4 @@
-import HomeView from "./views/HomeView";
+import HomeView from "./pages/LandingPage";
 
 function App() {
   return <HomeView />;
