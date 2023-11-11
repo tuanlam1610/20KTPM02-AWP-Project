@@ -1,13 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
-import SignInView from "./views/SignInView.tsx";
-import SignUpView from "./views/SignUpView.tsx";
+import SignInView from "./pages/SignInPage.tsx";
+import SignUpView from "./pages/SignUpPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -16,12 +13,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <SignInView />
+    element: <SignInView />,
   },
   {
     path: "/register",
-    element: <SignUpView />
-  }
+    element: <SignUpView />,
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
