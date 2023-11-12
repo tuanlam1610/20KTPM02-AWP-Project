@@ -13,7 +13,7 @@ async function main() {
     create: {
       name: 'Truong Gia Huy',
       email: 'rexfury121@gmail.com',
-      password: '123456',
+      hash: '123456',
       dob: new Date('2002-12-31T23:00:00.000Z'),
     },
   });
@@ -24,7 +24,7 @@ async function main() {
     create: {
       name: 'Nguyen Ngoc Qua g',
       email: 'quangcui@gmail.com',
-      password: '123456',
+      hash: '123456',
       dob: new Date('2002-10-31T23:00:00.000Z'),
     },
   });

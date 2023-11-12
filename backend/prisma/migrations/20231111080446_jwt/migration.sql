@@ -1,10 +1,13 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "dob" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT,
+    "dob" TIMESTAMP(3),
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
+    "hashedRt" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
