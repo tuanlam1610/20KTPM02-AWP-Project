@@ -7,16 +7,30 @@ import {
   Param,
   Delete,
   NotFoundException,
+  UseGuards,
+  HttpCode,
+  Req,
+  HttpStatus,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
-import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('getUserProfile')
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
+  findUserByAT(@Req() req: any) {
+    const user = req.user;
+    return this.usersService.findOne(user['sub']);
+  }
 
   @Post()
   @ApiCreatedResponse({ type: UserEntity })
@@ -53,3 +67,4 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 }
+

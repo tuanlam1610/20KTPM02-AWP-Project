@@ -17,7 +17,7 @@ import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
   @Post('local/signup')
   @HttpCode(HttpStatus.CREATED) //MB DO GET API CREATED RESPONSE INSTEAD
   signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
@@ -39,6 +39,7 @@ export class AuthController {
   }
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
+  @ApiBearerAuth('jwt')
   @HttpCode(HttpStatus.OK)
   refreshTokens(
     @GetCurrentUserId() userId: number,

@@ -18,10 +18,14 @@ export default function Navbar() {
         {
             key: '2',
             label: (
-                <Link to={'/'} className='flex gap-4'>
+                <Link to={'/'} className={`flex gap-4`} onClick={() => {
+                    localStorage.removeItem('accessToken')
+                    localStorage.removeItem('refreshToken')
+                }}>
                     <LogoutOutlined />
                     <p>Sign Out</p>
                 </Link>
+
             ),
         },
     ];
