@@ -1,9 +1,10 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Form, Input, } from 'antd';
 import loginImg from '../assets/imgs/Login-amico.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import useForm from 'antd/es/form/hooks/useForm';
+import axios from 'axios';
 
 type FieldType = {
   fullname?: string;
@@ -15,15 +16,26 @@ type FieldType = {
 
 export default function SignUpPage() {
   const [form] = useForm();
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate()
 
   const onFinish = async (values: FieldType) => {
     setIsSubmitting(true);
+    document.body.style.cursor = 'wait'
     console.log('Success:', values);
-    await new Promise((r) => setTimeout(r, 3000));
     setIsSubmitting(false);
+    document.body.style.cursor = 'default'
     form.resetFields();
+    axios.post(`http://localhost:4000/auth/local/signup`, values)
+      .then(res => {
+        console.log(res);
+        console.log(res.data);
+        localStorage.setItem('refreshToken', res.data.refreshToken)
+        localStorage.setItem('accessToken', res.data.accessToken)
+        form.resetFields();
+        navigate('/home')
+      })
+      .catch((err) => console.log(err))
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
