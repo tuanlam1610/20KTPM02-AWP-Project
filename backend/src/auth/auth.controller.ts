@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, SignUpDto } from './dto/auth.dto';
 import { Tokens } from './types';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
@@ -17,10 +17,10 @@ import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
   @Post('local/signup')
   @HttpCode(HttpStatus.CREATED) //MB DO GET API CREATED RESPONSE INSTEAD
-  signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
+  signupLocal(@Body() dto: SignUpDto): Promise<Tokens> {
     return this.authService.signupLocal(dto);
   }
   @Post('local/signin')
