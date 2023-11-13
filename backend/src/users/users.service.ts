@@ -3,9 +3,21 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+//helper
+function exclude<User, Key extends keyof User>(
+  user: User,
+  keys: Key[],
+): Omit<User, Key> {
+  const filteredEntries = Object.entries(user).filter(
+    ([key]) => !keys.includes(key as Key),
+  );
+  const filteredObject = Object.fromEntries(filteredEntries) as Omit<User, Key>;
+  return filteredObject;
+}
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
+
   //CRUD
   create(createUserDto: CreateUserDto) {
     return this.prisma.user.create({ data: createUserDto });
@@ -24,7 +36,9 @@ export class UsersService {
   // }
 
   async findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id: id } });
+    const user = await this.prisma.user.findUnique({ where: { id: id } });
+    const userWithoutPassword = exclude(user, ['hash', 'hashedRt']);
+    return userWithoutPassword;
   }
 
   update(id: number, updateUserDTO: UpdateUserDto) {
