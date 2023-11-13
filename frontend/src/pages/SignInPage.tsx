@@ -1,10 +1,10 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
+import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import loginImg from '../assets/imgs/Login-amico.png';
-import axios from 'axios';
 
 type FieldType = {
   email?: string;
@@ -13,26 +13,26 @@ type FieldType = {
 };
 
 export default function SignInPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [form] = useForm();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const onFinish = async (values: FieldType) => {
-    setIsSubmitting(true);
-    document.body.style.cursor = 'wait'
-    console.log('Success:', values);
-    setIsSubmitting(false);
-    document.body.style.cursor = 'default'
-    axios.post(`http://localhost:4000/auth/local/signin`, values)
-      .then(res => {
-        console.log(res);
-        console.log(res.data);
-        localStorage.setItem('refreshToken', res.data.refreshToken)
-        localStorage.setItem('accessToken', res.data.accessToken)
-        form.resetFields();
-        navigate('/home')
-      })
-      .catch((err) => console.log(err))
+    try {
+      setIsSubmitting(true);
+      document.body.style.cursor = 'wait';
+      const signInResult = await axios.post(
+        `http://localhost:4000/auth/local/signin`,
+        values,
+      );
+      localStorage.setItem('refreshToken', signInResult.data.refreshToken);
+      localStorage.setItem('accessToken', signInResult.data.accessToken);
+      navigate('/home');
+      setIsSubmitting(false);
+      document.body.style.cursor = 'default';
+    } catch (err) {
+      console.log(err);
+    }
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
