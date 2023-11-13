@@ -14,11 +14,11 @@ import carouselImg3 from '../assets/imgs/teenage-students-in-classroom--14109006
 import { useEffect } from 'react';
 
 export default function LandingPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   useEffect(() => {
-    console.log(localStorage)
-    if (localStorage.getItem('accessToken')) navigate('/home')
-  })
+    console.log(localStorage);
+    if (localStorage.getItem('accessToken')) navigate('/home');
+  });
   const listContent = [
     {
       title: 'Online Learning',

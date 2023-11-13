@@ -4,12 +4,12 @@ import { User } from '../interface/';
 
 interface ScheduleState {
   loading: Loading;
-  userMap: Record<string, User>;
+  userInfo?: User;
 }
 
 const initialState: ScheduleState = {
   loading: Loading.idle,
-  userMap: {},
+  userInfo: undefined,
 };
 
 const appSlice = createSlice({
@@ -19,11 +19,14 @@ const appSlice = createSlice({
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
+    setUserInfo: (state, action) => {
+      state.userInfo = action.payload;
+    },
   },
   extraReducers(builder) {
     builder;
   },
 });
 
-export const { setLoading } = appSlice.actions;
+export const { setLoading, setUserInfo } = appSlice.actions;
 export default appSlice;
