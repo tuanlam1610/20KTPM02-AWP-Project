@@ -1,0 +1,25 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "backend/src/main.ts",
+        "use": "@vercel/node",
+        "hooks": {
+          "build": "npx prisma migrate deploy"
+        }
+      }
+    ],
+    "routes": [
+        {
+            "src": "backend/(.*)",
+            "dest": "backend/src/main.ts",
+            "methods": [
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE"
+            ]
+        }
+    ]
+  }
+  
