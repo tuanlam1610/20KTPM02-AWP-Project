@@ -16,7 +16,6 @@ import { useEffect } from 'react';
 export default function LandingPage() {
   const navigate = useNavigate();
   useEffect(() => {
-    console.log(localStorage);
     if (localStorage.getItem('accessToken')) navigate('/home');
   });
   const listContent = [

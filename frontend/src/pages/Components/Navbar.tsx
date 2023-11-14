@@ -32,6 +32,7 @@ export default function Navbar() {
           onClick={() => {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
+            dispatch(setUserInfo(undefined))
           }}
         >
           <LogoutOutlined />
@@ -42,13 +43,21 @@ export default function Navbar() {
   ];
 
   const getUserProfile = async () => {
-    const res = await axios.get(`http://localhost:4000/users/getUserProfile`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    });
-    console.log(res.data);
-    dispatch(setUserInfo(res.data));
+    try {
+      const res = await axios.get(`http://localhost:4000/users/getUserProfile`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      console.log(res);
+      dispatch(setUserInfo(res.data));
+      console.log(userInfo)
+    } catch (error) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      dispatch(setUserInfo(undefined))
+      navigate('/')
+    }
   };
 
   useEffect(() => {
@@ -56,11 +65,12 @@ export default function Navbar() {
       if (!localStorage.getItem('refreshToken')) navigate('/');
       else {
         if (!userInfo) {
+          console.log("Get Profile")
           getUserProfile();
         }
       }
     }
-  }, []);
+  });
 
   return (
     <div className="flex items-center justify-between h-12 shadow-lg sticky">
