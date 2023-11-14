@@ -3,23 +3,18 @@
     "builds": [
       {
         "src": "backend/src/main.ts",
-        "use": "@vercel/node",
-        "hooks": {
-          "build": "npx prisma migrate deploy"
-        }
+        "use": "@vercel/node"
       }
     ],
     "routes": [
-        {
-            "src": "backend/(.*)",
-            "dest": "backend/src/main.ts",
-            "methods": [
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE"
-            ]
-        }
-    ]
+      {
+        "src": "backend/(.*)",
+        "dest": "backend/src/main.ts",
+        "methods": ["GET", "POST", "PUT", "DELETE"]
+      }
+    ],
+    "hooks": {
+      "postbuild": "npx prisma migrate deploy"
+    }
   }
   
