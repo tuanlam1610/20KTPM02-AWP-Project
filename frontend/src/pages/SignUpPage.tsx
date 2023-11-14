@@ -27,11 +27,14 @@ export default function SignUpPage() {
     console.log('Success:', values);
     setIsSubmitting(false);
     document.body.style.cursor = 'default';
-    values = { ...values, dob: dayjs(values.dob).toDate().toISOString() }
-    console.log(values)
+    values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
+    console.log(values);
     form.resetFields();
     axios
-      .post(`http://localhost:4000/auth/local/signup`, values)
+      .post(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signup`,
+        values,
+      )
       .then((res) => {
         console.log(res);
         console.log(res.data);
@@ -150,7 +153,10 @@ export default function SignUpPage() {
           </p>
         </div>
       </div>
-      <img src={wave} className='absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden ' />
+      <img
+        src={wave}
+        className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden "
+      />
     </div>
   );
 }

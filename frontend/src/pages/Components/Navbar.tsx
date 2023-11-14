@@ -32,7 +32,7 @@ export default function Navbar() {
           onClick={() => {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            dispatch(setUserInfo(undefined))
+            dispatch(setUserInfo(undefined));
           }}
         >
           <LogoutOutlined />
@@ -44,19 +44,22 @@ export default function Navbar() {
 
   const getUserProfile = async () => {
     try {
-      const res = await axios.get(`http://localhost:4000/users/getUserProfile`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/getUserProfile`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
         },
-      });
+      );
       console.log(res);
       dispatch(setUserInfo(res.data));
-      console.log(userInfo)
+      console.log(userInfo);
     } catch (error) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      dispatch(setUserInfo(undefined))
-      navigate('/')
+      dispatch(setUserInfo(undefined));
+      navigate('/');
     }
   };
 
@@ -65,7 +68,7 @@ export default function Navbar() {
       if (!localStorage.getItem('refreshToken')) navigate('/');
       else {
         if (!userInfo) {
-          console.log("Get Profile")
+          console.log('Get Profile');
           getUserProfile();
         }
       }

@@ -23,7 +23,7 @@ export default function SignInPage() {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
       const signInResult = await axios.post(
-        `http://localhost:4000/auth/local/signin`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signin`,
         values,
       );
       localStorage.setItem('refreshToken', signInResult.data.refreshToken);
@@ -33,7 +33,7 @@ export default function SignInPage() {
       document.body.style.cursor = 'default';
     } catch (err) {
       console.log(err);
-      openNotification()
+      openNotification();
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     }
@@ -49,7 +49,8 @@ export default function SignInPage() {
   const openNotification = () => {
     api['error']({
       message: 'Sign In Failed',
-      description: 'The email and password you entered did not match our records. Please double-check and try again.',
+      description:
+        'The email and password you entered did not match our records. Please double-check and try again.',
       duration: null,
     });
   };
@@ -93,18 +94,19 @@ export default function SignInPage() {
           >
             <Form.Item<FieldType>
               label="Email"
-              rules={[{
-                required: true,
-                message: 'Please enter your email!'
-              }, {
-                pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
-                message: 'Invalid email. Example: example@email.com'
-              }]}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your email!',
+                },
+                {
+                  pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
+                  message: 'Invalid email. Example: example@email.com',
+                },
+              ]}
               name={'email'}
             >
-              <Input type="text"
-                placeholder="Enter your email"
-              />
+              <Input type="text" placeholder="Enter your email" />
             </Form.Item>
 
             <Form.Item<FieldType>
@@ -114,7 +116,7 @@ export default function SignInPage() {
               ]}
               name={'password'}
             >
-              <Input.Password placeholder='Enter your password' />
+              <Input.Password placeholder="Enter your password" />
             </Form.Item>
 
             <Form.Item<FieldType>
@@ -148,7 +150,10 @@ export default function SignInPage() {
           </p>
         </div>
       </div>
-      <img src={wave} className='absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden' />
+      <img
+        src={wave}
+        className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden"
+      />
     </div>
   );
 }

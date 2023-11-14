@@ -20,9 +20,11 @@ export default function UserProfilePage() {
     try {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
-      values = { ...values, dob: dayjs(values.dob).toDate().toISOString() }
+      values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
       const res = await axios.patch(
-        `http://localhost:4000/users/${userInfo?.id}`,
+        `${import.meta.env.VITE_REACT_APP_UNSPLASH_CLIENT_ID}/users/${
+          userInfo?.id
+        }`,
         values,
         {
           headers: {
@@ -132,9 +134,12 @@ export default function UserProfilePage() {
             </div>
           </Form.Item>
         </Form>
-        {isSubmitting && <Spin className='flex justify-center items-center' />}
+        {isSubmitting && <Spin className="flex justify-center items-center" />}
       </div>
-      <img src={wave} className='absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden' />
+      <img
+        src={wave}
+        className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden"
+      />
     </div>
   );
 }
