@@ -22,9 +22,7 @@ export default function UserProfilePage() {
       document.body.style.cursor = 'wait';
       values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
       const res = await axios.patch(
-        `${import.meta.env.VITE_REACT_APP_UNSPLASH_CLIENT_ID}/users/${
-          userInfo?.id
-        }`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/${userInfo?.id}`,
         values,
         {
           headers: {
