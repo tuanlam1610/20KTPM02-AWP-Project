@@ -1,10 +1,11 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, notification } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
 import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import loginImg from '../assets/imgs/Login-amico.png';
+import wave from '../assets/imgs/wave.svg';
 
 type FieldType = {
   email?: string;
@@ -22,7 +23,7 @@ export default function SignInPage() {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
       const signInResult = await axios.post(
-        `http://localhost:4000/auth/local/signin`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signin`,
         values,
       );
       localStorage.setItem('refreshToken', signInResult.data.refreshToken);
@@ -32,22 +33,38 @@ export default function SignInPage() {
       document.body.style.cursor = 'default';
     } catch (err) {
       console.log(err);
+      openNotification();
+      setIsSubmitting(false);
+      document.body.style.cursor = 'default';
     }
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
+  const [api, contextHolder] = notification.useNotification({
+    stack: { threshold: 3 },
+  });
+
+  const openNotification = () => {
+    api['error']({
+      message: 'Sign In Failed',
+      description:
+        'The email and password you entered did not match our records. Please double-check and try again.',
+      duration: null,
+    });
+  };
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center">
+    <div className="h-screen w-screen flex justify-center items-center fixed">
+      {contextHolder}
       {/* Content */}
-      <div className="flex flex-row w-7/12 h-2/3 rounded-xl border-2 border-gray-300 shadow-xl overflow-auto">
+      <div className="flex flex-row w-7/12 h-2/3 rounded-xl bg-white border-2 border-gray-300 shadow-xl overflow-hidden">
         {/* Left Section */}
-        <div className="w-2/5 flex flex-col justify-start items-center bg-blue-200">
+        <div className="w-2/5 flex flex-col justify-start items-center bg-indigo-500 text-white">
           <div className="w-full flex justify-start my-4">
             <Link to={'/'}>
-              <Button className="ms-4 flex justify-center items-center border-gray-500">
+              <Button className="ms-4 flex justify-center items-center border-white text-white hover:bg-white">
                 <LeftOutlined />
               </Button>
             </Link>
@@ -77,20 +94,29 @@ export default function SignInPage() {
           >
             <Form.Item<FieldType>
               label="Email"
-              rules={[{ required: true, message: 'Please input your email!' }]}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your email!',
+                },
+                {
+                  pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
+                  message: 'Invalid email. Example: example@email.com',
+                },
+              ]}
               name={'email'}
             >
-              <Input />
+              <Input type="text" placeholder="Enter your email" />
             </Form.Item>
 
             <Form.Item<FieldType>
               label="Password"
               rules={[
-                { required: true, message: 'Please input your password!' },
+                { required: true, message: 'Please enter your password!' },
               ]}
               name={'password'}
             >
-              <Input.Password />
+              <Input.Password placeholder="Enter your password" />
             </Form.Item>
 
             <Form.Item<FieldType>
@@ -105,7 +131,7 @@ export default function SignInPage() {
               <Button
                 type="primary"
                 htmlType="submit"
-                className="bg-blue-500 rounded-full px-8 flex justify-center items-center"
+                className="bg-indigo-500 rounded-full px-8 flex justify-center items-center"
                 loading={isSubmitting}
               >
                 <span>Sign In</span>
@@ -117,13 +143,17 @@ export default function SignInPage() {
             Don't have an account?{' '}
             <Link
               to={'/register'}
-              className="underline font-semibold p-2 hover:text-blue-500"
+              className="underline font-semibold p-2 hover:text-indigo-500"
             >
               Sign up
             </Link>
           </p>
         </div>
       </div>
+      <img
+        src={wave}
+        className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden"
+      />
     </div>
   );
 }

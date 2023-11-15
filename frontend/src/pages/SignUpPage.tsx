@@ -1,10 +1,12 @@
 import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button, DatePicker, Form, Input } from 'antd';
-import loginImg from '../assets/imgs/Login-amico.png';
+import signUpImg from '../assets/imgs/Sign up-amico.png';
+import wave from '../assets/imgs/wave.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import useForm from 'antd/es/form/hooks/useForm';
 import axios from 'axios';
+import dayjs from 'dayjs';
 
 type FieldType = {
   name?: string;
@@ -25,9 +27,14 @@ export default function SignUpPage() {
     console.log('Success:', values);
     setIsSubmitting(false);
     document.body.style.cursor = 'default';
+    values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
+    console.log(values);
     form.resetFields();
     axios
-      .post(`http://localhost:4000/auth/local/signup`, values)
+      .post(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signup`,
+        values,
+      )
       .then((res) => {
         console.log(res);
         console.log(res.data);
@@ -44,13 +51,13 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="h-screen w-screen flex justify-center items-center ">
-      <div className="flex flex-row w-7/12 h-2/3 rounded-xl border-2 border-gray-300 shadow-xl overflow-auto">
+    <div className="h-screen w-screen flex justify-center items-center overflow-hidden fixed">
+      <div className="flex flex-row w-7/12 h-2/3 rounded-xl bg-white border-2 border-gray-300 shadow-xl overflow-hidden">
         {/* Right Section */}
-        <div className="w-2/5 flex flex-col justify-start items-center bg-blue-200">
+        <div className="w-2/5 flex flex-col justify-start items-center bg-indigo-500 text-white">
           <div className="w-full flex justify-start my-4">
             <Link to={'/'}>
-              <Button className="ms-4 flex justify-center items-center border-gray-500">
+              <Button className="ms-4 flex justify-center items-center border-white text-white hover:bg-white">
                 <LeftOutlined />
               </Button>
             </Link>
@@ -58,18 +65,18 @@ export default function SignUpPage() {
           <h1 className="uppercase font-semibold text-xl text-center">
             HQL Application
           </h1>
-          <p className=" mt-2 mb-4 text-sm text-center">Welcome to HQL</p>
-          <img src={loginImg} className="object-contain box-border px-8" />
+          <p className=" mt-2 mb-4 text-sm text-center">Join With Us Now</p>
+          <img src={signUpImg} className="object-contain box-border px-8" />
         </div>
         {/* Left Section */}
-        <div className="flex flex-col flex-1 justify-center items-center">
+        <div className="flex flex-col flex-1 justify-center items-center bg-white">
           <h1 className="uppercase font-semibold text-xl text-center my-4">
             Sign Up
           </h1>
           <Form
             form={form}
             className="mt-4"
-            labelCol={{ span: 8 }}
+            labelCol={{ span: 10 }}
             wrapperCol={{ span: 16 }}
             name="basic"
             initialValues={{ remember: true }}
@@ -101,7 +108,7 @@ export default function SignUpPage() {
               rules={[{ required: true, message: 'Please input your dob!' }]}
               className="ms-0"
             >
-              <DatePicker />
+              <DatePicker format={'DD/MM/YYYY'} />
             </Form.Item>
 
             <Form.Item<FieldType>
@@ -127,7 +134,7 @@ export default function SignUpPage() {
               <Button
                 type="primary"
                 htmlType="submit"
-                className="bg-blue-500 rounded-full px-8 flex justify-center items-center"
+                className="bg-indigo-500 rounded-full px-8 flex justify-center items-center"
                 loading={isSubmitting}
               >
                 <span>Sign Up</span>
@@ -139,13 +146,17 @@ export default function SignUpPage() {
             Already have an account?{' '}
             <Link
               to={'/login'}
-              className="underline font-semibold p-2 hover:text-blue-500"
+              className="underline font-semibold p-2 hover:text-indigo-500"
             >
               Sign in
             </Link>
           </p>
         </div>
       </div>
+      <img
+        src={wave}
+        className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden "
+      />
     </div>
   );
 }

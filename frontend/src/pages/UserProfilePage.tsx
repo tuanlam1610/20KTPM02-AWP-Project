@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../redux/store';
 import { User } from '../interface';
 import axios from 'axios';
 import { setUserInfo } from '../redux/appSlice';
+import wave from '../assets/imgs/wave.svg';
 
 export default function UserProfilePage() {
   const dispatch = useAppDispatch();
@@ -19,8 +20,9 @@ export default function UserProfilePage() {
     try {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
+      values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
       const res = await axios.patch(
-        `http://localhost:4000/users/${userInfo?.id}`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/${userInfo?.id}`,
         values,
         {
           headers: {
@@ -34,6 +36,9 @@ export default function UserProfilePage() {
       document.body.style.cursor = 'default';
     } catch (err) {
       console.log(err);
+      setIsSubmitting(false);
+      setIsEditing(false);
+      document.body.style.cursor = 'default';
     }
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -42,7 +47,7 @@ export default function UserProfilePage() {
   };
   return (
     <div className="flex justify-center h-[80vh] mt-8">
-      <div className="w-1/2 rounded-xl shadow-2xl border-2 border-gray-300 overflow-hidden">
+      <div className="w-1/2 rounded-xl shadow-2xl bg-white border-2 border-gray-300 overflow-hidden">
         <div className="flex flex-col justify-center items-center h-1/4 min-h-fit bg-[url('https://media.sproutsocial.com/uploads/1c_facebook-cover-photo_clean@2x.png')] ">
           <Avatar size={64} icon={<UserOutlined />} className="bg-indigo-500" />
           <Button
@@ -72,7 +77,7 @@ export default function UserProfilePage() {
             rules={[
               {
                 required: true,
-                message: 'Please input your fullname!',
+                message: 'Please enter your name!',
               },
             ]}
             className="ms-0"
@@ -85,7 +90,7 @@ export default function UserProfilePage() {
             rules={[
               {
                 required: true,
-                message: 'Please input your email!',
+                message: 'Please enter your email!',
               },
             ]}
             name={'email'}
@@ -95,11 +100,11 @@ export default function UserProfilePage() {
           <Form.Item<Omit<User, 'Id'>>
             label="Date Of Birth"
             name="dob"
-            initialValue={dayjs(userInfo?.dob, 'DD/MM/YYYY')}
+            initialValue={dayjs(userInfo?.dob, 'YYYY-MM-DD')}
             rules={[
               {
                 required: true,
-                message: 'Please input your dob!',
+                message: 'Please enter your dob!',
               },
             ]}
             className="ms-0"
@@ -127,8 +132,12 @@ export default function UserProfilePage() {
             </div>
           </Form.Item>
         </Form>
-        {isSubmitting && <Spin />}
+        {isSubmitting && <Spin className="flex justify-center items-center" />}
       </div>
+      <img
+        src={wave}
+        className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden"
+      />
     </div>
   );
 }
