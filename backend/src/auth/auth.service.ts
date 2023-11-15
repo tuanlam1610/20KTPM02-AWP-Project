@@ -4,11 +4,13 @@ import { AuthDto, SignUpDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens } from './types';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   hashData(data: string) {
@@ -16,20 +18,22 @@ export class AuthService {
   }
 
   async getTokens(userId: number, email: string): Promise<Tokens> {
+    const AT_SECRET_KEY = this.configService.get<string>('AT_SECRET_KEY');
+    const RT_SECRET_KEY = this.configService.get<string>('RT_SECRET_KEY');
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           email: email,
         },
-        { expiresIn: '15m', secret: 'at-secret' },
+        { expiresIn: '15m', secret: AT_SECRET_KEY },
       ), //TODO sync and make it better later
       this.jwtService.signAsync(
         {
           sub: userId,
           email: email,
         },
-        { expiresIn: '7d', secret: 'rt-secret' },
+        { expiresIn: '7d', secret: RT_SECRET_KEY },
       ),
     ]);
     return {

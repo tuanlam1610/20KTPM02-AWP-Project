@@ -7,10 +7,10 @@ import { JwtPayload, JwtPayloadWithRt } from '../types';
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
-  constructor(config: ConfigService) {
+  constructor(private configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'rt-secret',
+      secretOrKey: configService.get<string>('RT_SECRET_KEY'),
       passReqToCallback: true,
     });
   }
