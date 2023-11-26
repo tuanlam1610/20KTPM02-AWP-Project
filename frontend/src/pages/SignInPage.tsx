@@ -1,4 +1,4 @@
-import { ArrowRightOutlined, HomeOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, FacebookOutlined, GoogleOutlined, HomeOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, notification } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
 import axios from 'axios';
@@ -81,6 +81,20 @@ export default function SignInPage() {
           <h1 className="uppercase font-semibold text-2xl text-center my-4">
             Sign In
           </h1>
+          <div className='w-2/3 flex justify-center'>
+            <Button className='w-full mb-4 py-4 flex justify-center items-center gap-4 text-indigo-500 font-medium border-indigo-500'>
+              <GoogleOutlined />
+              <p>Continue with Google</p>
+            </Button>
+          </div>
+          <div className='w-2/3 flex justify-center'>
+            <Button className='w-full py-4 flex justify-center items-center gap-4 text-indigo-500 font-medium border-indigo-500'>
+              <FacebookOutlined />
+              <p>Continue with Facebook</p>
+            </Button>
+          </div>
+          <p className='mt-4'>Or</p>
+          <p className='text-sm text-gray-500'>Sign In With Email</p>
           <Form
             form={form}
             className="mt-4"

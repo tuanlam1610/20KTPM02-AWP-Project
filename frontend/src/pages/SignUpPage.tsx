@@ -154,7 +154,7 @@ export default function SignUpPage() {
           </h1>
           <p className='text-gray-700 text-sm'>Please enter 6 digital code send to <span className='font-semibold'>example@email.com</span></p>
           <p className='text-gray-700 text-sm'>Don't forget to check your spam section</p>
-          <InputNumber addonBefore="Verification Code: " placeholder='Pin Code' controls={false} className='my-8' />
+          <InputNumber addonBefore="OTP Code: " placeholder='Enter OTP Code' controls={false} className='my-8' />
           <p className='text-gray-700 text-sm'>Didn't receive the code? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
           <div className='flex gap-2 justify-center items-center'>
             <Button type="text" onClick={backHandler}>Back</Button>
