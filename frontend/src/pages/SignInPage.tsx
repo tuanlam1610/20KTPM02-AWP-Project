@@ -1,4 +1,4 @@
-import { ArrowRightOutlined, LeftOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, HomeOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, notification } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
 import axios from 'axios';
@@ -64,8 +64,8 @@ export default function SignInPage() {
         <div className="w-2/5 flex flex-col justify-start items-center bg-indigo-500 text-white">
           <div className="w-full flex justify-start my-4">
             <Link to={'/'}>
-              <Button className="ms-4 flex justify-center items-center border-white text-white hover:bg-white">
-                <LeftOutlined />
+              <Button className="ms-4 flex justify-center items-center border-white text-indigo-500 bg-white">
+                <HomeOutlined />
               </Button>
             </Link>
           </div>
@@ -148,6 +148,9 @@ export default function SignInPage() {
               Sign up
             </Link>
           </p>
+          <Link to={'/recover'} className="underline font-semibold p-2 hover:text-indigo-500">
+            <p className="text-sm underline font-semibold">Forgot password?</p>
+          </Link>
         </div>
       </div>
       <img
