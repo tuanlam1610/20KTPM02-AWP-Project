@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto, SignUpDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
@@ -50,7 +54,16 @@ export class AuthService {
     });
   }
 
-  async signupLocal(dto: SignUpDto): Promise<Tokens> {
+  async returnTokens(email: string): Promise<Tokens> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email },
+    });
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async signupLocal(dto: SignUpDto): Promise<String> {
     const hash = await this.hashData(dto.password);
     const newUser = await this.prisma.user.create({
       data: {
@@ -60,10 +73,7 @@ export class AuthService {
         dob: dto.dob,
       },
     });
-
-    const tokens = await this.getTokens(newUser.id, newUser.email);
-    await this.updateRtHash(newUser.id, tokens.refreshToken);
-    return tokens;
+    return 'Success';
   }
 
   async signinLocal(dto: AuthDto) {
@@ -73,7 +83,9 @@ export class AuthService {
     if (!user) throw new ForbiddenException('Invalid credentials');
     const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
     if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
-
+    if (!user.isEmailConfirm) {
+      throw new UnauthorizedException('Email not confirmed');
+    }
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;

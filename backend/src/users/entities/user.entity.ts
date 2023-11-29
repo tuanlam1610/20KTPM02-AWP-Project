@@ -28,5 +28,5 @@ export class UserEntity implements User {
   hashedRt: string;
 
   @ApiProperty()
-  isEmailConfirmed: boolean;
+  isEmailConfirm: boolean = false;
 }
