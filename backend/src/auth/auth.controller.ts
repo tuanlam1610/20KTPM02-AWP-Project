@@ -9,13 +9,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, SignUpDto } from './dto/auth.dto';
+import {
+  AccountToResetPasswordDto,
+  AuthDto,
+  ResetPasswordDto,
+  SignUpDto,
+} from './dto/auth.dto';
 import { Tokens } from './types';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetCurrentUser, GetCurrentUserId } from './common/decorators';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { STATUS_CODES } from 'http';
 
 @Controller('auth')
 export class AuthController {
@@ -30,6 +36,13 @@ export class AuthController {
   //   await this.emailConfirmationService.sendVerificationLink(registrationData.email);
   //   return user;
   // }
+  @Post('local/resetPassword')
+  @HttpCode(HttpStatus.CREATED) //MB DO GET API CREATED RESPONSE INSTEAD
+  async resetPassword(@Body() dto: AccountToResetPasswordDto): Promise<String> {
+    await this.emailConfirmationService.sendResetPasswordLink(dto.email);
+    return STATUS_CODES.OK;
+    //TODO: AWP-22: add proper throw for dupplicate email
+  }
 
   @Post('local/signup')
   @HttpCode(HttpStatus.CREATED) //MB DO GET API CREATED RESPONSE INSTEAD
