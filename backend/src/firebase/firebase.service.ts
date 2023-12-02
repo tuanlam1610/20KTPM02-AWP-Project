@@ -8,7 +8,7 @@ export class FirebaseService {
     const serviceAccount = require(
       path.resolve(
         __dirname,
-        'backend/config/awp-hql-firebase-adminsdk-nyqoj-b5093b4329.json',
+        '../../config/awp-hql-firebase-adminsdk-nyqoj-b5093b4329.json',
       ),
     );
 
@@ -20,5 +20,13 @@ export class FirebaseService {
 
   getAdmin(): admin.app.App {
     return this.firebaseAdmin;
+  }
+  async decodeToken(token: string): Promise<admin.auth.DecodedIdToken> {
+    try {
+      const decodedToken = await this.firebaseAdmin.auth().verifyIdToken(token);
+      return decodedToken;
+    } catch (error) {
+      throw new Error('Unable to decode token');
+    }
   }
 }
