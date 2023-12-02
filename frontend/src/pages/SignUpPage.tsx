@@ -67,14 +67,15 @@ export default function SignUpPage() {
         </h1>
         <Form
           form={form}
-          className="mt-4"
+          className="mt-4 w-2/3 min-w-fit"
+          labelWrap
           labelCol={{ span: 10 }}
-          wrapperCol={{ span: 16 }}
-          name="basic"
+          labelAlign='left'
           initialValues={{ remember: true }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
           autoComplete="off"
+          rootClassName='flex flex-col items-center'
         >
           <Form.Item<FieldType>
             label="Fullname"
@@ -82,25 +83,25 @@ export default function SignUpPage() {
             rules={[
               { required: true, message: 'Please input your fullname!' },
             ]}
-            className="ms-0"
+            className="w-full mb-4"
           >
-            <Input />
+            <Input type='text' placeholder='Enter your name' />
           </Form.Item>
           <Form.Item<FieldType>
             label="Email"
             name="email"
             rules={[{ required: true, message: 'Please input your email!' }]}
-            className="ms-0"
+            className="w-full mb-4"
           >
-            <Input />
+            <Input type='text' placeholder='example@email.com' />
           </Form.Item>
           <Form.Item<FieldType>
             label="Date Of Birth"
             name="dob"
             rules={[{ required: true, message: 'Please input your dob!' }]}
-            className="ms-0"
+            className="w-full mb-4"
           >
-            <DatePicker format={'DD/MM/YYYY'} />
+            <DatePicker format={'DD/MM/YYYY'} className='w-full' />
           </Form.Item>
 
           <Form.Item<FieldType>
@@ -109,6 +110,7 @@ export default function SignUpPage() {
             rules={[
               { required: true, message: 'Please input your password!' },
             ]}
+            className="w-full mb-4"
           >
             <Input.Password />
           </Form.Item>
@@ -118,15 +120,16 @@ export default function SignUpPage() {
             rules={[
               { required: true, message: 'Please confirm your password!' },
             ]}
+            className="w-full mb-6"
           >
             <Input.Password />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 8 }}>
+          <Form.Item className="w-full mb-2">
             <Button
               type="primary"
               htmlType="submit"
-              className="bg-indigo-500 rounded-full px-8 flex justify-center items-center"
+              className="flex justify-center items-center px-8 py-4 bg-indigo-500 rounded-full w-full"
               loading={isSubmitting}
             >
               <span>Sign Up</span>
@@ -135,7 +138,7 @@ export default function SignUpPage() {
           </Form.Item>
         </Form>
         <p className="text-sm flex justify-center items-center">
-          Already have an account?{' '}
+          Already have an account?
           <Link
             to={'/login'}
             className="underline font-semibold p-2 hover:text-indigo-500"
@@ -148,21 +151,23 @@ export default function SignUpPage() {
     {
       title: 'Email Verification',
       content: (
-        <div>
+        <div className='w-2/3 min-w-fit'>
           <h1 className="uppercase font-semibold text-xl text-center my-4">
             Email Verification
           </h1>
-          <p className='text-gray-700 text-sm'>Please enter 6 digital code send to <span className='font-semibold'>example@email.com</span></p>
-          <p className='text-gray-700 text-sm'>Don't forget to check your spam section</p>
-          <InputNumber addonBefore="OTP Code: " placeholder='Enter OTP Code' controls={false} className='my-8' />
-          <p className='text-gray-700 text-sm'>Didn't receive the code? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
-          <div className='flex gap-2 justify-center items-center'>
-            <Button type="text" onClick={backHandler}>Back</Button>
-            <Button className='flex justify-center items-center my-4 px-4 py-2 bg-indigo-500 text-white hover:bg-white' onClick={() => {
+          <div className='mt-4'>
+            <p className='text-gray-700 text-sm'>Please enter 6 digital code send to <span className='font-semibold'>example@email.com</span></p>
+            <p className='text-gray-700 text-sm'>Don't forget to check your spam section</p>
+          </div>
+          <InputNumber addonBefore="OTP Code: " placeholder='Enter OTP Code' controls={false} className='mt-8 mb-4 w-full' />
+          <p className='text-gray-700 text-sm mb-6'>Didn't receive the code? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
+          <div className='flex flex-col gap-2 justify-center items-center w-full mb-4'>
+            <Button className='flex justify-center items-center rounded-full w-full px-6 py-2 bg-indigo-500 text-white hover:bg-white' onClick={() => {
               navigate(
                 '/'
               )
             }}>Verify Code</Button>
+            <Button type="default" onClick={backHandler} className='rounded-full w-full'>Back</Button>
           </div>
           <p className=" text-sm flex justify-center items-center">
             Already have an account?{' '}
@@ -178,13 +183,13 @@ export default function SignUpPage() {
     },
   ];
   const items = steps.map((item) => ({ key: item.title, title: item.title }));
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
 
   return (
     <div className="h-screen w-screen flex justify-center items-center overflow-hidden fixed">
       <div className="flex flex-row w-7/12 h-2/3 rounded-xl bg-white border-2 border-gray-300 shadow-xl overflow-hidden">
         {/* Left Section */}
-        <div className="w-2/5 flex flex-col justify-start items-center bg-indigo-500 text-white">
+        <div className="w-2/5 flex flex-col justify-start items-center bg-indigo-400 text-white">
           <div className="w-full flex justify-start my-4">
             <Link to={'/'}>
               <Button className="ms-4 flex justify-center items-center border-white text-indigo-500 bg-white">
@@ -200,8 +205,8 @@ export default function SignUpPage() {
         </div>
         {/* Right Section */}
         <div className="flex flex-col flex-1 justify-start items-center bg-white mt-4">
-          <div>
-            <Steps items={items} current={currentStep} />
+          <div className='w-full px-12'>
+            <Steps items={items} current={currentStep} size='small' className='mt-4' />
           </div>
           {steps[currentStep].content}
         </div>
