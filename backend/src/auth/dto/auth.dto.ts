@@ -17,3 +17,14 @@ export class SignUpDto extends AuthDto {
   @IsDateString()
   dob: Date;
 }
+
+export class AccountToResetPasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+}
+export class ResetPasswordDto extends AccountToResetPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
