@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model User {
@@ -21,4 +22,6 @@ model User {
   email    String  @unique
   hash     String
   hashedRt String?
+
+  isEmailConfirm Boolean @default(false)
 }

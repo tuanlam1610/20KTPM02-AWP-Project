@@ -5,10 +5,20 @@ import { RtStrategy } from './strategies/rt.strategy';
 import { AtStrategy } from './strategies/at.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
+import { EmailsModule } from 'src/emails/emails.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [JwtModule.register({})],
+  imports: [JwtModule.register({}), EmailsModule, UsersModule],
   controllers: [AuthController],
-  providers: [AuthService, ConfigService, AtStrategy, RtStrategy],
+  providers: [
+    AuthService,
+    ConfigService,
+    AtStrategy,
+    RtStrategy,
+    EmailConfirmationService,
+  ],
+  exports: [AuthService],
 })
 export class AuthModule {}

@@ -26,4 +26,7 @@ export class UserEntity implements User {
   updatedAt: Date;
 
   hashedRt: string;
+
+  @ApiProperty()
+  isEmailConfirm: boolean = false;
 }
