@@ -28,3 +28,9 @@ export class ResetPasswordDto extends AccountToResetPasswordDto {
   @IsString()
   newPassword: string;
 }
+
+export class NewPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
