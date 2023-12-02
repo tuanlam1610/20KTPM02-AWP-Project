@@ -64,6 +64,15 @@ export class AuthService {
     return tokens;
   }
 
+  // async decodeToken(token: string) {
+  //   try {
+  //     const decodedToken = await this.firebaseService.decodeToken(token);
+  //     return { success: true, decodedToken };
+  //   } catch (error) {
+  //     return { success: false, message: error.message };
+  //   }
+  // }
+
   async signupLocal(dto: SignUpDto): Promise<String> {
     const hash = await this.hashData(dto.password);
     const newUser = await this.prisma.user.create({
@@ -82,6 +91,7 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (!user) throw new ForbiddenException('Invalid credentials');
+    console.log('pepsi', user.hash);
     const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
     if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
     if (!user.isEmailConfirm) {
@@ -91,6 +101,37 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
+
+  async signinGoogle(dto: AuthDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    if (!user) throw new ForbiddenException('Invalid credentials');
+    const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
+    if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
+    if (!user.isEmailConfirm) {
+      throw new UnauthorizedException('Email not confirmed');
+    }
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async signinFacebook(dto: AuthDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+    if (!user) throw new ForbiddenException('Invalid credentials');
+    const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
+    if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
+    if (!user.isEmailConfirm) {
+      throw new UnauthorizedException('Email not confirmed');
+    }
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
   async logout(userId: number) {
     await this.prisma.user.updateMany({
       where: { id: userId, hashedRt: { not: null } },
@@ -135,6 +176,7 @@ export class AuthService {
         hash: hash,
       },
     });
+    console.log(hash);
     //Probably not return tokens
     // const tokens = await this.getTokens(user.id, user.email);
     // await this.updateRtHash(user.id, tokens.refreshToken);

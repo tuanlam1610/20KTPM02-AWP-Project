@@ -67,6 +67,17 @@ export class AuthController {
     }
   }
 
+  @Post('google/signin')
+  @HttpCode(HttpStatus.OK)
+  signinGoogle(@Body() dto: AuthDto): Promise<Tokens> {
+    return this.authService.signinGoogle(dto);
+  }
+  @Post('facebook/signin')
+  @HttpCode(HttpStatus.OK)
+  signinFacebook(@Body() dto: AuthDto): Promise<Tokens> {
+    return this.authService.signinFacebook(dto);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   @ApiBearerAuth('jwt')

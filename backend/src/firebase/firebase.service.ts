@@ -1,6 +1,9 @@
+import { Injectable } from '@nestjs/common';
+
 import * as admin from 'firebase-admin';
 import * as path from 'path';
 
+@Injectable()
 export class FirebaseService {
   private readonly firebaseAdmin: admin.app.App;
 
@@ -8,7 +11,7 @@ export class FirebaseService {
     const serviceAccount = require(
       path.resolve(
         __dirname,
-        '../../config/awp-hql-firebase-adminsdk-nyqoj-b5093b4329.json',
+        './awp-hql-firebase-adminsdk-nyqoj-b5093b4329.json',
       ),
     );
 
