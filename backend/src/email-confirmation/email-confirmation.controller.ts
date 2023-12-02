@@ -10,11 +10,12 @@ import {
   BadRequestException,
   Get,
 } from '@nestjs/common';
-import ConfirmEmailDto, { ResendVerificationDto } from './dto/confirmEmail.dto';
+import { ResendVerificationDto } from './dto/confirmEmail.dto';
 import { EmailConfirmationService } from './email-confirmation.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { STATUS_CODES } from 'http';
+import { NewPasswordDto } from 'src/auth/dto/auth.dto';
 
 @Controller('email-confirmation')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -40,9 +41,9 @@ export class EmailConfirmationController {
     return tokens;
   }
   @Post('confirm-password-reset')
-  async confirmPassword(
+  async confirmResetPassword(
     @Query('token') token: string,
-    @Body() newPassword: string,
+    @Body() newPasswordDto: NewPasswordDto,
   ) {
     if (!token) {
       throw new BadRequestException('Token must be provided');
@@ -51,10 +52,9 @@ export class EmailConfirmationController {
     const email =
       await this.emailConfirmationService.decodeConfirmationToken(token);
     //TODO: This probably insecure AF
-    console.log(newPassword);
     const user = await this.emailConfirmationService.confirmResetPasswordEmail(
       email,
-      newPassword,
+      newPasswordDto.newPassword,
     );
     return STATUS_CODES.OK;
   }
