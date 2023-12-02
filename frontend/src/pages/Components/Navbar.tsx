@@ -64,7 +64,7 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    if (!['', 'login', 'register'].includes(pathName)) {
+    if (!['', 'login', 'register', 'recover'].includes(pathName)) {
       if (!localStorage.getItem('refreshToken')) navigate('/');
       else {
         if (!userInfo) {
