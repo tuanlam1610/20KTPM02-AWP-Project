@@ -1,10 +1,15 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto, SignUpDto } from './dto/auth.dto';
+import { AuthDto, SignUpDto, ResetPasswordDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens } from './types';
 import { ConfigService } from '@nestjs/config';
+import { STATUS_CODES } from 'http';
 @Injectable()
 export class AuthService {
   constructor(
@@ -50,7 +55,16 @@ export class AuthService {
     });
   }
 
-  async signupLocal(dto: SignUpDto): Promise<Tokens> {
+  async returnTokens(email: string): Promise<Tokens> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email },
+    });
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async signupLocal(dto: SignUpDto): Promise<String> {
     const hash = await this.hashData(dto.password);
     const newUser = await this.prisma.user.create({
       data: {
@@ -60,10 +74,7 @@ export class AuthService {
         dob: dto.dob,
       },
     });
-
-    const tokens = await this.getTokens(newUser.id, newUser.email);
-    await this.updateRtHash(newUser.id, tokens.refreshToken);
-    return tokens;
+    return STATUS_CODES.OK;
   }
 
   async signinLocal(dto: AuthDto) {
@@ -73,7 +84,9 @@ export class AuthService {
     if (!user) throw new ForbiddenException('Invalid credentials');
     const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
     if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
-
+    if (!user.isEmailConfirm) {
+      throw new UnauthorizedException('Email not confirmed');
+    }
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
@@ -99,5 +112,32 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refreshToken);
 
     return tokens;
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    let user = await this.prisma.user.findUnique({
+      where: { email: resetPasswordDto.email },
+    });
+    if (!user) throw new ForbiddenException('Invalid credentials');
+    // const isPasswordValid = await bcrypt.compare(
+    //   resetPasswordDto.password,
+    //   user.hash,
+    // );
+    // if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
+    if (!user.isEmailConfirm) {
+      throw new UnauthorizedException('Email not confirmed');
+    }
+    //console.log(typeof resetPasswordDto.newPassword.toString());
+    const hash = await this.hashData(resetPasswordDto.newPassword.toString());
+    user = await this.prisma.user.update({
+      where: { email: resetPasswordDto.email },
+      data: {
+        hash: hash,
+      },
+    });
+    //Probably not return tokens
+    // const tokens = await this.getTokens(user.id, user.email);
+    // await this.updateRtHash(user.id, tokens.refreshToken);
+    // return tokens;
   }
 }

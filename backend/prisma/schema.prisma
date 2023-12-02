@@ -22,4 +22,6 @@ model User {
   email    String  @unique
   hash     String
   hashedRt String?
+
+  isEmailConfirm Boolean @default(false)
 }

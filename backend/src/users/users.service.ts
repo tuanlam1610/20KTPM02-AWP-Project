@@ -18,6 +18,15 @@ function exclude<User, Key extends keyof User>(
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  markEmailConfirmed(email: string) {
+    return this.prisma.user.update({
+      where: { email: email },
+      data: {
+        isEmailConfirm: true,
+      },
+    });
+  }
+
   //CRUD
   create(createUserDto: CreateUserDto) {
     return this.prisma.user.create({ data: createUserDto });
