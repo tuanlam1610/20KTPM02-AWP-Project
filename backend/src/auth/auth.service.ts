@@ -15,8 +15,8 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private configService: ConfigService,
-  ) {}
+    private configService: ConfigService, // eslint-disable-next-line prettier/prettier
+  ) { }
 
   hashData(data: string) {
     return bcrypt.hash(data, 10);
@@ -64,9 +64,9 @@ export class AuthService {
     return tokens;
   }
 
-  async signupLocal(dto: SignUpDto): Promise<String> {
+  async signupLocal(dto: SignUpDto): Promise<string> {
     const hash = await this.hashData(dto.password);
-    const newUser = await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         email: dto.email,
         hash: hash,
