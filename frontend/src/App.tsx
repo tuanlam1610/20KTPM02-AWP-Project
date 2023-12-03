@@ -9,7 +9,7 @@ import SignUpPage from './pages/SignUpPage';
 import UserProfilePage from './pages/UserProfilePage';
 import { appStore } from './redux/store';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import ActivateEmailPage from './pages/ActivateEmailPage';
+// import ActivateEmailPage from './pages/ActivateEmailPage';
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
         <Route path="/recover" element={<RecoverPasswordPage />} />
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path='/resetPassword' element={<ResetPasswordPage />} />
-        <Route path='/activateEmail' element={<ActivateEmailPage />} />
+        {/* <Route path='/activateEmail' element={<ActivateEmailPage />} /> */}
       </Routes>
     </Provider>
   );
