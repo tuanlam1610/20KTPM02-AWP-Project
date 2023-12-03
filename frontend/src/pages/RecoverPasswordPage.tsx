@@ -1,22 +1,17 @@
-import { ArrowRightOutlined, HomeOutlined } from '@ant-design/icons';
-import { Button, Form, Input, InputNumber, Steps, notification } from 'antd';
+import { ArrowRightOutlined, HomeOutlined, MailOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Steps, notification } from 'antd';
+import useForm from 'antd/es/form/hooks/useForm';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import forgotPassImg from '../assets/imgs/Forgot password-pana (3).png';
 import wave from '../assets/imgs/wave.svg';
-import useForm from 'antd/es/form/hooks/useForm';
+import axios from 'axios';
 
 type EmailField = {
     email?: string;
 };
 
-type PasswordField = {
-    password?: string;
-    rePassword?: string;
-};
-
 export default function RecoverPasswordPage() {
-    const navigate = useNavigate();
     const [form] = useForm();
     const [api, contextHolder] = notification.useNotification({
         stack: { threshold: 3 },
@@ -36,14 +31,11 @@ export default function RecoverPasswordPage() {
             setIsSubmitting(true);
             document.body.style.cursor = 'wait';
             console.log(values)
+            await axios.post(
+                `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/resetPassword`,
+                values,
+            )
             nextHandler()
-            // const signInResult = await axios.post(
-            //     `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signin`,
-            //     values,
-            // );
-            // localStorage.setItem('refreshToken', signInResult.data.refreshToken);
-            // localStorage.setItem('accessToken', signInResult.data.accessToken);
-            // navigate('/home');
             setIsSubmitting(false);
             document.body.style.cursor = 'default';
         } catch (err) {
@@ -57,38 +49,12 @@ export default function RecoverPasswordPage() {
         console.log('Failed:', errorInfo);
     };
 
-    const onFinishPassword = async (values: PasswordField) => {
-        try {
-            setIsSubmitting(true);
-            document.body.style.cursor = 'wait';
-            console.log(values)
-            navigate('/')
-            // const signInResult = await axios.post(
-            //     `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signin`,
-            //     values,
-            // );
-            // localStorage.setItem('refreshToken', signInResult.data.refreshToken);
-            // localStorage.setItem('accessToken', signInResult.data.accessToken);
-            // navigate('/home');
-            setIsSubmitting(false);
-            document.body.style.cursor = 'default';
-        } catch (err) {
-            console.log(err);
-            setIsSubmitting(false);
-            document.body.style.cursor = 'default';
-        }
-    };
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    const onFinishPasswordFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-    };
-
     const backHandler = () => {
         setCurrentStep(currentStep - 1)
     }
 
     const nextHandler = () => {
-        setCurrentStep(currentStep + 1)
+        if (currentStep + 1 < steps.length) setCurrentStep(currentStep + 1)
     }
 
     const steps = [
@@ -103,7 +69,7 @@ export default function RecoverPasswordPage() {
                         form={form}
                         className="mt-4 min-w-fit "
                         labelWrap
-                        labelCol={{ span: 8 }}
+                        labelCol={{ span: 6 }}
                         labelAlign='left'
                         initialValues={{ remember: true }}
                         onFinish={onFinishEmail}
@@ -115,7 +81,7 @@ export default function RecoverPasswordPage() {
                             label="Email"
                             rules={[
                                 {
-                                    required: false,
+                                    required: true,
                                     message: 'Please enter your email!',
                                 },
                                 {
@@ -124,7 +90,7 @@ export default function RecoverPasswordPage() {
                                 },
                             ]}
                             name={'email'}
-                            className="w-full mb-6"
+                            className="w-full mb-4"
                         >
                             <Input type="text" placeholder="Enter your email" />
                         </Form.Item>
@@ -145,83 +111,31 @@ export default function RecoverPasswordPage() {
             )
         },
         {
-            title: "Verify Email", content: (
-                <div className='w-2/3 min-w-fit mt-4'>
-                    <h1 className="uppercase font-semibold text-xl text-center my-4">
-                        Email Verification
-                    </h1>
-                    <div className='mt-4'>
-                        <p className='text-gray-700 text-sm'>Please enter 6 digital code send to <span className='font-semibold'>example@email.com</span></p>
-                        <p className='text-gray-700 text-sm'>Don't forget to check your spam section</p>
-                    </div>
-                    <InputNumber addonBefore="OTP Code: " placeholder='Enter OTP Code' controls={false} className='mt-8 mb-4 w-full' />
-                    <p className='text-gray-700 text-sm mb-6'>Didn't receive the code? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
-                    <div className='flex flex-col gap-2 justify-center items-center w-full mb-4'>
-                        <Button className='flex justify-center items-center rounded-full w-full px-6 py-2 bg-indigo-500 text-white hover:bg-white' onClick={() => {
-                            nextHandler()
-                        }}>Verify Code</Button>
-                        <Button type="default" onClick={backHandler} className='rounded-full w-full'>Back</Button>
-                    </div>
-                </div>
-            )
-        },
-        {
             title: "Reset Password", content: (
-                <div className='mt-4 w-2/3 min-w-fit'>
+                <div className='w-2/3 mt-4'>
                     <h1 className="uppercase font-semibold text-xl text-center my-4">
                         Reset Password
                     </h1>
-                    <p className='text-sm text-gray-500 text-center'>Create new password for your account</p>
-                    <Form
-                        form={form}
-                        className="mt-4 w-full min-w-fit"
-                        labelWrap
-                        labelCol={{ span: 10 }}
-                        labelAlign='left'
-                        initialValues={{ remember: true }}
-                        onFinish={onFinishPassword}
-                        onFinishFailed={onFinishPasswordFailed}
-                        autoComplete="off"
-                        rootClassName='flex flex-col items-center'
-                    >
-                        <Form.Item<PasswordField>
-                            label="New Password"
-                            rules={[
-                                { required: false, message: 'Please enter your password!' },
-                            ]}
-                            name={'password'}
-                            className='w-full mb-4'
-                        >
-                            <Input.Password placeholder="Enter your new password" />
-                        </Form.Item>
-
-                        <Form.Item<PasswordField>
-                            label="Confirm Password"
-                            rules={[
-                                { required: false, message: 'Please enter your password!' },
-                            ]}
-                            name={'rePassword'}
-                            className='w-full mb-6'
-                        >
-                            <Input.Password placeholder="Enter your password again" />
-                        </Form.Item>
-
-                        <Form.Item className='w-full mb-2'>
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                className="flex justify-center items-center px-8 py-4 mb-2 bg-indigo-500 rounded-full w-full"
-                                loading={isSubmitting}
-                            >
-                                <span>Confirm</span>
-                                <ArrowRightOutlined className="text-sm flex justify-center items-center leading-none" />
-                            </Button>
-                            <Button type="default" onClick={backHandler} className='rounded-full w-full'>Back</Button>
-                        </Form.Item>
-                    </Form>
+                    <div>
+                        <MailOutlined className='text-4xl' />
+                    </div>
+                    <div className='my-4 w-full overflow-hidden flex flex-col gap-4 text-gray-700 text-sm'>
+                        <p>We've send a mail to</p>
+                        <p className='font-semibold text-lg'>{form.getFieldValue('email') != "" ? form.getFieldValue('email') : "example@email.com"}</p>
+                        <div>
+                            <p>Please click the link in your email to activate your account. The link in the mail will expire in 5 minutes.</p>
+                            <p> Don't forget to check your spam section!</p>
+                        </div>
+                        <p className=''>Didn't receive a mail? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'
+                            onClick={() => {
+                                onFinishEmail({ email: form.getFieldValue('email') })
+                            }}>Resend</span></p>
+                    </div>
+                    <Button type="default" onClick={backHandler} className='rounded-full w-full'>Back</Button>
                 </div>
             )
-        }]
+        },
+    ]
 
     const items = steps.map((item) => ({ key: item.title, title: item.title }));
     const [currentStep, setCurrentStep] = useState(0);
@@ -249,7 +163,7 @@ export default function RecoverPasswordPage() {
                 </div>
                 {/* Right Section */}
                 <div className="flex flex-col flex-1 justify-start items-center bg-white mt-4">
-                    <div className='w-full px-12'>
+                    <div className='w-2/3'>
                         <Steps size='small' items={items} current={currentStep} className='mt-4' onChange={(step) => {
                             if (step > currentStep) {
                                 openNotification()
