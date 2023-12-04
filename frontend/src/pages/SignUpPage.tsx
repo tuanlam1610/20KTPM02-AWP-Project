@@ -1,10 +1,10 @@
-import { ArrowRightOutlined, HomeOutlined } from '@ant-design/icons';
-import { Button, DatePicker, Form, Input, InputNumber, Steps } from 'antd';
+import { ArrowRightOutlined, HomeOutlined, MailOutlined } from '@ant-design/icons';
+import { Button, DatePicker, Form, Input, Steps } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import signUpImg from '../assets/imgs/Sign up-amico.png';
 import wave from '../assets/imgs/wave.svg';
 
@@ -17,41 +17,26 @@ type FieldType = {
 };
 
 export default function SignUpPage() {
-
-
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-
-  const backHandler = () => {
-    setCurrentStep(0)
-  }
 
   const onFinish = async (values: FieldType) => {
-    console.log(currentStep)
-    setCurrentStep(1)
-    setIsSubmitting(true);
-    document.body.style.cursor = 'wait';
-    console.log('Success:', values);
-    setIsSubmitting(false);
-    document.body.style.cursor = 'default';
-    values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
-    console.log(values);
-    form.resetFields();
-    axios
-      .post(
+    try {
+      setIsSubmitting(true);
+      document.body.style.cursor = 'wait';
+      values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
+      await axios.post(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signup`,
         values,
       )
-      .then((res) => {
-        console.log(res);
-        console.log(res.data);
-        // localStorage.setItem('refreshToken', res.data.refreshToken);
-        // localStorage.setItem('accessToken', res.data.accessToken);
-        form.resetFields();
-        // navigate('/home');
-      })
-      .catch((err) => console.log(err));
+      setIsSubmitting(false);
+      document.body.style.cursor = 'default';
+      setCurrentStep(1)
+    } catch (err) {
+      console.log(err);
+      setIsSubmitting(false);
+      document.body.style.cursor = 'default';
+    }
   };
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishFailed = (errorInfo: any) => {
@@ -90,7 +75,16 @@ export default function SignUpPage() {
           <Form.Item<FieldType>
             label="Email"
             name="email"
-            rules={[{ required: true, message: 'Please input your email!' }]}
+            rules={[
+              {
+                required: true,
+                message: 'Please enter your email!',
+              },
+              {
+                pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
+                message: 'Invalid email. Example: example@email.com',
+              },
+            ]}
             className="w-full mb-4"
           >
             <Input type='text' placeholder='example@email.com' />
@@ -151,33 +145,22 @@ export default function SignUpPage() {
     {
       title: 'Email Verification',
       content: (
-        <div className='w-2/3 min-w-fit'>
+        <div className='w-2/3'>
           <h1 className="uppercase font-semibold text-xl text-center my-4">
-            Email Verification
+            Activate Account
           </h1>
-          <div className='mt-4'>
-            <p className='text-gray-700 text-sm'>Please enter 6 digital code send to <span className='font-semibold'>example@email.com</span></p>
-            <p className='text-gray-700 text-sm'>Don't forget to check your spam section</p>
+          <div>
+            <MailOutlined className='text-4xl' />
           </div>
-          <InputNumber addonBefore="OTP Code: " placeholder='Enter OTP Code' controls={false} className='mt-8 mb-4 w-full' />
-          <p className='text-gray-700 text-sm mb-6'>Didn't receive the code? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
-          <div className='flex flex-col gap-2 justify-center items-center w-full mb-4'>
-            <Button className='flex justify-center items-center rounded-full w-full px-6 py-2 bg-indigo-500 text-white hover:bg-white' onClick={() => {
-              navigate(
-                '/'
-              )
-            }}>Verify Code</Button>
-            <Button type="default" onClick={backHandler} className='rounded-full w-full'>Back</Button>
+          <div className='my-4 w-full overflow-hidden flex flex-col gap-4 text-gray-700 text-sm'>
+            <p>We've send a mail to</p>
+            <p className='font-semibold text-lg'>{form.getFieldValue('email') != "" ? form.getFieldValue('email') : "example@email.com"}</p>
+            <div>
+              <p >Please click the link in your email to activate your account. The link in the mail will expire in 5 minutes.</p>
+              <p> Don't forget to check your spam section!</p>
+            </div>
+            <p className=''>Didn't receive a mail? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
           </div>
-          <p className=" text-sm flex justify-center items-center">
-            Already have an account?{' '}
-            <Link
-              to={'/login'}
-              className="underline font-semibold p-2 hover:text-indigo-500"
-            >
-              Sign in
-            </Link>
-          </p>
         </div>
       ),
     },
