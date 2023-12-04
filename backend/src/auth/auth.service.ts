@@ -4,19 +4,26 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto, SignUpDto, ResetPasswordDto } from './dto/auth.dto';
+import {
+  AuthDto,
+  SignUpDto,
+  ResetPasswordDto,
+  SocialLoginDto,
+} from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens } from './types';
 import { ConfigService } from '@nestjs/config';
 import { STATUS_CODES } from 'http';
+import { FirebaseService } from 'src/firebase/firebase.service';
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService, // eslint-disable-next-line prettier/prettier
-  ) { }
+    private firebaseService: FirebaseService,
+  ) {}
 
   hashData(data: string) {
     return bcrypt.hash(data, 10);
@@ -64,7 +71,16 @@ export class AuthService {
     return tokens;
   }
 
-  async signupLocal(dto: SignUpDto): Promise<string> {
+  // async decodeToken(token: string) {
+  //   try {
+  //     const decodedToken = await this.firebaseService.decodeToken(token);
+  //     return { success: true, decodedToken };
+  //   } catch (error) {
+  //     return { success: false, message: error.message };
+  //   }
+  // }
+
+  async signupLocal(dto: SignUpDto): Promise<String> {
     const hash = await this.hashData(dto.password);
     await this.prisma.user.create({
       data: {
@@ -82,6 +98,7 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (!user) throw new ForbiddenException('Invalid credentials');
+    console.log('pepsi', user.hash);
     const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
     if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
     if (!user.isEmailConfirm) {
@@ -91,6 +108,57 @@ export class AuthService {
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
+
+  async signinGoogle(dto: SocialLoginDto) {
+    const decodedToken = await this.firebaseService.decodeToken(dto.idToken);
+
+    let user = await this.prisma.user.findUnique({
+      where: { email: decodedToken.email },
+    });
+    if (!user) {
+      const googleEmail = decodedToken.email;
+      if (googleEmail) {
+        user = await this.prisma.user.create({
+          data: {
+            email: googleEmail,
+            hash: 'google',
+            name: decodedToken.name,
+            dob: new Date(),
+          },
+        });
+      } else {
+        throw new ForbiddenException('token does not have email');
+      }
+    }
+
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async signinFacebook(dto: SocialLoginDto) {
+    const decodedToken = await this.firebaseService.decodeToken(dto.idToken);
+    let facebookEmail = decodedToken.email;
+    if (!facebookEmail) facebookEmail = decodedToken.user_id + '@facebook.com';
+    let user = await this.prisma.user.findUnique({
+      where: { email: facebookEmail },
+    });
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          email: facebookEmail,
+          hash: 'facebook',
+          name: decodedToken.name,
+          dob: new Date(),
+        },
+      });
+    }
+
+    const tokens = await this.getTokens(user.id, user.email);
+    await this.updateRtHash(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
   async logout(userId: number) {
     await this.prisma.user.updateMany({
       where: { id: userId, hashedRt: { not: null } },
@@ -135,6 +203,7 @@ export class AuthService {
         hash: hash,
       },
     });
+    console.log(hash);
     //Probably not return tokens
     // const tokens = await this.getTokens(user.id, user.email);
     // await this.updateRtHash(user.id, tokens.refreshToken);

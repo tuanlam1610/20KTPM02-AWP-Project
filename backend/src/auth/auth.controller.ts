@@ -14,6 +14,7 @@ import {
   AuthDto,
   ResetPasswordDto,
   SignUpDto,
+  SocialLoginDto,
 } from './dto/auth.dto';
 import { Tokens } from './types';
 import { AuthGuard } from '@nestjs/passport';
@@ -65,6 +66,17 @@ export class AuthController {
       // Handle other errors or re-throw if needed
       throw error;
     }
+  }
+
+  @Post('google/signin')
+  @HttpCode(HttpStatus.OK)
+  signinGoogle(@Body() dto: SocialLoginDto): Promise<Tokens> {
+    return this.authService.signinGoogle(dto);
+  }
+  @Post('facebook/signin')
+  @HttpCode(HttpStatus.OK)
+  signinFacebook(@Body() dto: SocialLoginDto): Promise<Tokens> {
+    return this.authService.signinFacebook(dto);
   }
 
   @UseGuards(AuthGuard('jwt'))

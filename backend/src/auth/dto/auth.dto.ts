@@ -10,6 +10,12 @@ export class AuthDto {
   password: string;
 }
 
+export class SocialLoginDto {
+  @IsNotEmpty()
+  @IsString()
+  idToken: string;
+}
+
 export class SignUpDto extends AuthDto {
   @IsString()
   name: string;

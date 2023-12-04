@@ -4,9 +4,27 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 
+//import { initializeApp } from 'firebase/app';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
+  const firebaseConfig = {
+    apiKey: 'AIzaSyAz7Wk483sls5XVuHhysbQnyUpOWegIvnk',
+
+    authDomain: 'awp-hql.firebaseapp.com',
+
+    projectId: 'awp-hql',
+
+    storageBucket: 'awp-hql.appspot.com',
+
+    messagingSenderId: '280816673390',
+
+    appId: '1:280816673390:web:70efd2ac5bf96335497c7f',
+  };
+  // // Initialize Firebase
+
+  // const app = initializeApp(firebaseConfig);
   const config = new DocumentBuilder()
     .setTitle('Median')
     .setDescription('The Median API description')

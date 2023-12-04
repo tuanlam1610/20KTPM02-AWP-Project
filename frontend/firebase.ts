@@ -33,8 +33,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const googleAuthProvider = new GoogleAuthProvider();
 export const fbAuthProvider = new FacebookAuthProvider();
+fbAuthProvider.addScope('email');
+// fbAuthProvider.addScope('user_birthday');
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
+auth.languageCode = 'it';
 
 export default app;
