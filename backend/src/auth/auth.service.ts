@@ -21,7 +21,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private configService: ConfigService, // eslint-disable-next-line prettier/prettier
     private firebaseService: FirebaseService,
   ) {}
 
@@ -82,7 +82,7 @@ export class AuthService {
 
   async signupLocal(dto: SignUpDto): Promise<String> {
     const hash = await this.hashData(dto.password);
-    const newUser = await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         email: dto.email,
         hash: hash,
