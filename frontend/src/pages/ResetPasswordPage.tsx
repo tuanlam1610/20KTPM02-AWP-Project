@@ -14,9 +14,9 @@ type PasswordField = {
 
 export default function RecoverPasswordPage() {
   const navigate = useNavigate();
-  const [params] = useSearchParams()
-  const token = params.get("token")
-  console.log(token)
+  const [params] = useSearchParams();
+  const token = params.get('token');
+  console.log(token);
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,20 +25,22 @@ export default function RecoverPasswordPage() {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
       if (values.password == values.rePassword) {
-        console.log(values)
-        await axios
-          .post(
-            `${import.meta.env.VITE_REACT_APP_SERVER_URL}/email-confirmation/confirm-password-reset`,
-            { newPassword: values.password }, {
+        console.log(values);
+        await axios.post(
+          `${
+            import.meta.env.VITE_REACT_APP_SERVER_URL
+          }/email-confirmation/confirm-password-reset`,
+          { newPassword: values.password },
+          {
             params: {
-              token: token
-            }
-          })
+              token: token,
+            },
+          },
+        );
         form.resetFields();
         navigate('/login');
-      }
-      else {
-        console.log("Not match")
+      } else {
+        console.log('Not match');
       }
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
@@ -48,7 +50,6 @@ export default function RecoverPasswordPage() {
       document.body.style.cursor = 'default';
     }
   };
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   const onFinishPasswordFailed = (errorInfo: any) => {
     console.log('Failed:', errorInfo);
   };
@@ -69,27 +70,31 @@ export default function RecoverPasswordPage() {
           <h1 className="uppercase font-semibold text-xl text-center">
             HQL Application
           </h1>
-          <p className=" mt-2 mb-4 text-sm text-center">Recover Your Password</p>
+          <p className=" mt-2 mb-4 text-sm text-center">
+            Recover Your Password
+          </p>
           <img src={forgotPassImg} className="object-contain box-border px-8" />
         </div>
         {/* Right Section */}
         <div className="flex flex-col flex-1 justify-start items-center bg-white mt-4">
-          <div className='mt-4 w-2/3 min-w-fit'>
+          <div className="mt-4 w-2/3 min-w-fit">
             <h1 className="uppercase font-semibold text-xl text-center my-4">
               Reset Password
             </h1>
-            <p className='text-sm text-gray-500 text-center'>Create new password for your account</p>
+            <p className="text-sm text-gray-500 text-center">
+              Create new password for your account
+            </p>
             <Form
               form={form}
               className="mt-4 w-full min-w-fit"
               labelWrap
               labelCol={{ span: 10 }}
-              labelAlign='left'
+              labelAlign="left"
               initialValues={{ remember: true }}
               onFinish={onFinishPassword}
               onFinishFailed={onFinishPasswordFailed}
               autoComplete="off"
-              rootClassName='flex flex-col items-center'
+              rootClassName="flex flex-col items-center"
             >
               <Form.Item<PasswordField>
                 label="New Password"
@@ -97,7 +102,7 @@ export default function RecoverPasswordPage() {
                   { required: true, message: 'Please enter your password!' },
                 ]}
                 name={'password'}
-                className='w-full mb-4'
+                className="w-full mb-4"
               >
                 <Input.Password placeholder="Enter your new password" />
               </Form.Item>
@@ -108,12 +113,12 @@ export default function RecoverPasswordPage() {
                   { required: true, message: 'Please enter your password!' },
                 ]}
                 name={'rePassword'}
-                className='w-full mb-6'
+                className="w-full mb-6"
               >
                 <Input.Password placeholder="Enter your password again" />
               </Form.Item>
 
-              <Form.Item className='w-full mb-2'>
+              <Form.Item className="w-full mb-2">
                 <Button
                   type="primary"
                   htmlType="submit"
@@ -133,5 +138,5 @@ export default function RecoverPasswordPage() {
         className="absolute bottom-0 left-0 right-0 -z-20 w-screen overflow-hidden"
       />
     </div>
-  )
+  );
 }

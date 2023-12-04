@@ -49,8 +49,7 @@ export default function SignInPage() {
       document.body.style.cursor = 'default';
     }
   };
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const onFinishFailed = (errorInfo: any) => {
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
   const [api, contextHolder] = notification.useNotification({

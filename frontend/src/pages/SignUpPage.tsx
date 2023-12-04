@@ -1,4 +1,8 @@
-import { ArrowRightOutlined, HomeOutlined, MailOutlined } from '@ant-design/icons';
+import {
+  ArrowRightOutlined,
+  HomeOutlined,
+  MailOutlined,
+} from '@ant-design/icons';
 import { Button, DatePicker, Form, Input, Steps } from 'antd';
 import useForm from 'antd/es/form/hooks/useForm';
 import axios from 'axios';
@@ -28,138 +32,152 @@ export default function SignUpPage() {
       await axios.post(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signup`,
         values,
-      )
+      );
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
-      setCurrentStep(1)
+      setCurrentStep(1);
     } catch (err) {
       console.log(err);
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     }
   };
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const onFinishFailed = (errorInfo: any) => {
+
+  const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
   const steps = [
     {
       title: 'Fill In Information',
-      content: (<div>
-        <h1 className="uppercase font-semibold text-xl text-center my-4">
-          Sign Up
-        </h1>
-        <Form
-          form={form}
-          className="mt-4 w-2/3 min-w-fit"
-          labelWrap
-          labelCol={{ span: 10 }}
-          labelAlign='left'
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-          rootClassName='flex flex-col items-center'
-        >
-          <Form.Item<FieldType>
-            label="Fullname"
-            name="name"
-            rules={[
-              { required: true, message: 'Please input your fullname!' },
-            ]}
-            className="w-full mb-4"
+      content: (
+        <div>
+          <h1 className="uppercase font-semibold text-xl text-center my-4">
+            Sign Up
+          </h1>
+          <Form
+            form={form}
+            className="mt-4 w-2/3 min-w-fit"
+            labelWrap
+            labelCol={{ span: 10 }}
+            labelAlign="left"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+            autoComplete="off"
+            rootClassName="flex flex-col items-center"
           >
-            <Input type='text' placeholder='Enter your name' />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="Email"
-            name="email"
-            rules={[
-              {
-                required: true,
-                message: 'Please enter your email!',
-              },
-              {
-                pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
-                message: 'Invalid email. Example: example@email.com',
-              },
-            ]}
-            className="w-full mb-4"
-          >
-            <Input type='text' placeholder='example@email.com' />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="Date Of Birth"
-            name="dob"
-            rules={[{ required: true, message: 'Please input your dob!' }]}
-            className="w-full mb-4"
-          >
-            <DatePicker format={'DD/MM/YYYY'} className='w-full' />
-          </Form.Item>
-
-          <Form.Item<FieldType>
-            label="Password"
-            name="password"
-            rules={[
-              { required: true, message: 'Please input your password!' },
-            ]}
-            className="w-full mb-4"
-          >
-            <Input.Password />
-          </Form.Item>
-          <Form.Item<FieldType>
-            label="Confirm Password"
-            name="confirmPassword"
-            rules={[
-              { required: true, message: 'Please confirm your password!' },
-            ]}
-            className="w-full mb-6"
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item className="w-full mb-2">
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="flex justify-center items-center px-8 py-4 bg-indigo-500 rounded-full w-full"
-              loading={isSubmitting}
+            <Form.Item<FieldType>
+              label="Fullname"
+              name="name"
+              rules={[
+                { required: true, message: 'Please input your fullname!' },
+              ]}
+              className="w-full mb-4"
             >
-              <span>Sign Up</span>
-              <ArrowRightOutlined className="text-sm flex justify-center items-center leading-none" />
-            </Button>
-          </Form.Item>
-        </Form>
-        <p className="text-sm flex justify-center items-center">
-          Already have an account?
-          <Link
-            to={'/login'}
-            className="underline font-semibold p-2 hover:text-indigo-500"
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>),
+              <Input type="text" placeholder="Enter your name" />
+            </Form.Item>
+            <Form.Item<FieldType>
+              label="Email"
+              name="email"
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your email!',
+                },
+                {
+                  pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
+                  message: 'Invalid email. Example: example@email.com',
+                },
+              ]}
+              className="w-full mb-4"
+            >
+              <Input type="text" placeholder="example@email.com" />
+            </Form.Item>
+            <Form.Item<FieldType>
+              label="Date Of Birth"
+              name="dob"
+              rules={[{ required: true, message: 'Please input your dob!' }]}
+              className="w-full mb-4"
+            >
+              <DatePicker format={'DD/MM/YYYY'} className="w-full" />
+            </Form.Item>
+
+            <Form.Item<FieldType>
+              label="Password"
+              name="password"
+              rules={[
+                { required: true, message: 'Please input your password!' },
+              ]}
+              className="w-full mb-4"
+            >
+              <Input.Password />
+            </Form.Item>
+            <Form.Item<FieldType>
+              label="Confirm Password"
+              name="confirmPassword"
+              rules={[
+                { required: true, message: 'Please confirm your password!' },
+              ]}
+              className="w-full mb-6"
+            >
+              <Input.Password />
+            </Form.Item>
+
+            <Form.Item className="w-full mb-2">
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="flex justify-center items-center px-8 py-4 bg-indigo-500 rounded-full w-full"
+                loading={isSubmitting}
+              >
+                <span>Sign Up</span>
+                <ArrowRightOutlined className="text-sm flex justify-center items-center leading-none" />
+              </Button>
+            </Form.Item>
+          </Form>
+          <p className="text-sm flex justify-center items-center">
+            Already have an account?
+            <Link
+              to={'/login'}
+              className="underline font-semibold p-2 hover:text-indigo-500"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
+      ),
     },
     {
       title: 'Email Verification',
       content: (
-        <div className='w-2/3'>
+        <div className="w-2/3">
           <h1 className="uppercase font-semibold text-xl text-center my-4">
             Activate Account
           </h1>
           <div>
-            <MailOutlined className='text-4xl' />
+            <MailOutlined className="text-4xl" />
           </div>
-          <div className='my-4 w-full overflow-hidden flex flex-col gap-4 text-gray-700 text-sm'>
+          <div className="my-4 w-full overflow-hidden flex flex-col gap-4 text-gray-700 text-sm">
             <p>We've send a mail to</p>
-            <p className='font-semibold text-lg'>{form.getFieldValue('email') != "" ? form.getFieldValue('email') : "example@email.com"}</p>
+            <p className="font-semibold text-lg">
+              {form.getFieldValue('email') != ''
+                ? form.getFieldValue('email')
+                : 'example@email.com'}
+            </p>
             <div>
-              <p >Please click the link in your email to activate your account. The link in the mail will expire in 5 minutes.</p>
+              <p>
+                Please click the link in your email to activate your account.
+                The link in the mail will expire in 5 minutes.
+              </p>
               <p> Don't forget to check your spam section!</p>
             </div>
-            <p className=''>Didn't receive a mail? <span className='underline text-indigo-500 font-semibold hover:cursor-pointer'>Resend</span></p>
+            <p className="">
+              Didn't receive a mail?{' '}
+              <span className="underline text-indigo-500 font-semibold hover:cursor-pointer">
+                Resend
+              </span>
+            </p>
           </div>
         </div>
       ),
@@ -188,8 +206,13 @@ export default function SignUpPage() {
         </div>
         {/* Right Section */}
         <div className="flex flex-col flex-1 justify-start items-center bg-white mt-4">
-          <div className='w-full px-12'>
-            <Steps items={items} current={currentStep} size='small' className='mt-4' />
+          <div className="w-full px-12">
+            <Steps
+              items={items}
+              current={currentStep}
+              size="small"
+              className="mt-4"
+            />
           </div>
           {steps[currentStep].content}
         </div>
