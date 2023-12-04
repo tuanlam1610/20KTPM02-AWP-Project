@@ -69,19 +69,34 @@ export default function SignInPage() {
   const handleSignInWithGG = async () => {
     setPersistence(auth, browserSessionPersistence);
     const result = await signInWithPopup(auth, googleAuthProvider);
-    console.log((result.user as any).accessToken);
-
+    const idToken = await result.user.getIdToken();
+    const value = { idToken: idToken };
     // Send token to backend
 
-    // const res = await axios.post(
-    //   `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signin`,
-    //   (result.user as any).accessToken,
-    // );
+    const signInResult = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/google/signin`,
+      value,
+    );
+    localStorage.setItem('refreshToken', signInResult.data.refreshToken);
+    localStorage.setItem('accessToken', signInResult.data.accessToken);
+    console.log(signInResult.data);
+    navigate('/home');
+    setIsSubmitting(false);
+    document.body.style.cursor = 'default';
   };
 
   const handleSignInWithFB = async () => {
     const result = await signInWithPopup(auth, fbAuthProvider);
-    console.log(result);
+
+    const signInResult = await axios.post(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/facebook/signin`,
+      { idToken: await result.user.getIdToken() },
+    );
+    localStorage.setItem('refreshToken', signInResult.data.refreshToken);
+    localStorage.setItem('accessToken', signInResult.data.accessToken);
+    navigate('/home');
+    setIsSubmitting(false);
+    document.body.style.cursor = 'default';
   };
 
   return (

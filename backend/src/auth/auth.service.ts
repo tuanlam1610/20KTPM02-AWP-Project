@@ -138,24 +138,20 @@ export class AuthService {
 
   async signinFacebook(dto: SocialLoginDto) {
     const decodedToken = await this.firebaseService.decodeToken(dto.idToken);
-
+    let facebookEmail = decodedToken.email;
+    if (!facebookEmail) facebookEmail = decodedToken.user_id + '@facebook.com';
     let user = await this.prisma.user.findUnique({
-      where: { email: decodedToken.email },
+      where: { email: facebookEmail },
     });
     if (!user) {
-      const facebookEmail = decodedToken.email;
-      if (facebookEmail) {
-        user = await this.prisma.user.create({
-          data: {
-            email: facebookEmail,
-            hash: 'google',
-            name: decodedToken.name,
-            dob: new Date(),
-          },
-        });
-      } else {
-        throw new ForbiddenException('token does not have email');
-      }
+      user = await this.prisma.user.create({
+        data: {
+          email: facebookEmail,
+          hash: 'facebook',
+          name: decodedToken.name,
+          dob: new Date(),
+        },
+      });
     }
 
     const tokens = await this.getTokens(user.id, user.email);

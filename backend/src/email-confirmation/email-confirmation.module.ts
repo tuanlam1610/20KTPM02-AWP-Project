@@ -10,6 +10,7 @@ import { RtStrategy } from 'src/auth/strategies/rt.strategy';
 import { AtStrategy } from 'src/auth/strategies/at.strategy';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthModule } from 'src/auth/auth.module';
+import { FirebaseModule } from 'src/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from 'src/auth/auth.module';
     EmailsModule,
     AuthModule,
     JwtModule.register({}),
+    FirebaseModule,
   ],
   controllers: [EmailConfirmationController],
   providers: [

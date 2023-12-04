@@ -11,6 +11,7 @@ import { EmailConfirmationModule } from './email-confirmation/email-confirmation
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from './prisma/prisma.module';
 import { FirebaseService } from './firebase/firebase.service';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -23,8 +24,9 @@ import { FirebaseService } from './firebase/firebase.service';
     EmailsModule,
     EmailConfirmationModule,
     JwtModule.register({}),
+    FirebaseModule,
   ],
   controllers: [AppController, EmailConfirmationController],
-  providers: [AppService, EmailConfirmationService, FirebaseService],
+  providers: [AppService, EmailConfirmationService],
 })
 export class AppModule {}
