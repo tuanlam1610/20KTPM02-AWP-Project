@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { EmailConfirmationService } from 'src/email-confirmation/email-confirmation.service';
 import { EmailsModule } from 'src/emails/emails.module';
 import { UsersModule } from 'src/users/users.module';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Module({
   imports: [JwtModule.register({}), EmailsModule, UsersModule],
@@ -18,6 +19,7 @@ import { UsersModule } from 'src/users/users.module';
     AtStrategy,
     RtStrategy,
     EmailConfirmationService,
+    FirebaseService,
   ],
   exports: [AuthService],
 })

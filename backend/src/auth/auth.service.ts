@@ -4,18 +4,25 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto, SignUpDto, ResetPasswordDto } from './dto/auth.dto';
+import {
+  AuthDto,
+  SignUpDto,
+  ResetPasswordDto,
+  SocialLoginDto,
+} from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens } from './types';
 import { ConfigService } from '@nestjs/config';
 import { STATUS_CODES } from 'http';
+import { FirebaseService } from 'src/firebase/firebase.service';
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private firebaseService: FirebaseService,
   ) {}
 
   hashData(data: string) {
@@ -102,31 +109,55 @@ export class AuthService {
     return tokens;
   }
 
-  async signinGoogle(dto: AuthDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+  async signinGoogle(dto: SocialLoginDto) {
+    const decodedToken = await this.firebaseService.decodeToken(dto.idToken);
+
+    let user = await this.prisma.user.findUnique({
+      where: { email: decodedToken.email },
     });
-    if (!user) throw new ForbiddenException('Invalid credentials');
-    const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
-    if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
-    if (!user.isEmailConfirm) {
-      throw new UnauthorizedException('Email not confirmed');
+    if (!user) {
+      const googleEmail = decodedToken.email;
+      if (googleEmail) {
+        user = await this.prisma.user.create({
+          data: {
+            email: googleEmail,
+            hash: 'google',
+            name: decodedToken.name,
+            dob: new Date(),
+          },
+        });
+      } else {
+        throw new ForbiddenException('token does not have email');
+      }
     }
+
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
 
-  async signinFacebook(dto: AuthDto) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+  async signinFacebook(dto: SocialLoginDto) {
+    const decodedToken = await this.firebaseService.decodeToken(dto.idToken);
+
+    let user = await this.prisma.user.findUnique({
+      where: { email: decodedToken.email },
     });
-    if (!user) throw new ForbiddenException('Invalid credentials');
-    const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
-    if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
-    if (!user.isEmailConfirm) {
-      throw new UnauthorizedException('Email not confirmed');
+    if (!user) {
+      const facebookEmail = decodedToken.email;
+      if (facebookEmail) {
+        user = await this.prisma.user.create({
+          data: {
+            email: facebookEmail,
+            hash: 'google',
+            name: decodedToken.name,
+            dob: new Date(),
+          },
+        });
+      } else {
+        throw new ForbiddenException('token does not have email');
+      }
     }
+
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
