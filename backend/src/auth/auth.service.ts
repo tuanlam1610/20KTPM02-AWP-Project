@@ -123,6 +123,7 @@ export class AuthService {
             email: googleEmail,
             hash: 'google',
             name: decodedToken.name,
+            isEmailConfirm: true,
           },
         });
       } else {
@@ -148,6 +149,7 @@ export class AuthService {
           email: facebookEmail,
           hash: 'facebook',
           name: decodedToken.name,
+          isEmailConfirm: true,
         },
       });
     }
