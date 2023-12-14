@@ -1,7 +1,6 @@
 import { Provider } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import Navbar from './pages/Components/Navbar';
-import HomePage from './pages/Teacher/HomePage';
 import LandingPage from './pages/LandingPage';
 import RecoverPasswordPage from './pages/RecoverPasswordPage';
 import SignInPage from './pages/SignInPage';
@@ -10,6 +9,8 @@ import UserProfilePage from './pages/UserProfilePage';
 import { appStore } from './redux/store';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ActivateEmailPage from './pages/ActivateEmailPage';
+import TeacherHomePage from './pages/Teacher/HomePage';
+import ClassDetailsPage from './pages/Teacher/ClassDetailsPage'
 
 function App() {
   return (
@@ -17,13 +18,14 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/home" element={<HomePage />} />
+        <Route path="/home" element={<TeacherHomePage />} />
         <Route path="/login" element={<SignInPage />} />
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/recover" element={<RecoverPasswordPage />} />
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path='/resetPassword' element={<ResetPasswordPage />} />
         <Route path='/activateEmail' element={<ActivateEmailPage />} />
+        <Route path='/classDetails/:id' element={<ClassDetailsPage />} />
       </Routes>
     </Provider>
   );

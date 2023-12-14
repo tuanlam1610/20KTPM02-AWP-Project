@@ -1,18 +1,16 @@
 import { Button, Form, Input, Modal } from 'antd'
 import { useForm } from 'antd/es/form/Form';
 import TextArea from 'antd/es/input/TextArea';
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { useAppDispatch } from '../../../../redux/store';
+import { addClass } from '../../../../redux/teacherSlice';
 
-// type FieldType = {
-//   name?: string;
-//   description?: string;
-// };
 
 export default function CreateClassModal() {
+  const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
-
 
   const showModal = () => {
     setOpen(true);
@@ -26,6 +24,11 @@ export default function CreateClassModal() {
     console.log("Submit Values: ", values)
 
     setTimeout(() => {
+      dispatch(addClass({
+        name: values.name,
+        description: values.description ? values.description : '',
+        courseImg: 'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg'
+      }))
       setOpen(false);
       setConfirmLoading(false);
     }, 2000);
@@ -42,7 +45,7 @@ export default function CreateClassModal() {
         Create New Class
       </Button>
       <Modal
-        title={<h1 className='text-2xl pb-2 mb-4 border-b-[1px] border-gray-300'>Create New Class</h1>}
+        title={<h1 className='text-2xl text-indigo-500 pb-4 mb-4 border-b-[1px] border-gray-300 uppercase'>Create New Class</h1>}
         centered
         open={open}
         onOk={handleOk}
