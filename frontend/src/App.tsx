@@ -1,7 +1,7 @@
 import { Provider } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 import Navbar from './pages/Components/Navbar';
-import HomePage from './pages/HomePage';
+import HomePage from './pages/Teacher/HomePage';
 import LandingPage from './pages/LandingPage';
 import RecoverPasswordPage from './pages/RecoverPasswordPage';
 import SignInPage from './pages/SignInPage';
