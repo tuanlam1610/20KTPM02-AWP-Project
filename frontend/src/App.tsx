@@ -25,6 +25,8 @@ function App() {
         <Route path="/profile" element={<UserProfilePage />} />
         <Route path='/resetPassword' element={<ResetPasswordPage />} />
         <Route path='/activateEmail' element={<ActivateEmailPage />} />
+
+        {/* Teacher Route */}
         <Route path='/classDetails/:id' element={<ClassDetailsPage />} />
       </Routes>
     </Provider>

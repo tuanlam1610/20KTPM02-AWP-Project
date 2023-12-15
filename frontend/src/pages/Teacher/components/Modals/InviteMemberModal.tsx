@@ -1,16 +1,14 @@
-import { Button, Form, Input, Modal, Space } from 'antd'
+import { Button, Form, Input, Modal, Space, message } from 'antd'
 import { useForm } from 'antd/es/form/Form';
 import { useState } from 'react'
-import { useAppDispatch } from '../../../../redux/store';
-import { addClass } from '../../../../redux/teacherSlice';
 import { UserAddOutlined } from '@ant-design/icons';
 
 
 export default function InviteMemberModal() {
-  const dispatch = useAppDispatch()
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const showModal = () => {
     setOpen(true);
@@ -22,25 +20,27 @@ export default function InviteMemberModal() {
     const values = await form.validateFields()
     form.resetFields()
     console.log("Submit Values: ", values)
+    messageApi.open({
+      type: 'success',
+      content: (<span>Send invitation to <span className='font-semibold'>{values.email}</span> successfully</span>),
+      duration: 1
+    });
 
     setTimeout(() => {
-      dispatch(addClass({
-        name: values.name,
-        description: values.description ? values.description : '',
-        courseImg: 'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg'
-      }))
       setOpen(false);
       setConfirmLoading(false);
-    }, 2000);
+    }, 1000);
   };
 
   const handleCancel = () => {
     console.log('Clicked cancel button');
+    form.resetFields()
     setOpen(false);
   };
 
   return (
     <>
+      {contextHolder}
       <Button onClick={showModal} icon={<UserAddOutlined />}>
         Invite
       </Button>
