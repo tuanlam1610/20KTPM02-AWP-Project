@@ -11,11 +11,11 @@ interface AppState {
 const initialState: AppState = {
   loading: Loading.idle,
   userInfo: undefined,
-  isAuthenticated: false
+  isAuthenticated: false,
 };
 
 const appSlice = createSlice({
-  name: 'schedule',
+  name: 'app',
   initialState,
   reducers: {
     setLoading: (state, action) => {
@@ -26,7 +26,7 @@ const appSlice = createSlice({
     },
     setIsAuthenticated: (state, action) => {
       state.isAuthenticated = action.payload;
-    }
+    },
   },
   extraReducers(builder) {
     builder;

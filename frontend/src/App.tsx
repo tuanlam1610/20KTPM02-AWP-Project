@@ -10,7 +10,7 @@ import { appStore } from './redux/store';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ActivateEmailPage from './pages/ActivateEmailPage';
 import TeacherHomePage from './pages/Teacher/HomePage';
-import ClassDetailsPage from './pages/Teacher/ClassDetailsPage'
+import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
 
 function App() {
   return (
@@ -23,11 +23,11 @@ function App() {
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/recover" element={<RecoverPasswordPage />} />
         <Route path="/profile" element={<UserProfilePage />} />
-        <Route path='/resetPassword' element={<ResetPasswordPage />} />
-        <Route path='/activateEmail' element={<ActivateEmailPage />} />
+        <Route path="/resetPassword" element={<ResetPasswordPage />} />
+        <Route path="/activateEmail" element={<ActivateEmailPage />} />
 
         {/* Teacher Route */}
-        <Route path='/classDetails/:id' element={<ClassDetailsPage />} />
+        <Route path="/class/:id" element={<ClassDetailsPage />} />
       </Routes>
     </Provider>
   );

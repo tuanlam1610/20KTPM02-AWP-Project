@@ -2,10 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 
 interface TeacherSliceInterface {
   classes: {
-    name: string,
-    description: string,
-    courseImg: string,
-  }[]
+    name: string;
+    description: string;
+    courseImg: string;
+  }[];
 }
 
 const initialState: TeacherSliceInterface = {
@@ -70,11 +70,11 @@ const initialState: TeacherSliceInterface = {
     //   courseImg:
     //     'https://cdn.sanity.io/images/qyzm5ged/production/4fe5252b1031f0520fc5a58fc109749e01972381-2138x1200.jpg',
     // },
-  ]
+  ],
 };
 
 const teacherSlice = createSlice({
-  name: 'schedule',
+  name: 'teacher',
   initialState,
   reducers: {
     addClass: (state, action) => {

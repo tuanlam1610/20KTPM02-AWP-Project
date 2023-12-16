@@ -5,14 +5,14 @@ import CreateClassModal from './components/Modals/CreateClassModal';
 import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
-  const classes = useAppSelector((state) => state.teacher.classes)
-  const navigate = useNavigate()
+  const classes = useAppSelector((state) => state.teacher.classes);
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
-        <div className='flex justify-between items-center'>
+        <div className="flex justify-between items-center">
           <p className="text-4xl font-semibold mb-4">All Courses</p>
           <CreateClassModal />
         </div>
@@ -30,7 +30,7 @@ export default function HomePage() {
                 className="flex flex-col w-1/5 min-h-[50vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
                 onClick={() => {
-                  navigate(`/classDetails/${index}`)
+                  navigate(`/class/${index}`);
                 }}
               >
                 <img src={course.courseImg} className="h-1/2 object-contain" />
