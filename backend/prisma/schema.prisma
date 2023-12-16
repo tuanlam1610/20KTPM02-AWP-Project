@@ -11,8 +11,9 @@ datasource db {
   //directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
+//Module
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -23,5 +24,179 @@ model User {
   hash     String
   hashedRt String?
 
+  type      String
+  studentId Student?
+  teacherId Teacher?
+  adminId   Admin?
+
   isEmailConfirm Boolean @default(false)
+  isLocked       Boolean @default(false)
+  isBanned       Boolean @default(false)
+
+  comment Comment[]
+}
+
+//Module
+model Student {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user                      User?                       @relation(fields: [userId], references: [id])
+  userId                    String?                     @unique // 1:1 relation between User and Student
+  classMember               ClassMember[]
+  classInvitationForStudent ClassInvitationForStudent[]
+  studentGrade              StudentGrade[]
+  gradeReview               GradeReview[]
+}
+
+//Module
+model Teacher {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user                      User?                       @relation(fields: [userId], references: [id])
+  userId                    String?                     @unique
+  classTeacher              ClassTeacher[]
+  classInvitationForTeacher ClassInvitationForTeacher[]
+  gradeReview               GradeReview[]
+}
+
+//Module
+model Admin {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @unique
+}
+
+//Class //Module
+model Class {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name           String
+  description    String?
+  code           String  @unique //Need to be generated
+  invitationLink String  @unique
+
+  gradeCompositions GradeComposition[]
+
+  classTeacher              ClassTeacher[]
+  classInvitationForTeacher ClassInvitationForTeacher[]
+  classMember               ClassMember[]
+  classInvitationForStudent ClassInvitationForStudent[]
+}
+
+model ClassTeacher {
+  class     Class   @relation(fields: [classId], references: [id])
+  classId   String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  teacherId String
+
+  @@id([classId, teacherId])
+}
+
+model ClassMember {
+  class     Class   @relation(fields: [classId], references: [id])
+  classId   String
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+
+  @@id([classId, studentId])
+}
+
+model ClassInvitationForTeacher {
+  invitedTeacher Teacher @relation(fields: [teacherId], references: [id])
+  teacherId      String
+  class          Class   @relation(fields: [classId], references: [id])
+  classId        String
+
+  invitedTime DateTime @default(now())
+
+  @@id([classId, teacherId])
+}
+
+model ClassInvitationForStudent {
+  invitedStudent Student @relation(fields: [studentId], references: [id])
+  studentId      String
+  class          Class   @relation(fields: [classId], references: [id])
+  classId        String
+
+  invitedTime DateTime @default(now())
+
+  @@id([classId, studentId])
+}
+
+//Grade composition //Module
+model GradeComposition {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  percentage  Float
+  rank        Int
+  isFinalized Boolean @default(false)
+
+  class   Class  @relation(fields: [classId], references: [id])
+  classId String
+
+  studentGrades StudentGrade[]
+}
+
+//Module
+model StudentGrade {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gradeComposition   GradeComposition @relation(fields: [gradeCompositionId], references: [id])
+  gradeCompositionId String
+  student            Student          @relation(fields: [studentId], references: [id])
+  studentId          String
+  grade              Int
+  gradeReview        GradeReview[]
+}
+
+//Module
+model GradeReview {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  currentGrade  Float
+  expectedGrade Float
+  finalGrade    Float?
+
+  explanation String?
+
+  comment Comment[]
+
+  student   Student @relation(fields: [studentId], references: [id])
+  studentId String
+  teacher   Teacher @relation(fields: [teacherId], references: [id])
+  teacherId String
+
+  studentGrade   StudentGrade @relation(fields: [studentGradeId], references: [id])
+  studentGradeId String
+}
+
+//Module
+model Comment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gradeReview   GradeReview @relation(fields: [gradeReviewId], references: [id])
+  gradeReviewId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  content String
 }

@@ -29,7 +29,7 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
-  async getTokens(userId: number, email: string): Promise<Tokens> {
+  async getTokens(userId: string, email: string): Promise<Tokens> {
     const AT_SECRET_KEY = this.configService.get<string>('AT_SECRET_KEY');
     const RT_SECRET_KEY = this.configService.get<string>('RT_SECRET_KEY');
     const [at, rt] = await Promise.all([
@@ -54,7 +54,7 @@ export class AuthService {
     };
   }
 
-  async updateRtHash(userId: number, rt: string) {
+  async updateRtHash(userId: string, rt: string) {
     const hash = await this.hashData(rt);
     await this.prisma.user.update({
       where: { id: userId },
@@ -88,6 +88,8 @@ export class AuthService {
         hash: hash,
         name: dto.name,
         dob: dto.dob,
+        type: 'student', //TODO CHANGE LATER
+        comment: undefined,
       },
     });
     return STATUS_CODES.OK;
@@ -124,6 +126,8 @@ export class AuthService {
             hash: 'google',
             name: decodedToken.name,
             isEmailConfirm: true,
+            type: 'student', //TODO CHANGE LATER
+            comment: undefined,
           },
         });
       } else {
@@ -150,6 +154,8 @@ export class AuthService {
           hash: 'facebook',
           name: decodedToken.name,
           isEmailConfirm: true,
+          type: 'student', //TODO CHANGE LATER
+          comment: undefined,
         },
       });
     }
@@ -159,13 +165,13 @@ export class AuthService {
     return tokens;
   }
 
-  async logout(userId: number) {
+  async logout(userId: string) {
     await this.prisma.user.updateMany({
       where: { id: userId, hashedRt: { not: null } },
       data: { hashedRt: null },
     });
   }
-  async refreshTokens(userId: number, rt: string): Promise<Tokens> {
+  async refreshTokens(userId: string, rt: string): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,

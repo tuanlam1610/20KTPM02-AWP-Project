@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserEntity implements User {
   @ApiProperty()
-  id: number;
+  id: string;
 
   @ApiProperty()
   email: string;
@@ -19,14 +19,34 @@ export class UserEntity implements User {
   @ApiProperty()
   hash: string;
 
+  @ApiProperty({ required: false })
+  hashedRt: string;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty({ required: false })
+  studentId?: string;
+  @ApiProperty({ required: false })
+  teacherId?: string;
+  @ApiProperty({ required: false })
+  adminId?: string;
+
+  @ApiProperty()
+  comment?: string[];
+
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
   updatedAt: Date;
 
-  hashedRt: string;
-
   @ApiProperty()
   isEmailConfirm: boolean = false;
+
+  @ApiProperty()
+  isLocked: boolean = false;
+
+  @ApiProperty()
+  isBanned: boolean = false;
 }
