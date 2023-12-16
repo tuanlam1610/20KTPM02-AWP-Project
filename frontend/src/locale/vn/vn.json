@@ -1,0 +1,27 @@
+{
+  "signInPage": {
+    "signIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "welcome": "Chào mừng tới HQL Education",
+    "googleSignIn": "Tiếp tục với Google",
+    "fbSignIn": "Tiếp tục với Facebook",
+    "or": "Hoặc",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "rememberMe": "Duy trì đăng nhập",
+    "forgetPassword": "Quên mật khẩu?",
+    "notHaveAccount": "Đã có tài khoản?",
+    "signInFail": "Đăng nhập thất bại",
+    "signInFailDescription": "Email và mật khẩu không chính xác. Vui lòng kiểm tra lại.",
+    "fillInInformation": "Nhập thông tin",
+    "emailRequired": "Vui lòng nhập email!",
+    "passwordRequired": "Vui lòng nhập mật khẩu!",
+    "emailInvalid": "Email không hợp lệ. Ví dụ: example@email.com",
+    "emailVerification": "Xác thực email",
+    "activateAccount": "Kích hoạt tài khoản",
+    "sendEmailTo": "Mail đã được gửi đến",
+    "activateAccountContent": "Vui lòng nhấp vào liên kết trong email để kích hoạt tài khoản của bạn.\n Liên kết trong thư sẽ hết hạn sau 5 phút.\n Đừng quên kiểm tra phần thư rác!",
+    "notRecieveMail": "Không nhận được mail?",
+    "resend": "Gửi lại"
+  }
+}

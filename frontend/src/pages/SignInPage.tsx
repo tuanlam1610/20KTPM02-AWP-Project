@@ -18,6 +18,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth, fbAuthProvider, googleAuthProvider } from '../../firebase';
 import loginImg from '../assets/imgs/Login-amico.png';
 import wave from '../assets/imgs/wave.svg';
+import { t } from 'i18next';
 
 type FieldType = {
   email?: string;
@@ -78,9 +79,8 @@ export default function SignInPage() {
   });
   const openNotification = () => {
     api['error']({
-      message: 'Sign In Failed',
-      description:
-        'The email and password you entered did not match our records. Please double-check and try again.',
+      message: t('text.signInPage.signInFail'),
+      description: t('text.signInPage.signInFailDescription'),
       duration: 2,
     });
   };
@@ -120,12 +120,12 @@ export default function SignInPage() {
 
   const steps = [
     {
-      title: 'Fill In Information',
+      title: t('text.signInPage.fillInInformation'),
       content: (
         <div className="flex flex-col flex-1 justify-center items-center overflow-auto">
           {/* {isSubmitting && <Spin />} */}
           <h1 className="uppercase font-semibold text-2xl text-center my-4">
-            Sign In
+            {t('text.signInPage.signIn')}
           </h1>
           <div className="w-2/3 min-w-fit flex justify-center">
             <Button
@@ -133,7 +133,7 @@ export default function SignInPage() {
               onClick={handleSignInWithGG}
             >
               <GoogleOutlined />
-              <p className="w-1/2 flex">Continue with Google</p>
+              <p className="w-1/2 flex">{t('text.signInPage.googleSignIn')}</p>
             </Button>
           </div>
           <div className="w-2/3 min-w-fit flex justify-center">
@@ -142,10 +142,10 @@ export default function SignInPage() {
               onClick={handleSignInWithFB}
             >
               <FacebookOutlined />
-              <p className="w-1/2 flex">Continue with Facebook</p>
+              <p className="w-1/2 flex">{t('text.signInPage.fbSignIn')}</p>
             </Button>
           </div>
-          <p className="mt-4">Or</p>
+          <p className="mt-4">{t('text.signInPage.or')}</p>
           <Form
             form={form}
             className="mt-4 w-2/3 min-w-fit"
@@ -163,11 +163,11 @@ export default function SignInPage() {
               rules={[
                 {
                   required: true,
-                  message: 'Please enter your email!',
+                  message: t('text.signInPage.emailRequired'),
                 },
                 {
                   pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
-                  message: 'Invalid email. Example: example@email.com',
+                  message: t('text.signInPage.emailInvalid'),
                 },
               ]}
               name={'email'}
@@ -179,12 +179,17 @@ export default function SignInPage() {
             <Form.Item<FieldType>
               label="Password"
               rules={[
-                { required: true, message: 'Please enter your password!' },
+                {
+                  required: true,
+                  message: t('text.signInPage.passwordRequired'),
+                },
               ]}
               name={'password'}
               className="w-full mb-2"
             >
-              <Input.Password placeholder="Enter your password" />
+              <Input.Password
+                placeholder={t('text.signInPage.passwordPlaceholder')}
+              />
             </Form.Item>
 
             <div className="w-full flex justify-between">
@@ -193,14 +198,14 @@ export default function SignInPage() {
                 name={'remember'}
                 className="w-fit mb-6"
               >
-                <Checkbox>Remember me</Checkbox>
+                <Checkbox>{t('text.signInPage.rememberMe')}</Checkbox>
               </Form.Item>
               <Link
                 to={'/recover'}
                 className="underline font-semibold p-2 hover:text-indigo-500"
               >
                 <p className="text-sm underline font-semibold">
-                  Forgot password?
+                  {t('text.signInPage.forgetPassword')}
                 </p>
               </Link>
             </div>
@@ -212,52 +217,48 @@ export default function SignInPage() {
                 className="flex justify-center items-center px-8 py-4 bg-indigo-500 rounded-full w-full"
                 loading={isSubmitting}
               >
-                <span>Sign In</span>
+                <span>{t('text.signInPage.signIn')}</span>
                 <ArrowRightOutlined className="text-sm flex justify-center items-center leading-none" />
               </Button>
             </Form.Item>
           </Form>
           <p className="text-sm">
-            Don't have an account?{' '}
+            {t('text.signInPage.forgetPassword')}
             <Link
               to={'/register'}
               className="underline font-semibold p-2 hover:text-indigo-500"
             >
-              Sign up
+              {t('text.signInPage.signUp')}
             </Link>
           </p>
         </div>
       ),
     },
     {
-      title: 'Email Verification',
+      title: t('text.signInPage.emailVerification'),
       content: (
         <div className="flex flex-col flex-1 justify-center items-center overflow-auto">
           <div className="w-2/3">
             <h1 className="uppercase font-semibold text-xl text-center my-4">
-              Activate Account
+              {t('text.signInPage.activateAccount')}
             </h1>
             <div>
               <MailOutlined className="text-4xl" />
             </div>
             <div className="my-4 w-full overflow-hidden flex flex-col gap-4 text-gray-700 text-sm">
-              <p>We've send a mail to</p>
+              <p>{t('text.signInPage.sendEmailTo')}</p>
               <p className="font-semibold text-lg">
                 {form.getFieldValue('email') != ''
                   ? form.getFieldValue('email')
                   : 'example@email.com'}
               </p>
               <div>
-                <p>
-                  Please click the link in your email to activate your account.
-                  The link in the mail will expire in 5 minutes.
-                </p>
-                <p> Don't forget to check your spam section!</p>
+                <p>{t('text.signInPage.activateAccountContent')}</p>
               </div>
               <p className="">
-                Didn't receive a mail?{' '}
+                {t('text.signInPage.activateAccountContent')}
                 <span className="underline text-indigo-500 font-semibold hover:cursor-pointer">
-                  Resend
+                  {t('text.signInPage.resend')}
                 </span>
               </p>
             </div>
@@ -285,7 +286,9 @@ export default function SignInPage() {
           <h1 className="uppercase font-semibold text-xl text-center">
             HQL Application
           </h1>
-          <p className=" mt-2 mb-4 text-sm text-center">Welcome to HQL</p>
+          <p className=" mt-2 mb-4 text-sm text-center">
+            {t('text.signInPage.welcome')}
+          </p>
           <img src={loginImg} className="object-contain box-border px-8" />
         </div>
         {/* Right Section */}
