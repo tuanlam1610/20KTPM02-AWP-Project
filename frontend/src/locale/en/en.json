@@ -1,0 +1,27 @@
+{
+  "signInPage": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "welcome": "Welcome to HQL Education",
+    "googleSignIn": "Continue with Google",
+    "fbSignIn": "Continue with Facebook",
+    "or": "Or",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgetPassword": "Forgot Password?",
+    "notHaveAccount": "Don't have an account?",
+    "signInFail": "Sign In Fail",
+    "signInFailDescription": "The email and password is incorrect. Please double-check and try again.",
+    "fillInInformation": "Fill In Information",
+    "emailRequired": "Please enter your email!",
+    "passwordRequired": "Please enter your password!",
+    "emailInvalid": "Invalid email. Example: example@email.com",
+    "emailVerification": "Email Verification",
+    "activateAccount": "Activate Account",
+    "sendEmailTo": "We've send a mail to",
+    "activateAccountContent": "Please click the link in your email to activate your account.\nThe link in the mail will expire in 5 minutes.\nDon't forget to check your spam section!",
+    "notRecieveMail": "Didn't receive a mail?",
+    "resend": "Resend"
+  }
+}

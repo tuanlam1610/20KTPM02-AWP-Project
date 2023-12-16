@@ -1,4 +1,4 @@
-import { EditOutlined, UserOutlined } from '@ant-design/icons';
+import { EditOutlined, LeftOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, DatePicker, Form, Input, Spin } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import dayjs from 'dayjs';
@@ -8,6 +8,7 @@ import { User } from '../interface';
 import axios from 'axios';
 import { setUserInfo } from '../redux/appSlice';
 import wave from '../assets/imgs/wave.svg';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserProfilePage() {
   const dispatch = useAppDispatch();
@@ -15,6 +16,11 @@ export default function UserProfilePage() {
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userInfo = useAppSelector((state) => state.app.userInfo);
+  const navigate = useNavigate();
+
+  const handleBackButton = () => {
+    navigate(-1);
+  };
 
   const onFinish = async (values: Omit<User, 'Id'>) => {
     try {
@@ -46,6 +52,13 @@ export default function UserProfilePage() {
   };
   return (
     <div className="flex justify-center h-[80vh] mt-8">
+      <Button
+        className="absolute top-16 left-4"
+        icon={<LeftOutlined />}
+        onClick={handleBackButton}
+      >
+        Back
+      </Button>
       <div className="w-1/2 rounded-xl shadow-2xl bg-white border-2 border-gray-300 overflow-hidden">
         <div className="flex flex-col justify-center items-center h-1/4 min-h-fit bg-[url('https://media.sproutsocial.com/uploads/1c_facebook-cover-photo_clean@2x.png')] ">
           <Avatar size={64} icon={<UserOutlined />} className="bg-indigo-500" />
