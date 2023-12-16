@@ -16,11 +16,11 @@ export default function UserProfilePage() {
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userInfo = useAppSelector((state) => state.app.userInfo);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleBackButton = () => {
-    navigate(-1)
-  }
+    navigate(-1);
+  };
 
   const onFinish = async (values: Omit<User, 'Id'>) => {
     try {
@@ -51,8 +51,14 @@ export default function UserProfilePage() {
     console.log('Failed:', errorInfo);
   };
   return (
-    <div className="flex justify-center h-[80vh] mt-8 relative">
-      <Button className='absolute top-0 left-4' icon={<LeftOutlined />} onClick={handleBackButton}>Back</Button>
+    <div className="flex justify-center h-[80vh] mt-8">
+      <Button
+        className="absolute top-16 left-4"
+        icon={<LeftOutlined />}
+        onClick={handleBackButton}
+      >
+        Back
+      </Button>
       <div className="w-1/2 rounded-xl shadow-2xl bg-white border-2 border-gray-300 overflow-hidden">
         <div className="flex flex-col justify-center items-center h-1/4 min-h-fit bg-[url('https://media.sproutsocial.com/uploads/1c_facebook-cover-photo_clean@2x.png')] ">
           <Avatar size={64} icon={<UserOutlined />} className="bg-indigo-500" />
