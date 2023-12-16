@@ -10,6 +10,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import { appStore } from './redux/store';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ActivateEmailPage from './pages/ActivateEmailPage';
+import './locale/i18n';
 
 function App() {
   return (
@@ -22,8 +23,8 @@ function App() {
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/recover" element={<RecoverPasswordPage />} />
         <Route path="/profile" element={<UserProfilePage />} />
-        <Route path='/resetPassword' element={<ResetPasswordPage />} />
-        <Route path='/activateEmail' element={<ActivateEmailPage />} />
+        <Route path="/resetPassword" element={<ResetPasswordPage />} />
+        <Route path="/activateEmail" element={<ActivateEmailPage />} />
       </Routes>
     </Provider>
   );
