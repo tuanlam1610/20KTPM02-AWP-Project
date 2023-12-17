@@ -19,7 +19,7 @@ export class GradeCompositionsService {
         );
       }
 
-      const fetchedStudentsGrade = await this.prisma.studentGrade.findMany({
+      const fetchedStudentsGrade = await this.prisma.student.findMany({
         where: { id: { in: createGradeCompositionDto.studentGrades } },
       });
 
@@ -43,7 +43,10 @@ export class GradeCompositionsService {
           isFinalized: createGradeCompositionDto.isFinalized,
           class: { connect: { id: fetchedClass.id } },
           studentGrades: {
-            connect: fetchedStudentsGrade.map((sg) => ({ id: sg.id })),
+            create: fetchedStudentsGrade.map((sg) => ({
+              student: { connect: { id: sg.id } },
+              grade: 0,
+            })),
           },
         },
       });
@@ -93,7 +96,7 @@ export class GradeCompositionsService {
         );
       }
 
-      const fetchedStudentsGrade = await this.prisma.studentGrade.findMany({
+      const fetchedStudentsGrade = await this.prisma.student.findMany({
         where: { id: { in: updateGradeCompositionDto.studentGrades } },
       });
 
@@ -119,7 +122,12 @@ export class GradeCompositionsService {
             isFinalized: updateGradeCompositionDto.isFinalized,
             class: { connect: { id: fetchedClass.id } },
             studentGrades: {
-              set: fetchedStudentsGrade.map((sg) => ({ id: sg.id })),
+              //"set"
+              create: fetchedStudentsGrade.map((sg) => ({
+                student: { connect: { id: sg.id } },
+                grade: 0,
+              })),
+              //Wat the hell was "set"
             },
           },
         },

@@ -12,24 +12,31 @@ export class StudentsService {
     // Batch fetch related entities
     const batchedFetch = await Promise.all([
       createStudentDto.classMember
-        ? this.prisma.classMember.findMany({
-            where: { studentId: { in: createStudentDto.classMember } },
+        ? this.prisma.class.findMany({
+            where: { id: { in: createStudentDto.classMember } },
           })
         : [],
       createStudentDto.classInvitationForStudent
-        ? this.prisma.classInvitationForStudent.findMany({
+        ? this.prisma.class.findMany({
             where: {
-              studentId: { in: createStudentDto.classInvitationForStudent },
+              id: { in: createStudentDto.classInvitationForStudent },
             },
           })
         : [],
       createStudentDto.studentGrade
-        ? this.prisma.studentGrade.findMany({
+        ? this.prisma.gradeComposition.findMany({
             where: {
               id: { in: createStudentDto.studentGrade },
             },
           })
         : [],
+      // createStudentDto.studentGrade
+      // ? this.prisma.studentGrade.findMany({
+      //     where: {
+      //       id: { in: createStudentDto.studentGrade },
+      //     },
+      //   })
+      // : [],
       createStudentDto.gradeReview
         ? this.prisma.gradeReview.findMany({
             where: { id: { in: createStudentDto.gradeReview } },
@@ -47,9 +54,15 @@ export class StudentsService {
     return this.prisma.student.create({
       data: {
         ...createStudentDto,
+
         studentGrade: {
-          connect: fetchedStudentGrade.map((sg) => ({ id: sg.id })),
+          //TEST: Grade might be missing
+          create: fetchedStudentGrade.map((sg) => ({
+            gradeComposition: { connect: { id: sg.id } },
+            grade: 0,
+          })),
         },
+        //TODO: OTM CASE
         gradeReview: {
           connect: fetchedGradeReview.map((gr) => ({
             id: gr.id,
@@ -57,18 +70,14 @@ export class StudentsService {
         },
 
         classMember: {
-          connect: fetchedClassMember.map((cm) => ({
-            classId_studentId: {
-              studentId: cm.studentId,
-              classId: cm.classId,
-            },
+          create: fetchedClassMember.map((cm) => ({
+            class: { connect: { id: cm.id } },
           })),
         },
         classInvitationForStudent: {
-          connect: fetchedClassInvitationForStudent.map((cifs) => ({
-            classId_studentId: {
-              studentId: cifs.studentId,
-              classId: cifs.classId,
+          create: fetchedClassInvitationForStudent.map((cifs) => ({
+            class: {
+              connect: { id: cifs.id },
             },
           })),
         },
@@ -98,24 +107,31 @@ export class StudentsService {
   async update(id: string, updateStudentDto: UpdateStudentDto) {
     const batchedFetch = await Promise.all([
       updateStudentDto.classMember
-        ? this.prisma.classMember.findMany({
-            where: { studentId: { in: updateStudentDto.classMember } },
+        ? this.prisma.class.findMany({
+            where: { id: { in: updateStudentDto.classMember } },
           })
         : [],
       updateStudentDto.classInvitationForStudent
-        ? this.prisma.classInvitationForStudent.findMany({
+        ? this.prisma.class.findMany({
             where: {
-              studentId: { in: updateStudentDto.classInvitationForStudent },
+              id: { in: updateStudentDto.classInvitationForStudent },
             },
           })
         : [],
       updateStudentDto.studentGrade
-        ? this.prisma.studentGrade.findMany({
+        ? this.prisma.gradeComposition.findMany({
             where: {
               id: { in: updateStudentDto.studentGrade },
             },
           })
         : [],
+      // updateStudentDto.studentGrade
+      // ? this.prisma.studentGrade.findMany({
+      //     where: {
+      //       id: { in: updateStudentDto.studentGrade },
+      //     },
+      //   })
+      // : [],
       updateStudentDto.gradeReview
         ? this.prisma.gradeReview.findMany({
             where: { id: { in: updateStudentDto.gradeReview } },
@@ -135,26 +151,28 @@ export class StudentsService {
       data: {
         ...updateStudentDto,
         studentGrade: {
-          connect: fetchedStudentGrade.map((sg) => ({ id: sg.id })),
+          //TEST: Grade might be missing
+          create: fetchedStudentGrade.map((sg) => ({
+            gradeComposition: { connect: { id: sg.id } },
+            grade: sg.grade,
+          })),
         },
+        //TODO: OTM CASE
         gradeReview: {
           connect: fetchedGradeReview.map((gr) => ({
             id: gr.id,
           })),
         },
+
         classMember: {
-          connect: fetchedClassMember.map((cm) => ({
-            classId_studentId: {
-              studentId: cm.studentId,
-              classId: cm.classId,
-            },
+          create: fetchedClassMember.map((cm) => ({
+            class: { connect: { id: cm.id } },
           })),
         },
         classInvitationForStudent: {
-          connect: fetchedClassInvitationForStudent.map((cifs) => ({
-            classId_studentId: {
-              studentId: cifs.studentId,
-              classId: cifs.classId,
+          create: fetchedClassInvitationForStudent.map((cifs) => ({
+            class: {
+              connect: { id: cifs.id },
             },
           })),
         },

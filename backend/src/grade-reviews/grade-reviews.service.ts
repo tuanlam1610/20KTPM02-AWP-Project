@@ -148,6 +148,7 @@ export class GradeReviewsService {
           finalGrade: updateGradeReviewDto.finalGrade,
           explanation: updateGradeReviewDto.explanation,
           comment: {
+            //Todo: comment might not be related
             connect: fetchedComment.map((sg) => ({ id: sg.id })),
           },
           student: { connect: { id: fetchedStudent.id } },
