@@ -11,6 +11,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
+import { Provider } from 'react-redux';
+import { appStore } from './redux/store.ts';
 
 dayjs.extend(updateLocale);
 dayjs.updateLocale('en', {
@@ -25,8 +27,10 @@ dayjs.extend(minMax);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <Provider store={appStore}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 );

@@ -1,23 +1,21 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, MenuProps } from 'antd';
-import { useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Logo from '../../assets/imgs/Logo.png';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
-import axios from 'axios';
 import { setUserInfo } from '../../redux/appSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname.replace('/', '');
   const userInfo = useAppSelector((state) => state.app.userInfo);
+  const role = 'teacher';
   const items: MenuProps['items'] = [
     {
       key: '1',
       label: (
-        <Link to={'/profile'} className={`flex gap-4`}>
+        <Link to={`${role}/profile`} className={`flex gap-4`}>
           <UserOutlined />
           <p>User Profile</p>
         </Link>
@@ -42,39 +40,6 @@ export default function Navbar() {
     },
   ];
 
-  const getUserProfile = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/getUserProfile`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-        },
-      );
-      console.log(res);
-      dispatch(setUserInfo(res.data));
-      console.log(userInfo);
-    } catch (error) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      dispatch(setUserInfo(undefined));
-      navigate('/');
-    }
-  };
-
-  useEffect(() => {
-    if (!['', 'login', 'register', 'recover', "resetPassword", "activateEmail"].includes(pathName)) {
-      if (!localStorage.getItem('refreshToken')) navigate('/');
-      else {
-        if (!userInfo) {
-          console.log('Get Profile');
-          getUserProfile();
-        }
-      }
-    }
-  });
-
   return (
     <div className="flex items-center justify-between h-12 shadow-lg sticky">
       <Link to={'/'} className="flex h-full items-center gap-2 mx-4">
@@ -85,7 +50,7 @@ export default function Navbar() {
         />
         <h1 className="uppercase font-semibold text-lg">Edu</h1>
       </Link>
-      {pathName == '' && (
+      {['', 'landing'].includes(pathName) && (
         <div className="flex gap-2 justify-between mx-4">
           <Link to={`login`}>
             <Button type="primary" className="bg-indigo-500 px-8 rounded-full">

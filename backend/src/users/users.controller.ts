@@ -37,21 +37,27 @@ export class UsersController {
   }
 
   @Post()
+  @ApiBearerAuth('jwt')
   @ApiCreatedResponse({ type: UserEntity })
+  @HttpCode(HttpStatus.OK)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
   @ApiOkResponse({ type: UserEntity })
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: string) {
-    const user = await this.usersService.findOne(+id);
+    const user = await this.usersService.findOne(id);
 
     if (!user) {
       throw new NotFoundException(`Could not find article with ${id}.`);
@@ -61,13 +67,17 @@ export class UsersController {
 
   @Patch(':id')
   @ApiOkResponse({ type: UserEntity })
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: UserEntity })
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

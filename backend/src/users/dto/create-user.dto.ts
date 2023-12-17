@@ -12,4 +12,10 @@ export class CreateUserDto {
 
   @ApiProperty({ required: false })
   dob?: Date;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty({ required: false })
+  comment;
 }

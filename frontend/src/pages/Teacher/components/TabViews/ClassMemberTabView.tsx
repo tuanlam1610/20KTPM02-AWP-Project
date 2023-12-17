@@ -27,7 +27,6 @@ export default function ClassMemberTabView() {
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/class/${classId}/getMembers`,
       );
-      console.log(res);
       return res;
     } catch (err) {
       const sampleMembers = [
@@ -91,7 +90,6 @@ export default function ClassMemberTabView() {
           <div>
             {members.teachers.map((teacher, index) => {
               const bgColor = randomBg();
-              console.log(bgColor);
               return (
                 <div>
                   <div className="flex justify-between items-center p-4">
@@ -121,7 +119,7 @@ export default function ClassMemberTabView() {
             </h1>
             <div className="flex gap-4">
               <p className="text-lg font-semibold text-indigo-500 me-2">
-                {`${members.students.length} teachers`}
+                {`${members.students.length} students`}
               </p>
               {/* Invite */}
               <InviteMemberModal type="student" />
@@ -131,7 +129,6 @@ export default function ClassMemberTabView() {
           <div>
             {members.students.map((student, index) => {
               const bgColor = randomBg();
-              console.log(bgColor);
               return (
                 <div>
                   <div className="flex justify-between items-center p-4">

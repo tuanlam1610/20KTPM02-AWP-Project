@@ -19,6 +19,8 @@ import { auth, fbAuthProvider, googleAuthProvider } from '../../firebase';
 import loginImg from '../assets/imgs/Login-amico.png';
 import wave from '../assets/imgs/wave.svg';
 import { t } from 'i18next';
+import { setUserInfo } from '../redux/appSlice';
+import { useAppDispatch } from '../redux/store';
 
 type FieldType = {
   email?: string;
@@ -28,6 +30,7 @@ type FieldType = {
 
 export default function SignInPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [form] = useForm();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +47,33 @@ export default function SignInPage() {
       console.log(err);
     }
   };
+
+  const getUserProfile = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/getUserProfile`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        },
+      );
+      dispatch(setUserInfo(res.data));
+      console.log(res);
+      navigate(`/${res?.data?.type}/home`);
+      setIsSubmitting(false);
+      document.body.style.cursor = 'default';
+    } catch (error) {
+      console.log(error);
+      setIsSubmitting(false);
+      document.body.style.cursor = 'default';
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      dispatch(setUserInfo(undefined));
+      navigate('/');
+    }
+  };
+
   const onFinish = async (values: FieldType) => {
     try {
       setIsSubmitting(true);
@@ -54,9 +84,7 @@ export default function SignInPage() {
       );
       localStorage.setItem('refreshToken', signInResult.data.refreshToken);
       localStorage.setItem('accessToken', signInResult.data.accessToken);
-      navigate('/home');
-      setIsSubmitting(false);
-      document.body.style.cursor = 'default';
+      await getUserProfile();
     } catch (err: any) {
       console.log(err.response.data.message);
       if (
