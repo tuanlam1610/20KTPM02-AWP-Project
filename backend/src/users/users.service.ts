@@ -3,6 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+//TODO
+// GO TO EACH CONTROLLER AND ADD PROPER TAG FOR SWAGGER
+// ADD PROPER RESPONSE CODE
+// ADD ADMINS STUFF
+// ADD AUTHORIZATION
 //helper
 function exclude<User, Key extends keyof User>(
   user: User,
