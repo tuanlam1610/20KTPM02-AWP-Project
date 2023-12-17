@@ -11,6 +11,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import ActivateEmailPage from './pages/ActivateEmailPage';
 import TeacherHomePage from './pages/Teacher/HomePage';
 import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
+import './locale/i18n';
 
 function App() {
   return (
