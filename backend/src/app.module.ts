@@ -20,6 +20,8 @@ import { ClassesModule } from './classes/classes.module';
 import { GradeCompositionsModule } from './grade-compositions/grade-compositions.module';
 import { GradeReviewsModule } from './grade-reviews/grade-reviews.module';
 import { CommentsModule } from './comments/comments.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -41,6 +43,14 @@ import { CommentsModule } from './comments/comments.module';
     CommentsModule,
   ],
   controllers: [AppController, EmailConfirmationController, StudentsController],
-  providers: [AppService, EmailConfirmationService, StudentsService],
+  providers: [
+    AppService,
+    EmailConfirmationService,
+    StudentsService,
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+  ],
 })
 export class AppModule {}

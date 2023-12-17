@@ -14,7 +14,7 @@ export class CreateUserDto {
   dob?: Date;
 
   @ApiProperty()
-  type: string;
+  roles: string[];
 
   @ApiProperty({ required: false })
   comment;

@@ -24,7 +24,7 @@ model User {
   hash     String
   hashedRt String?
 
-  type      String
+  roles     String[] @default([])
   studentId Student?
   teacherId Teacher?
   adminId   Admin?
