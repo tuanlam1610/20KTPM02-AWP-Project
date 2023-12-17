@@ -9,6 +9,8 @@ import {
   Query,
   BadRequestException,
   Get,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ResendVerificationDto } from './dto/confirmEmail.dto';
 import { EmailConfirmationService } from './email-confirmation.service';
@@ -16,8 +18,10 @@ import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { STATUS_CODES } from 'http';
 import { NewPasswordDto } from 'src/auth/dto/auth.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('email-confirmation')
+@ApiTags('email-confirmation')
 @UseInterceptors(ClassSerializerInterceptor)
 export class EmailConfirmationController {
   constructor(
@@ -27,6 +31,7 @@ export class EmailConfirmationController {
   ) {}
 
   @Get('confirm') //TODO CHANGE HANDLE
+  @HttpCode(HttpStatus.OK)
   async confirm(@Query('token') token: string) {
     if (!token) {
       throw new BadRequestException('Token must be provided');
@@ -41,6 +46,7 @@ export class EmailConfirmationController {
     return tokens;
   }
   @Post('confirm-password-reset')
+  @HttpCode(HttpStatus.OK)
   async confirmResetPassword(
     @Query('token') token: string,
     @Body() newPasswordDto: NewPasswordDto,
@@ -59,6 +65,7 @@ export class EmailConfirmationController {
     return STATUS_CODES.OK;
   }
   @Post('resendVerification')
+  @HttpCode(HttpStatus.OK)
   async sendEmail(@Body() registrationData: ResendVerificationDto) {
     const user = this.usersService.findOneByEmail(registrationData.email);
     if (!user) throw new BadRequestException('User not found');

@@ -37,18 +37,21 @@ export class StudentsController {
 
   @Post()
   @ApiCreatedResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
   create(@Body() createUserDto: CreateStudentDto) {
     return this.studentsService.create(createUserDto);
   }
 
   @Get()
   @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
   findAll() {
     return this.studentsService.findAll();
   }
 
   @Get(':id')
   @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
   async findOne(@Param('id') id: string) {
     const user = await this.studentsService.findOne(id);
 
@@ -60,12 +63,14 @@ export class StudentsController {
 
   @Patch(':id')
   @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updateStudentDto: CreateStudentDto) {
     return this.studentsService.update(id, updateStudentDto);
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
     return this.studentsService.remove(id);
   }
