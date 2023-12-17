@@ -5,19 +5,18 @@ import {
   LinkedinOutlined,
 } from '@ant-design/icons';
 import { Button, Carousel } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import carouselImg2 from '../assets/imgs/IDC_SocialShareIcon_1200x630.webp';
 import Logo from '../assets/imgs/Logo.png';
 import carouselImg1 from '../assets/imgs/Online-education-laptop.jpg';
 import contentImg from '../assets/imgs/contentImg.png';
 import carouselImg3 from '../assets/imgs/teenage-students-in-classroom--141090063-5af498bc6bf0690036889c1b.jpg';
-import { useEffect } from 'react';
 
 export default function LandingPage() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (localStorage.getItem('accessToken')) navigate('/home');
-  });
+  // const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (localStorage.getItem('accessToken')) navigate('/teacher/home');
+  // });
   const listContent = [
     {
       title: 'Online Learning',
