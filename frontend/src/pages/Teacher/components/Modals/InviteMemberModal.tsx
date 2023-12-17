@@ -38,7 +38,6 @@ export default function InviteMemberModal(props: { type: string }) {
   };
 
   const handleCancel = () => {
-    console.log('Clicked cancel button');
     form.resetFields();
     setOpen(false);
   };

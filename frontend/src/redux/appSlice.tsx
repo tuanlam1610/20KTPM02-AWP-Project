@@ -5,12 +5,14 @@ import { User } from '../interface/';
 interface AppState {
   loading: Loading;
   userInfo?: User;
+  userRole?: string;
   isAuthenticated: boolean;
 }
 
 const initialState: AppState = {
   loading: Loading.idle,
   userInfo: undefined,
+  userRole: undefined,
   isAuthenticated: false,
 };
 
@@ -27,11 +29,15 @@ const appSlice = createSlice({
     setIsAuthenticated: (state, action) => {
       state.isAuthenticated = action.payload;
     },
+    setUserRole: (state, action) => {
+      state.userRole = action.payload;
+    },
   },
   extraReducers(builder) {
     builder;
   },
 });
 
-export const { setLoading, setUserInfo, setIsAuthenticated } = appSlice.actions;
+export const { setLoading, setUserInfo, setIsAuthenticated, setUserRole } =
+  appSlice.actions;
 export default appSlice;

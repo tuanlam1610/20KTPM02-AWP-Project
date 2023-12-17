@@ -4,7 +4,7 @@ import { useAppSelector } from '../../redux/store';
 import CreateClassModal from './components/Modals/CreateClassModal';
 import { useNavigate } from 'react-router-dom';
 
-export default function HomePage() {
+export default function TeacherHomePage() {
   const classes = useAppSelector((state) => state.teacher.classes);
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ export default function HomePage() {
                 className="flex flex-col w-1/5 min-h-[50vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
                 onClick={() => {
-                  navigate(`/class/${index}`);
+                  navigate(`/teacher/class/${index}`);
                 }}
               >
                 <img src={course.courseImg} className="h-1/2 object-contain" />

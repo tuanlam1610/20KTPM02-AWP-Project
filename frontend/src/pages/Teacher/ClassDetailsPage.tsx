@@ -7,14 +7,12 @@ import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
 
 export default function HomePage() {
   const params = useParams();
-  console.log(params);
   const classId: number = params.id ? Number(params.id) : 0;
   const classes = useAppSelector((state) => state.teacher.classes);
   const classDetails = classes[classId];
   const navigate = useNavigate();
 
   const handleCopyClassId = () => {
-    console.log('Copied Class Id');
     navigator.clipboard.writeText(`000${classId}`);
   };
 
