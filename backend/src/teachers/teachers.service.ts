@@ -9,14 +9,14 @@ export class TeachersService {
   async create(createTeacherDto: CreateTeacherDto) {
     const batchedFetch = await Promise.all([
       createTeacherDto.classTeacher
-        ? this.prisma.classTeacher.findMany({
-            where: { teacherId: { in: createTeacherDto.classTeacher } },
+        ? this.prisma.class.findMany({
+            where: { id: { in: createTeacherDto.classTeacher } },
           })
         : [],
       createTeacherDto.classInvitationForTeacher
-        ? this.prisma.classInvitationForTeacher.findMany({
+        ? this.prisma.class.findMany({
             where: {
-              teacherId: { in: createTeacherDto.classInvitationForTeacher },
+              id: { in: createTeacherDto.classInvitationForTeacher },
             },
           })
         : [],
@@ -37,18 +37,14 @@ export class TeachersService {
       data: {
         ...createTeacherDto,
         classTeacher: {
-          connect: fetchedClassTeacher.map((ct) => ({
-            classId_teacherId: {
-              teacherId: ct.teacherId,
-              classId: ct.classId,
-            },
+          create: fetchedClassTeacher.map((ct) => ({
+            class: { connect: { id: ct.id } },
           })),
         },
         classInvitationForTeacher: {
-          connect: fetchedClassInvitationForTeacher.map((cifs) => ({
-            classId_teacherId: {
-              teacherId: cifs.teacherId,
-              classId: cifs.classId,
+          create: fetchedClassInvitationForTeacher.map((cift) => ({
+            class: {
+              connect: { id: cift.id },
             },
           })),
         },
@@ -73,14 +69,14 @@ export class TeachersService {
   async update(id: string, updateTeacherDto: UpdateTeacherDto) {
     const batchedFetch = await Promise.all([
       updateTeacherDto.classTeacher
-        ? this.prisma.classTeacher.findMany({
-            where: { teacherId: { in: updateTeacherDto.classTeacher } },
+        ? this.prisma.class.findMany({
+            where: { id: { in: updateTeacherDto.classTeacher } },
           })
         : [],
       updateTeacherDto.classInvitationForTeacher
-        ? this.prisma.classInvitationForTeacher.findMany({
+        ? this.prisma.class.findMany({
             where: {
-              teacherId: { in: updateTeacherDto.classInvitationForTeacher },
+              id: { in: updateTeacherDto.classInvitationForTeacher },
             },
           })
         : [],
@@ -102,21 +98,18 @@ export class TeachersService {
       data: {
         ...updateTeacherDto,
         classTeacher: {
-          connect: fetchedClassTeacher.map((ct) => ({
-            classId_teacherId: {
-              teacherId: ct.teacherId,
-              classId: ct.classId,
-            },
+          create: fetchedClassTeacher.map((ct) => ({
+            class: { connect: { id: ct.id } },
           })),
         },
         classInvitationForTeacher: {
-          connect: fetchedClassInvitationForTeacher.map((cifs) => ({
-            classId_teacherId: {
-              teacherId: cifs.teacherId,
-              classId: cifs.classId,
+          create: fetchedClassInvitationForTeacher.map((cift) => ({
+            class: {
+              connect: { id: cift.id },
             },
           })),
         },
+
         gradeReview: {
           connect: fetchedGradeReview.map((gr) => ({
             id: gr.id,

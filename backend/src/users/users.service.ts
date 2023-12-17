@@ -186,7 +186,9 @@ export class UsersService {
       const updateData: any = {
         ...updateUserDto,
         comment: {
-          connect: fetchedComment.map((c) => ({ id: c.id })),
+          create: fetchedComment.map((c) => ({
+            userId: { connect: { id: c.id } },
+          })),
         },
       };
 

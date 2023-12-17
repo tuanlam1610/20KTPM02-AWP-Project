@@ -16,6 +16,7 @@ export class CreateGradeCompositionDto {
   @ApiProperty()
   classId: string;
 
+  //TODO chjange students grade from array of strings to array of Map id To Grade {id: , grade:}
   @ApiProperty({ type: [String] })
   studentGrades: string[];
 }

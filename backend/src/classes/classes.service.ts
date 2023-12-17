@@ -67,32 +67,26 @@ export class ClassesService {
         gradeCompositions: {
           connect: fetchedGradeCompositions.map((gc) => ({ id: gc.id })),
         },
+        //TODO rework all tehse connection.
         classTeacher: {
-          connect: fetchedClassTeachers.map((ct) => ({
-            classId_teacherId: { teacherId: ct.teacherId, classId: ct.classId },
+          create: fetchedClassTeachers.map((ct) => ({
+            teacher: { connect: { id: ct.id } },
           })),
         },
         classInvitationForTeacher: {
-          connect: fetchedClassInvitationForTeachers.map((cit) => ({
-            classId_teacherId: {
-              teacherId: cit.teacherId,
-              classId: cit.classId,
-            },
+          create: fetchedClassInvitationForTeachers.map((cit) => ({
+            invitedTeacher: { connect: { id: cit.id } },
           })),
         },
         classMember: {
-          connect: fetchedClassMembers.map((cm) => ({
-            classId_studentId: {
-              studentId: cm.studentId,
-              classId: cm.classId,
-            },
+          create: fetchedClassMembers.map((cm) => ({
+            student: { connect: { id: cm.id } },
           })),
         },
         classInvitationForStudent: {
-          connect: fetchedClassInvitationForStudents.map((cifs) => ({
-            classId_studentId: {
-              studentId: cifs.studentId,
-              classId: cifs.classId,
+          create: fetchedClassInvitationForStudents.map((cifs) => ({
+            invitedStudent: {
+              connect: { id: cifs.id },
             },
           })),
         },
