@@ -11,6 +11,7 @@ import {
   HttpCode,
   Req,
   HttpStatus,
+  SetMetadata,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,12 +23,15 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/auth/enum/roles.enum';
+import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Get('getUserProfile')
   @ApiBearerAuth('jwt')
   @HttpCode(HttpStatus.OK)
@@ -36,8 +40,10 @@ export class UsersController {
     return this.usersService.findOne(user['sub']);
   }
 
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
   @ApiBearerAuth('jwt')
+  @Roles(Role.ADMIN)
   @ApiCreatedResponse({ type: UserEntity })
   @HttpCode(HttpStatus.OK)
   create(@Body() createUserDto: CreateUserDto) {

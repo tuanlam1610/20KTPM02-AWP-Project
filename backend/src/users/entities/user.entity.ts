@@ -23,7 +23,7 @@ export class UserEntity implements User {
   hashedRt: string;
 
   @ApiProperty()
-  type: string;
+  roles: string[];
 
   @ApiProperty({ required: false })
   studentId?: string;

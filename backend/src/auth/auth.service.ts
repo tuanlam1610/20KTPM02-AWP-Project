@@ -16,6 +16,7 @@ import { Tokens } from './types';
 import { ConfigService } from '@nestjs/config';
 import { STATUS_CODES } from 'http';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 @Injectable()
 export class AuthService {
   constructor(
@@ -29,21 +30,23 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
-  async getTokens(userId: string, email: string): Promise<Tokens> {
+  async getTokens(user: UserEntity): Promise<Tokens> {
     const AT_SECRET_KEY = this.configService.get<string>('AT_SECRET_KEY');
     const RT_SECRET_KEY = this.configService.get<string>('RT_SECRET_KEY');
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
-          email: email,
+          sub: user.id,
+          email: user.email,
+          roles: user.roles,
         },
-        { expiresIn: '15m', secret: AT_SECRET_KEY },
+        { expiresIn: '12h', secret: AT_SECRET_KEY },
       ), //TODO sync and make it better later
       this.jwtService.signAsync(
         {
-          sub: userId,
-          email: email,
+          sub: user.id,
+          email: user.email,
+          roles: user.roles,
         },
         { expiresIn: '7d', secret: RT_SECRET_KEY },
       ),
@@ -66,7 +69,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email: email },
     });
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
@@ -88,7 +91,7 @@ export class AuthService {
         hash: hash,
         name: dto.name,
         dob: dto.dob,
-        type: 'student', //TODO CHANGE LATER
+        roles: ['student'], //TODO CHANGE LATER
         comment: undefined,
       },
     });
@@ -100,13 +103,12 @@ export class AuthService {
       where: { email: dto.email },
     });
     if (!user) throw new ForbiddenException('Invalid credentials');
-    console.log('pepsi', user.hash);
     const isPasswordValid = await bcrypt.compare(dto.password, user.hash);
     if (!isPasswordValid) throw new ForbiddenException('Invalid credentials');
     if (!user.isEmailConfirm) {
       throw new UnauthorizedException('Email not confirmed');
     }
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
@@ -126,7 +128,7 @@ export class AuthService {
             hash: 'google',
             name: decodedToken.name,
             isEmailConfirm: true,
-            type: 'student', //TODO CHANGE LATER
+            roles: ['student'], //TODO CHANGE LATER
             comment: undefined,
           },
         });
@@ -135,7 +137,7 @@ export class AuthService {
       }
     }
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
@@ -154,13 +156,13 @@ export class AuthService {
           hash: 'facebook',
           name: decodedToken.name,
           isEmailConfirm: true,
-          type: 'student', //TODO CHANGE LATER
+          roles: ['student'], //TODO CHANGE LATER
           comment: undefined,
         },
       });
     }
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
@@ -182,7 +184,7 @@ export class AuthService {
     const rtMatches = await bcrypt.compare(rt, user.hashedRt);
     if (!rtMatches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user);
     await this.updateRtHash(user.id, tokens.refreshToken);
 
     return tokens;
@@ -211,7 +213,7 @@ export class AuthService {
     });
     console.log(hash);
     //Probably not return tokens
-    // const tokens = await this.getTokens(user.id, user.email);
+    // const tokens = await this.getTokens(user);
     // await this.updateRtHash(user.id, tokens.refreshToken);
     // return tokens;
   }

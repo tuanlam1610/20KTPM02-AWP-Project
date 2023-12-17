@@ -41,7 +41,7 @@ export class EmailConfirmationController {
       await this.emailConfirmationService.decodeConfirmationToken(token);
     //TODO: This probably insecure AF
     const user = await this.emailConfirmationService.confirmEmail(email);
-    const tokens = await this.authService.getTokens(user.id, user.email);
+    const tokens = await this.authService.getTokens(user);
     await this.authService.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
