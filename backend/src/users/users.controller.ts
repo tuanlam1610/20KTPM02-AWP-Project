@@ -11,7 +11,6 @@ import {
   HttpCode,
   Req,
   HttpStatus,
-  SetMetadata,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -24,8 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Role } from 'src/auth/enum/roles.enum';
-import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -43,7 +40,6 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
   @ApiBearerAuth('jwt')
-  @Roles(Role.ADMIN)
   @ApiCreatedResponse({ type: UserEntity })
   @HttpCode(HttpStatus.OK)
   create(@Body() createUserDto: CreateUserDto) {

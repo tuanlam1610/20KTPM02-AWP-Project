@@ -89,20 +89,18 @@ export class UsersService {
         if (!fetchedAdmin) {
           throw new Error(`Admin with ID ${updateUserDto.adminId} not found`);
         }
-      } else {
-        throw new Error('No user type provided');
       }
 
       const fetchedComment = await this.prisma.comment.findMany({
         where: { id: { in: updateUserDto.comment } },
       });
 
-      if (fetchedComment.length !== updateUserDto.comment.length) {
-        const notFoundIds = updateUserDto.comment.filter(
-          (cId) => !fetchedComment.some((c) => c.id === cId),
-        );
-        throw new Error(`Comment IDs ${notFoundIds.join(', ')} not found`);
-      }
+      // if (fetchedComment?.length !== updateUserDto?.comment?.length) {
+      //   const notFoundIds = updateUserDto.comment?.filter(
+      //     (cId) => !fetchedComment.some((c) => c.id === cId),
+      //   );
+      //   throw new Error(`Comment IDs ${notFoundIds.join(', ')} not found`);
+      // }
 
       const updateData: any = {
         ...updateUserDto,

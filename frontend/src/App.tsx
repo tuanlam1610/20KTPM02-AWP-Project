@@ -14,6 +14,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import StudentHomePage from './pages/Student/StudentHomePage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
+import ChooseRolePage from './pages/ChooseRolePage';
 
 function App() {
   return (
@@ -29,6 +30,8 @@ function App() {
         <Route path="/recover" element={<RecoverPasswordPage />} />
         <Route path="/resetPassword" element={<ResetPasswordPage />} />
         <Route path="/activateEmail" element={<ActivateEmailPage />} />
+        <Route path="chooserole" element={<ChooseRolePage />} />
+
         {/* Teacher Routes */}
         <Route
           path="/teacher"
