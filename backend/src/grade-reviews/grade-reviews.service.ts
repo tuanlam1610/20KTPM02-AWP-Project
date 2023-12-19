@@ -8,40 +8,11 @@ export class GradeReviewsService {
   constructor(private prisma: PrismaService) {}
   async create(createGradeReviewDto: CreateGradeReviewDto) {
     try {
-      const fetchedStudent = await this.prisma.student.findUnique({
-        where: { id: createGradeReviewDto.studentId },
-      });
-
-      if (!fetchedStudent) {
-        throw new Error(
-          `GradeReview with student ID ${createGradeReviewDto.studentId} not found`,
-        );
-      }
-      const fetchedTeacher = await this.prisma.teacher.findUnique({
-        where: { id: createGradeReviewDto.teacherId },
-      });
-
-      if (!fetchedTeacher) {
-        throw new Error(
-          `GradeReview withteacher ID ${createGradeReviewDto.studentId} not found`,
-        );
-      }
-
-      const fetchedStudentsGrade = await this.prisma.studentGrade.findUnique({
-        where: { id: createGradeReviewDto.studentGradeId },
-      });
-
-      if (!fetchedStudentsGrade) {
-        throw new Error(
-          `GradeReview with student grade ID ${createGradeReviewDto.studentGradeId} not found`,
-        );
-      }
-
       const fetchedComment = await this.prisma.comment.findMany({
         where: { id: { in: createGradeReviewDto.comment } },
       });
 
-      if (fetchedComment.length !== createGradeReviewDto.comment.length) {
+      if (fetchedComment.length ?? 0 !== createGradeReviewDto.comment.length) {
         const notFoundIds = createGradeReviewDto.comment.filter(
           (sgId) => !fetchedComment.some((sg) => sg.id === sgId),
         );
@@ -59,16 +30,16 @@ export class GradeReviewsService {
           comment: {
             connect: fetchedComment.map((sg) => ({ id: sg.id })),
           },
-          student: { connect: { id: fetchedStudent.id } },
-          teacher: { connect: { id: fetchedTeacher.id } },
-          studentGrade: { connect: { id: fetchedStudentsGrade.id } },
+          studentId: createGradeReviewDto.studentId,
+          teacherId: createGradeReviewDto.teacherId,
+          studentGradeId: createGradeReviewDto.studentGradeId,
         },
       });
 
       return newGradeReview;
     } catch (error) {
       // Custom error handling/logging/reporting
-      throw new Error(`Failed to create grade composition: ${error.message}`);
+      throw new Error(`Failed to create grade review: ${error.message}`);
     }
   }
 
@@ -97,41 +68,11 @@ export class GradeReviewsService {
 
   async update(id: string, updateGradeReviewDto: UpdateGradeReviewDto) {
     try {
-      const fetchedStudent = await this.prisma.student.findUnique({
-        where: { id: updateGradeReviewDto.studentId },
-      });
-
-      if (!fetchedStudent) {
-        throw new Error(
-          `GradeReview with student ID ${updateGradeReviewDto.studentId} not found`,
-        );
-      }
-
-      const fetchedTeacher = await this.prisma.teacher.findUnique({
-        where: { id: updateGradeReviewDto.teacherId },
-      });
-
-      if (!fetchedTeacher) {
-        throw new Error(
-          `GradeReview with teacher ID ${updateGradeReviewDto.teacherId} not found`,
-        );
-      }
-
-      const fetchedStudentsGrade = await this.prisma.studentGrade.findUnique({
-        where: { id: updateGradeReviewDto.studentGradeId },
-      });
-
-      if (!fetchedStudentsGrade) {
-        throw new Error(
-          `GradeReview with student grade ID ${updateGradeReviewDto.studentGradeId} not found`,
-        );
-      }
-
       const fetchedComment = await this.prisma.comment.findMany({
         where: { id: { in: updateGradeReviewDto.comment } },
       });
 
-      if (fetchedComment.length !== updateGradeReviewDto.comment.length) {
+      if (fetchedComment.length ?? 0 !== updateGradeReviewDto.comment.length) {
         const notFoundIds = updateGradeReviewDto.comment.filter(
           (sgId) => !fetchedComment.some((sg) => sg.id === sgId),
         );
@@ -151,9 +92,9 @@ export class GradeReviewsService {
             //Todo: comment might not be related
             connect: fetchedComment.map((sg) => ({ id: sg.id })),
           },
-          student: { connect: { id: fetchedStudent.id } },
-          teacher: { connect: { id: fetchedTeacher.id } },
-          studentGrade: { connect: { id: fetchedStudentsGrade.id } },
+          studentId: updateGradeReviewDto.studentId,
+          teacherId: updateGradeReviewDto.teacherId,
+          studentGradeId: updateGradeReviewDto.studentGradeId,
         },
       });
 

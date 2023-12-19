@@ -22,7 +22,6 @@ export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 
   @Post()
-  @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.OK)
   create(@Body() createClassDto: CreateClassDto) {
     return this.classesService.create(createClassDto);

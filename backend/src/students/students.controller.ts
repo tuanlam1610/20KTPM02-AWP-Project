@@ -18,22 +18,24 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { StudentEntity } from './entities/student.entity';
 
 @Controller('students')
+@ApiTags('students')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
-  @UseGuards(AuthGuard('jwt'))
-  @Get('getUserProfile')
-  @ApiBearerAuth('jwt')
-  @HttpCode(HttpStatus.OK)
-  findUserByAT(@Req() req: any) {
-    const user = req.user;
-    return this.studentsService.findOne(user['sub']);
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Get('getUserProfile')
+  // @ApiBearerAuth('jwt')
+  // @HttpCode(HttpStatus.OK)
+  // findUserByAT(@Req() req: any) {
+  //   const user = req.user;
+  //   return this.studentsService.findOne(user['sub']);
+  // }
 
   @Post()
   @ApiCreatedResponse({ type: StudentEntity })

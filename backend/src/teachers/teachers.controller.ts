@@ -12,9 +12,10 @@ import {
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { UpdateTeacherDto } from './dto/update-teacher.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('teachers')
+@ApiTags('teachers')
 export class TeachersController {
   constructor(private readonly teachersService: TeachersService) {}
 

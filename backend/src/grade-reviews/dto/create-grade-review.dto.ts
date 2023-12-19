@@ -11,7 +11,7 @@ export class CreateGradeReviewDto {
   finalGrade?: number;
 
   @ApiProperty({ required: false })
-  explanation: string;
+  explanation?: string;
 
   @ApiProperty()
   comment: string[];

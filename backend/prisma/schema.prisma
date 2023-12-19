@@ -160,7 +160,7 @@ model StudentGrade {
   student            Student          @relation(fields: [studentId], references: [id])
   studentId          String
   grade              Int
-  gradeReview        GradeReview[]
+  gradeReview        GradeReview?
 }
 
 //Module
@@ -183,7 +183,7 @@ model GradeReview {
   teacherId String
 
   studentGrade   StudentGrade @relation(fields: [studentGradeId], references: [id])
-  studentGradeId String
+  studentGradeId String       @unique
 }
 
 //Module

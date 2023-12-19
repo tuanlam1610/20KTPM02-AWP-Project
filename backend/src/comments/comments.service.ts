@@ -8,29 +8,11 @@ export class CommentsService {
   constructor(private prisma: PrismaService) {}
   async create(createCommentDto: CreateCommentDto) {
     try {
-      const fetchedGradeReview = await this.prisma.gradeReview.findUnique({
-        where: { id: createCommentDto.gradeReviewId },
-      });
-
-      if (!fetchedGradeReview) {
-        throw new Error(
-          `GradeReview with ID ${createCommentDto.gradeReviewId} not found`,
-        );
-      }
-
-      const fetchedUser = await this.prisma.user.findUnique({
-        where: { id: createCommentDto.userId },
-      });
-
-      if (!fetchedUser) {
-        throw new Error(`User with ID ${createCommentDto.userId} not found`);
-      }
-
       const newComment = await this.prisma.comment.create({
         data: {
           content: createCommentDto.content,
-          user: { connect: { id: fetchedUser.id } },
-          gradeReview: { connect: { id: fetchedGradeReview.id } },
+          userId: createCommentDto.userId,
+          gradeReviewId: createCommentDto.gradeReviewId,
         },
       });
 
@@ -50,30 +32,12 @@ export class CommentsService {
 
   async update(id: string, updateCommentDto: UpdateCommentDto) {
     try {
-      const fetchedGradeReview = await this.prisma.gradeReview.findUnique({
-        where: { id: updateCommentDto.gradeReviewId },
-      });
-
-      if (!fetchedGradeReview) {
-        throw new Error(
-          `GradeReview with ID ${updateCommentDto.gradeReviewId} not found`,
-        );
-      }
-
-      const fetchedUser = await this.prisma.user.findUnique({
-        where: { id: updateCommentDto.userId },
-      });
-
-      if (!fetchedUser) {
-        throw new Error(`User with ID ${updateCommentDto.userId} not found`);
-      }
-
       const updatedComment = await this.prisma.comment.update({
         where: { id: id },
         data: {
           content: updateCommentDto.content,
-          user: { connect: { id: fetchedUser.id } },
-          gradeReview: { connect: { id: fetchedGradeReview.id } },
+          userId: updateCommentDto.userId,
+          gradeReviewId: updateCommentDto.gradeReviewId,
         },
       });
 
