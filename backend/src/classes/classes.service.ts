@@ -2,10 +2,87 @@ import { Injectable } from '@nestjs/common';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { exclude } from 'src/users/users.service';
 
 @Injectable()
 export class ClassesService {
   constructor(private prisma: PrismaService) {}
+
+  async updateStudentTotalGrade(
+    classId: string,
+    studentId: string,
+    grade: number,
+  ) {
+    return this.prisma.classMember.update({
+      where: { classId_studentId: { classId: classId, studentId: studentId } },
+      data: {
+        totalGrade: grade,
+      },
+    });
+  }
+
+  async getStudentGradesByClass(classId: string) {
+    const classWithGradeCompositions = await this.prisma.class.findUnique({
+      where: { id: classId },
+      include: {
+        gradeCompositions: {
+          select: {
+            id: true,
+            name: true,
+            percentage: true,
+            studentGrades: {
+              select: {
+                id: true,
+                grade: true,
+                studentId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const studentGradesByStudent: Record<string, any> = {};
+
+    classWithGradeCompositions.gradeCompositions.forEach((gradeComposition) => {
+      gradeComposition.studentGrades.forEach((studentGrade) => {
+        const studentId = studentGrade.studentId;
+        if (!studentGradesByStudent[studentId]) {
+          studentGradesByStudent[studentId] = {
+            studentId: studentGrade.studentId,
+            gradeEntries: [],
+          };
+        }
+        const gradeCompositionX = exclude(gradeComposition, ['studentGrades']);
+        const studentGradeX = exclude(studentGrade, ['studentId']);
+        studentGradesByStudent[studentId].gradeEntries.push({
+          ...gradeCompositionX,
+          ...studentGradeX,
+        });
+      });
+    });
+
+    return Object.values(studentGradesByStudent);
+  }
+
+  async getAllGradeCompositionsOfClass(classId: string) {
+    return this.prisma.class.findUnique({
+      where: { id: classId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        code: true,
+        gradeCompositions: {
+          select: {
+            id: true,
+            name: true,
+            percentage: true,
+          },
+        },
+      },
+    });
+  }
 
   async create(createClassDto: CreateClassDto) {
     if (!createClassDto.invitationLink) {

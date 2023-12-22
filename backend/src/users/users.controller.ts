@@ -11,7 +11,6 @@ import {
   HttpCode,
   Req,
   HttpStatus,
-  SetMetadata,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -40,10 +39,8 @@ export class UsersController {
     return this.usersService.findOne(user['sub']);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
   @ApiBearerAuth('jwt')
-  @Roles(Role.ADMIN)
   @ApiCreatedResponse({ type: UserEntity })
   @HttpCode(HttpStatus.OK)
   create(@Body() createUserDto: CreateUserDto) {

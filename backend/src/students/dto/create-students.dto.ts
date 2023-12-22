@@ -3,7 +3,6 @@ import { IsOptional, IsString } from 'class-validator';
 
 export class CreateStudentDto {
   @ApiProperty({ required: false })
-  @IsString()
   userId?: string;
 
   @ApiProperty({ required: false })
