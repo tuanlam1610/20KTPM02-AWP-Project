@@ -23,8 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Role } from 'src/auth/enum/roles.enum';
-import { Roles } from 'src/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {

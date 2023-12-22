@@ -13,12 +13,12 @@ import {
   setPersistence,
   signInWithPopup,
 } from 'firebase/auth';
+import { t } from 'i18next';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, fbAuthProvider, googleAuthProvider } from '../../firebase';
 import loginImg from '../assets/imgs/Login-amico.png';
 import wave from '../assets/imgs/wave.svg';
-import { t } from 'i18next';
 import { setUserInfo } from '../redux/appSlice';
 import { useAppDispatch } from '../redux/store';
 
@@ -59,8 +59,10 @@ export default function SignInPage() {
         },
       );
       dispatch(setUserInfo(res.data));
-      console.log(res);
-      navigate(`/${res?.data?.type}/home`);
+      if (!res?.data?.roles[0]) {
+        return navigate('/chooserole');
+      }
+      navigate(`/${res?.data?.roles[0]}/home`);
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     } catch (error) {

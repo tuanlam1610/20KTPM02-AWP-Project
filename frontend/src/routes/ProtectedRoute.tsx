@@ -7,9 +7,16 @@ export const ProtectedRoute = ({ allowedRole }) => {
 
   if (userInfo == undefined) {
     return <Navigate to={'/landing'} state={{ from: location }} replace />;
-  }
-  if (userInfo != undefined && userInfo.type != allowedRole) {
-    return <Navigate to={'/unauthorized'} state={{ from: location }} replace />;
+  } else {
+    // If no specific role is required for this route, any authenticated user can access it
+    if (allowedRole == null) {
+      return <Navigate to={'/chooserole'} state={{ from: location }} replace />;
+    }
+    if (userInfo != allowedRole) {
+      return (
+        <Navigate to={'/unauthorized'} state={{ from: location }} replace />
+      );
+    }
   }
   return <Outlet />;
 };
