@@ -19,6 +19,13 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class TeachersController {
   constructor(private readonly teachersService: TeachersService) {}
 
+  @Get(':id/getAllClasses')
+  @ApiBearerAuth('jwt')
+  @HttpCode(HttpStatus.OK)
+  getAllClasses(@Param('id') id: string) {
+    return this.teachersService.getAllClassesOfTeacher(id);
+  }
+
   @Post()
   @ApiBearerAuth('jwt')
   @HttpCode(HttpStatus.OK)

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "ClassMember" ADD COLUMN     "totalGrade" DOUBLE PRECISION NOT NULL DEFAULT 0;

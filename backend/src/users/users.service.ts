@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 // ADD ADMINS STUFF
 // ADD AUTHORIZATION
 //helper
-function exclude<User, Key extends keyof User>(
+export function exclude<User, Key extends keyof User>(
   user: User,
   keys: Key[],
 ): Omit<User, Key> {

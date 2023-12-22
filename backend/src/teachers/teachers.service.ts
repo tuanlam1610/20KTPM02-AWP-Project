@@ -6,6 +6,34 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class TeachersService {
   constructor(private prisma: PrismaService) {}
+  async getAllClassesOfTeacher(teacherId: string) {
+    const classesOfTeacher = await this.prisma.teacher.findUnique({
+      where: { id: teacherId },
+      select: {
+        classTeacher: {
+          select: {
+            class: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                code: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return (
+      classesOfTeacher?.classTeacher?.map((ct) => ({
+        id: ct.class.id,
+        name: ct.class.name,
+        description: ct.class.description,
+        code: ct.class.code,
+      })) || []
+    );
+  }
+
   async create(createTeacherDto: CreateTeacherDto) {
     const batchedFetch = await Promise.all([
       createTeacherDto.classTeacher
