@@ -32,7 +32,7 @@ function App() {
         {/* Teacher Routes */}
         <Route
           path="/teacher"
-          element={<ProtectedRoute allowedRole="teacher" />}
+          // element={<ProtectedRoute allowedRole="teacher" />}
         >
           <Route path="home" element={<TeacherHomePage />} />
           <Route path="class/:id" element={<ClassDetailsPage />} />

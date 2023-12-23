@@ -1,13 +1,16 @@
 import { CopyOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button, Tabs, TabsProps } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import ClassDetailsTabView from './components/TabViews/ClassDetailsTabView';
 import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
+import { useEffect } from 'react';
+import { fetchInitData } from '../../redux/classDetailThunks';
 
 export default function HomePage() {
+  const dispatch = useAppDispatch();
   const params = useParams();
-  const classId: number = params.id ? Number(params.id) : 0;
+  const classId: string = params.id ? params.id : '';
   const classes = useAppSelector((state) => state.teacher.classes);
   const classDetails = classes[classId];
   const navigate = useNavigate();
@@ -32,6 +35,10 @@ export default function HomePage() {
       children: <ClassMemberTabView />,
     },
   ];
+
+  useEffect(() => {
+    dispatch(fetchInitData({ id: classId }));
+  }, [classId]);
 
   return (
     <div className="flex flex-col min-h-screen">

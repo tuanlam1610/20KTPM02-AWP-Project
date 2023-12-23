@@ -24,7 +24,7 @@ export default function InviteMemberModal(props: { type: string }) {
       type: 'success',
       content: (
         <span>
-          Send invitation to{' '}
+          Send invitation to
           <span className="font-semibold">{values.email}</span> successfully
         </span>
       ),
