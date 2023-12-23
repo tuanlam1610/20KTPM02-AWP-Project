@@ -1,12 +1,15 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Button, Dropdown, MenuProps } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/imgs/Logo.png';
 import { setUserInfo } from '../../redux/appSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 export default function Navbar() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname.replace('/', '');
   const userInfo = useAppSelector((state) => state.app.userInfo);
@@ -39,6 +42,36 @@ export default function Navbar() {
       ),
     },
   ];
+
+  const getUserProfile = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/getUserProfile`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        },
+      );
+      console.log(res);
+      dispatch(setUserInfo(res.data));
+      console.log(userInfo);
+    } catch (error) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      dispatch(setUserInfo(undefined));
+      navigate('/');
+    }
+  };
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!userInfo) {
+      if (accessToken) {
+        getUserProfile();
+      }
+    }
+  }, []);
 
   return (
     <div className="flex items-center justify-between h-12 shadow-lg sticky">
