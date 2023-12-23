@@ -1,4 +1,5 @@
 import { Col, Row } from 'antd';
+import GradeManagementPage from '../../../GradeManagement';
 
 export default function ClassDetailsTabView() {
   return (
@@ -9,8 +10,9 @@ export default function ClassDetailsTabView() {
         </div>
       </Col>
       <Col xs={{ order: 2, span: 24 }} md={{ order: 2, span: 16 }}>
-        <div className="bg-gray-300 rounded-md h-96 p-4">
+        <div className="border rounded-md h-96 p-4">
           <h1 className="text-lg font-semibold">Grade Structure:</h1>
+          <GradeManagementPage />
         </div>
       </Col>
     </Row>
