@@ -59,7 +59,6 @@ export class StudentsService {
           //TEST: Grade might be missing
           create: fetchedStudentGrade.map((sg) => ({
             gradeComposition: { connect: { id: sg.id } },
-            grade: 0,
           })),
         },
         //TODO: OTM CASE
@@ -154,7 +153,6 @@ export class StudentsService {
           //TEST: Grade might be missing
           create: fetchedStudentGrade.map((sg) => ({
             gradeComposition: { connect: { id: sg.id } },
-            grade: sg.grade,
           })),
         },
         //TODO: OTM CASE

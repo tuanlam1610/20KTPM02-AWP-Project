@@ -32,7 +32,6 @@ export class GradeCompositionsService {
 
     const studentGradesToCreate = studentIdsWithNoGrade.map((studentId) => ({
       student: { connect: { id: studentId } },
-      grade: undefined,
     }));
 
     await this.prisma.gradeComposition.update({
@@ -73,7 +72,6 @@ export class GradeCompositionsService {
           studentGrades: {
             create: fetchedStudentsGrade.map((sg) => ({
               student: { connect: { id: sg.id } },
-              grade: 0,
             })),
           },
         },
@@ -135,7 +133,6 @@ export class GradeCompositionsService {
               //"set"
               create: fetchedStudentsGrade.map((sg) => ({
                 student: { connect: { id: sg.id } },
-                grade: 0,
               })),
               //Wat the hell was "set"
             },
