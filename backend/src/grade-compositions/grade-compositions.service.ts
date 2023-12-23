@@ -7,6 +7,40 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class GradeCompositionsService {
   constructor(private prisma: PrismaService) {}
 
+  async populateStudentGrade(gradeCompositionId: string) {
+    const gradeComposition = await this.prisma.gradeComposition.findUnique({
+      where: { id: gradeCompositionId },
+      include: { studentGrades: true },
+    });
+
+    const classId = gradeComposition.classId;
+    const studentGrades = gradeComposition.studentGrades;
+
+    const classMembers = await this.prisma.classMember.findMany({
+      where: { classId },
+      include: { student: true },
+    });
+
+    const studentIds = classMembers.map((cm) => cm.studentId);
+
+    const studentIdsWithNoGrade = studentIds.filter(
+      (studentId) =>
+        !studentGrades.some(
+          (studentGrade) => studentGrade.studentId === studentId,
+        ),
+    );
+
+    const studentGradesToCreate = studentIdsWithNoGrade.map((studentId) => ({
+      student: { connect: { id: studentId } },
+      grade: undefined,
+    }));
+
+    await this.prisma.gradeComposition.update({
+      where: { id: gradeCompositionId },
+      data: { studentGrades: { create: studentGradesToCreate } },
+    });
+  }
+
   async create(createGradeCompositionDto: CreateGradeCompositionDto) {
     try {
       let fetchedStudentsGrade = [];
@@ -44,7 +78,7 @@ export class GradeCompositionsService {
           },
         },
       });
-
+      this.populateStudentGrade(newGradeComposition.id);
       return newGradeComposition;
     } catch (error) {
       // Custom error handling/logging/reporting
