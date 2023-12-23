@@ -107,6 +107,8 @@ model ClassMember {
   student   Student @relation(fields: [studentId], references: [id])
   studentId String
 
+  totalGrade Float?
+
   @@id([classId, studentId])
 }
 
@@ -160,7 +162,9 @@ model StudentGrade {
   student            Student          @relation(fields: [studentId], references: [id])
   studentId          String
   grade              Int
-  gradeReview        GradeReview[]
+  gradeReview        GradeReview?
+
+  @@unique([gradeCompositionId, studentId], name: "Unique_GradeComposition_Student")
 }
 
 //Module
@@ -183,7 +187,7 @@ model GradeReview {
   teacherId String
 
   studentGrade   StudentGrade @relation(fields: [studentGradeId], references: [id])
-  studentGradeId String
+  studentGradeId String       @unique
 }
 
 //Module

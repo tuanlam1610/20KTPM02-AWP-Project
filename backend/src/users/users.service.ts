@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 // ADD ADMINS STUFF
 // ADD AUTHORIZATION
 //helper
-function exclude<User, Key extends keyof User>(
+export function exclude<User, Key extends keyof User>(
   user: User,
   keys: Key[],
 ): Omit<User, Key> {
@@ -62,6 +62,7 @@ export class UsersService {
       let fetchedAdmin = null;
 
       if (updateUserDto.studentId) {
+        //prolly unecessary
         fetchedStudent = await this.prisma.student.findUnique({
           where: { id: updateUserDto.studentId },
         });
@@ -89,15 +90,13 @@ export class UsersService {
         if (!fetchedAdmin) {
           throw new Error(`Admin with ID ${updateUserDto.adminId} not found`);
         }
-      } else {
-        throw new Error('No user type provided');
       }
 
       const fetchedComment = await this.prisma.comment.findMany({
         where: { id: { in: updateUserDto.comment } },
       });
 
-      if (fetchedComment.length !== updateUserDto.comment.length) {
+      if (fetchedComment.length ?? 0 !== updateUserDto.comment.length) {
         const notFoundIds = updateUserDto.comment.filter(
           (cId) => !fetchedComment.some((c) => c.id === cId),
         );
@@ -113,14 +112,17 @@ export class UsersService {
 
       if (fetchedStudent) {
         updateData.student = { connect: { id: fetchedStudent.id } };
+        updateData.role = ['STUDENT'];
       }
 
       if (fetchedTeacher) {
         updateData.teacher = { connect: { id: fetchedTeacher.id } };
+        updateData.role = ['TEACHER'];
       }
 
       if (fetchedAdmin) {
         updateData.admin = { connect: { id: fetchedAdmin.id } };
+        updateData.role = ['ADMIN'];
       }
 
       const updatedUser = await this.prisma.user.update({
@@ -176,7 +178,7 @@ export class UsersService {
         where: { id: { in: updateUserDto.comment } },
       });
 
-      if (fetchedComment.length !== updateUserDto.comment.length) {
+      if (fetchedComment.length ?? 0 !== updateUserDto.comment.length) {
         const notFoundIds = updateUserDto.comment.filter(
           (cId) => !fetchedComment.some((c) => c.id === cId),
         );
