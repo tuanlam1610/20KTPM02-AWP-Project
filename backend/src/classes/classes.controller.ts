@@ -16,11 +16,26 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/roles.enum';
 import { TotalGradeDto } from './dto/total-grade.dto';
+import { GradeComposition } from '@prisma/client';
+import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
 
 @Controller('classes')
 @ApiTags('classes')
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
+
+  @Patch(':id/updateGradeCompositionOrder')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  updateGradeCompositionOrder(
+    @Param('id') classId: string,
+    @Body() gradeCompositionsDto: GradeComposition[],
+  ) {
+    return this.classesService.updateGradeCompositionOrder(
+      classId,
+      gradeCompositionsDto,
+    );
+  }
 
   @Patch(':id/updateStudentTotalGrade')
   @ApiOkResponse()

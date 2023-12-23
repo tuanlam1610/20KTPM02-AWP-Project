@@ -161,7 +161,7 @@ model StudentGrade {
   gradeCompositionId String
   student            Student          @relation(fields: [studentId], references: [id])
   studentId          String
-  grade              Int
+  grade              Int?
   gradeReview        GradeReview?
 
   @@unique([gradeCompositionId, studentId], name: "Unique_GradeComposition_Student")
