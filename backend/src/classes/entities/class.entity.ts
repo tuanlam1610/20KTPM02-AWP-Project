@@ -37,4 +37,7 @@ export class ClassEntity implements Class {
 
   @ApiProperty()
   classInvitationForStudents: string[];
+
+  @ApiProperty()
+  gradeReview: string[];
 }

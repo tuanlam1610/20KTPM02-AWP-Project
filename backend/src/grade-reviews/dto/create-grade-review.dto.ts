@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { GradeReviewStatus } from '@prisma/client';
 
 export class CreateGradeReviewDto {
   @ApiProperty()
@@ -6,6 +7,9 @@ export class CreateGradeReviewDto {
 
   @ApiProperty()
   expectedGrade: number;
+
+  @ApiProperty({ required: false })
+  status?: GradeReviewStatus;
 
   @ApiProperty({ required: false })
   finalGrade?: number;
@@ -24,4 +28,7 @@ export class CreateGradeReviewDto {
 
   @ApiProperty()
   studentGradeId: string;
+
+  @ApiProperty()
+  classId: string;
 }

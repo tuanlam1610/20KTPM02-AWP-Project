@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GradeReview } from '@prisma/client';
+import { $Enums, GradeReview } from '@prisma/client';
 
 export class GradeReviewEntity implements GradeReview {
+  @ApiProperty()
+  status: $Enums.GradeReviewStatus;
+
   @ApiProperty()
   id: string;
 
@@ -31,6 +34,9 @@ export class GradeReviewEntity implements GradeReview {
 
   @ApiProperty()
   teacherId: string;
+
+  @ApiProperty()
+  classId: string;
 
   @ApiProperty()
   studentGradeId: string;
