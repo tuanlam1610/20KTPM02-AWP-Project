@@ -37,7 +37,6 @@ export class UsersController {
     return this.usersService.findOne(user['sub']);
   }
 
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Post()
   @ApiBearerAuth('jwt')
   @ApiCreatedResponse({ type: UserEntity })

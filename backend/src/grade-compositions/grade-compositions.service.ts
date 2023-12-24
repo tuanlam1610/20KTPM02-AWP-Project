@@ -7,50 +7,76 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class GradeCompositionsService {
   constructor(private prisma: PrismaService) {}
 
+  async populateStudentGrade(gradeCompositionId: string) {
+    const gradeComposition = await this.prisma.gradeComposition.findUnique({
+      where: { id: gradeCompositionId },
+      include: { studentGrades: true },
+    });
+
+    const classId = gradeComposition.classId;
+    const studentGrades = gradeComposition.studentGrades;
+
+    const classMembers = await this.prisma.classMember.findMany({
+      where: { classId },
+      include: { student: true },
+    });
+
+    const studentIds = classMembers.map((cm) => cm.studentId);
+
+    const studentIdsWithNoGrade = studentIds.filter(
+      (studentId) =>
+        !studentGrades.some(
+          (studentGrade) => studentGrade.studentId === studentId,
+        ),
+    );
+
+    const studentGradesToCreate = studentIdsWithNoGrade.map((studentId) => ({
+      student: { connect: { id: studentId } },
+    }));
+
+    await this.prisma.gradeComposition.update({
+      where: { id: gradeCompositionId },
+      data: { studentGrades: { create: studentGradesToCreate } },
+    });
+  }
+
   async create(createGradeCompositionDto: CreateGradeCompositionDto) {
     try {
-      const fetchedClass = await this.prisma.class.findUnique({
-        where: { id: createGradeCompositionDto.classId },
-      });
+      let fetchedStudentsGrade = [];
+      if (createGradeCompositionDto.studentGrades) {
+        fetchedStudentsGrade = await this.prisma.student.findMany({
+          where: { id: { in: createGradeCompositionDto.studentGrades } },
+        });
 
-      if (!fetchedClass) {
-        throw new Error(
-          `Class with ID ${createGradeCompositionDto.classId} not found`,
-        );
+        {
+          if (
+            fetchedStudentsGrade.length ??
+            0 !== createGradeCompositionDto.studentGrades.length
+          ) {
+            const notFoundIds = createGradeCompositionDto.studentGrades.filter(
+              (sgId) => !fetchedStudentsGrade.some((sg) => sg.id === sgId),
+            );
+            throw new Error(
+              `Student grades with IDs ${notFoundIds.join(', ')} not found`,
+            );
+          }
+        }
       }
-
-      const fetchedStudentsGrade = await this.prisma.student.findMany({
-        where: { id: { in: createGradeCompositionDto.studentGrades } },
-      });
-
-      if (
-        fetchedStudentsGrade.length !==
-        createGradeCompositionDto.studentGrades.length
-      ) {
-        const notFoundIds = createGradeCompositionDto.studentGrades.filter(
-          (sgId) => !fetchedStudentsGrade.some((sg) => sg.id === sgId),
-        );
-        throw new Error(
-          `Student grades with IDs ${notFoundIds.join(', ')} not found`,
-        );
-      }
-
       const newGradeComposition = await this.prisma.gradeComposition.create({
         data: {
           name: createGradeCompositionDto.name,
           percentage: createGradeCompositionDto.percentage,
           rank: createGradeCompositionDto.rank,
           isFinalized: createGradeCompositionDto.isFinalized,
-          class: { connect: { id: fetchedClass.id } },
+          classId: createGradeCompositionDto.classId,
           studentGrades: {
             create: fetchedStudentsGrade.map((sg) => ({
               student: { connect: { id: sg.id } },
-              grade: 0,
             })),
           },
         },
       });
-
+      this.populateStudentGrade(newGradeComposition.id);
       return newGradeComposition;
     } catch (error) {
       // Custom error handling/logging/reporting
@@ -76,42 +102,24 @@ export class GradeCompositionsService {
     updateGradeCompositionDto: UpdateGradeCompositionDto,
   ) {
     try {
-      const existingGradeComposition =
-        await this.prisma.gradeComposition.findUnique({
-          where: { id },
-          include: { class: true, studentGrades: true },
+      let fetchedStudentsGrade = [];
+      if (updateGradeCompositionDto.studentGrades) {
+        fetchedStudentsGrade = await this.prisma.student.findMany({
+          where: { id: { in: updateGradeCompositionDto.studentGrades } },
         });
 
-      if (!existingGradeComposition) {
-        throw new Error(`Grade composition with ID ${id} not found`);
+        if (
+          fetchedStudentsGrade.length ??
+          0 !== updateGradeCompositionDto.studentGrades.length
+        ) {
+          const notFoundIds = updateGradeCompositionDto.studentGrades.filter(
+            (sgId) => !fetchedStudentsGrade.some((sg) => sg.id === sgId),
+          );
+          throw new Error(
+            `Student grades with IDs ${notFoundIds.join(', ')} not found`,
+          );
+        }
       }
-
-      const fetchedClass = await this.prisma.class.findUnique({
-        where: { id: updateGradeCompositionDto.classId },
-      });
-
-      if (!fetchedClass) {
-        throw new Error(
-          `Class with ID ${updateGradeCompositionDto.classId} not found`,
-        );
-      }
-
-      const fetchedStudentsGrade = await this.prisma.student.findMany({
-        where: { id: { in: updateGradeCompositionDto.studentGrades } },
-      });
-
-      if (
-        fetchedStudentsGrade.length !==
-        updateGradeCompositionDto.studentGrades.length
-      ) {
-        const notFoundIds = updateGradeCompositionDto.studentGrades.filter(
-          (sgId) => !fetchedStudentsGrade.some((sg) => sg.id === sgId),
-        );
-        throw new Error(
-          `Student grades with IDs ${notFoundIds.join(', ')} not found`,
-        );
-      }
-
       const updatedGradeComposition = await this.prisma.gradeComposition.update(
         {
           where: { id },
@@ -120,12 +128,11 @@ export class GradeCompositionsService {
             percentage: updateGradeCompositionDto.percentage,
             rank: updateGradeCompositionDto.rank,
             isFinalized: updateGradeCompositionDto.isFinalized,
-            class: { connect: { id: fetchedClass.id } },
+            classId: updateGradeCompositionDto.classId,
             studentGrades: {
               //"set"
               create: fetchedStudentsGrade.map((sg) => ({
                 student: { connect: { id: sg.id } },
-                grade: 0,
               })),
               //Wat the hell was "set"
             },

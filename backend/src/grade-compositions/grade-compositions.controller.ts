@@ -22,6 +22,13 @@ export class GradeCompositionsController {
     private readonly gradeCompositionsService: GradeCompositionsService,
   ) {}
 
+  @Get(':id/populate-student-grade')
+  @ApiOkResponse({ type: GradeCompositionEntity })
+  @HttpCode(HttpStatus.OK)
+  populateStudentGrade(@Param('id') id: string) {
+    return this.gradeCompositionsService.populateStudentGrade(id);
+  }
+
   @Post()
   @ApiCreatedResponse({ type: GradeCompositionEntity })
   @HttpCode(HttpStatus.OK)

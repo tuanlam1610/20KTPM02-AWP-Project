@@ -1,8 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GenericIdInput {
-  id: string;
-}
 export class CreateClassDto {
   @ApiProperty()
   name: string;

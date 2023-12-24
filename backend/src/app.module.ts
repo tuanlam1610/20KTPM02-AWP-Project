@@ -22,6 +22,7 @@ import { GradeReviewsModule } from './grade-reviews/grade-reviews.module';
 import { CommentsModule } from './comments/comments.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { StudentGradesModule } from './student-grades/student-grades.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     GradeCompositionsModule,
     GradeReviewsModule,
     CommentsModule,
+    StudentGradesModule,
   ],
   controllers: [AppController, EmailConfirmationController, StudentsController],
   providers: [
