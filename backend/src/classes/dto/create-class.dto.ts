@@ -24,4 +24,6 @@ export class CreateClassDto {
   classMembers: string[];
   @ApiProperty({ required: false, type: [String] })
   classInvitationForStudents: string[];
+  @ApiProperty({ required: false, type: [String] })
+  gradeReviews: string[];
 }

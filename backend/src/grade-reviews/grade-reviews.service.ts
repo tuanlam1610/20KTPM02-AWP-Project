@@ -6,6 +6,69 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class GradeReviewsService {
   constructor(private prisma: PrismaService) {}
+  async getGradeReviewDetails(id: string) {
+    try {
+      const gradeReview = await this.prisma.gradeReview.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          status: true,
+          currentGrade: true,
+          expectedGrade: true,
+          finalGrade: true,
+          explanation: true,
+          student: {
+            select: {
+              id: true,
+              name: true,
+              userId: true,
+            },
+          },
+          teacher: {
+            select: {
+              id: true,
+              name: true,
+              userId: true,
+            },
+          },
+          class: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          studentGrade: {
+            select: {
+              id: true,
+              grade: true,
+            },
+          },
+          comment: {
+            select: {
+              id: true,
+              content: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!gradeReview) {
+        throw new Error(`Grade review with ID ${id} not found`);
+      }
+
+      return gradeReview;
+    } catch (error) {
+      // Custom error handling/logging/reporting
+      throw new Error(`Failed to fetch grade review details: ${error.message}`);
+    }
+  }
+
   async create(createGradeReviewDto: CreateGradeReviewDto) {
     try {
       const fetchedComment = await this.prisma.comment.findMany({
@@ -26,12 +89,14 @@ export class GradeReviewsService {
           currentGrade: createGradeReviewDto.currentGrade,
           expectedGrade: createGradeReviewDto.expectedGrade,
           finalGrade: createGradeReviewDto.finalGrade,
+          status: createGradeReviewDto.status,
           explanation: createGradeReviewDto.explanation,
           comment: {
             connect: fetchedComment.map((sg) => ({ id: sg.id })),
           },
           studentId: createGradeReviewDto.studentId,
           teacherId: createGradeReviewDto.teacherId,
+          classId: createGradeReviewDto.classId,
           studentGradeId: createGradeReviewDto.studentGradeId,
         },
       });
@@ -45,24 +110,22 @@ export class GradeReviewsService {
 
   findAll() {
     return this.prisma.gradeReview.findMany({
-      // include: {
-      //   student: true,
-      //   teacher: true,
-      //   studentGrade: true,
-      //   comment: true,
-      // },
+      include: {
+        student: true,
+        teacher: true,
+        studentGrade: true,
+      },
     });
   }
 
   findOne(id: string) {
     return this.prisma.gradeReview.findUnique({
       where: { id },
-      // include: {
-      //   student: true,
-      //   teacher: true,
-      //   studentGrade: true,
-      //   comment: true,
-      // },
+      include: {
+        student: true,
+        teacher: true,
+        studentGrade: true,
+      },
     });
   }
 
@@ -88,6 +151,7 @@ export class GradeReviewsService {
           expectedGrade: updateGradeReviewDto.expectedGrade,
           finalGrade: updateGradeReviewDto.finalGrade,
           explanation: updateGradeReviewDto.explanation,
+          status: updateGradeReviewDto.status,
           comment: {
             //Todo: comment might not be related
             connect: fetchedComment.map((sg) => ({ id: sg.id })),

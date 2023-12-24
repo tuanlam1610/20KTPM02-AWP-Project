@@ -3,8 +3,15 @@ import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { exclude } from 'src/users/users.service';
-import { GradeComposition } from '@prisma/client';
+import { GradeComposition, Prisma } from '@prisma/client';
 import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
+
+enum GradeReviewStatusFilter {
+  open = 'open',
+  approved = 'approved',
+  denied = 'denied',
+  all = 'all',
+}
 
 @Injectable()
 export class ClassesService {
@@ -113,6 +120,59 @@ export class ClassesService {
     return Object.values(studentGradesByStudent);
   }
 
+  async getAllClassGradeReview(
+    classId: string,
+    page?: number,
+    limit?: number,
+    status?: GradeReviewStatusFilter,
+  ) {
+    const where: Prisma.GradeReviewWhereInput = {};
+    if (status !== GradeReviewStatusFilter.all) {
+      where.status = status;
+    }
+
+    return this.prisma.class.findUnique({
+      where: { id: classId, gradeReviews: { some: {} } },
+      select: {
+        gradeReviews: {
+          where: { ...where },
+          skip: page ?? 0,
+          take: limit ?? 10,
+          orderBy: { status: 'asc' },
+          select: {
+            id: true,
+            currentGrade: true,
+            expectedGrade: true,
+            finalGrade: true,
+            explanation: true,
+            status: true,
+            studentGrade: {
+              select: {
+                grade: true,
+                gradeComposition: {
+                  select: {
+                    name: true,
+                    percentage: true,
+                  },
+                },
+              },
+            },
+            student: {
+              select: {
+                name: true,
+              },
+            },
+            teacher: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
   async getAllGradeCompositionsOfClass(classId: string) {
     return this.prisma.class.findUnique({
       where: { id: classId },
@@ -174,6 +234,13 @@ export class ClassesService {
             },
           })
         : [],
+      createClassDto.gradeReviews
+        ? this.prisma.gradeReview.findMany({
+            where: {
+              id: { in: createClassDto.gradeReviews },
+            },
+          })
+        : [],
     ]);
 
     const [
@@ -182,9 +249,9 @@ export class ClassesService {
       fetchedClassInvitationForTeachers,
       fetchedClassMembers,
       fetchedClassInvitationForStudents,
+      fetchedGradeReviews,
     ] = batchedFetch;
-    console.log(createClassDto.classTeachers);
-    console.log(fetchedClassTeachers);
+
     return this.prisma.class.create({
       data: {
         name: createClassDto.name,
@@ -215,6 +282,11 @@ export class ClassesService {
             invitedStudent: {
               connect: { id: cifs.id },
             },
+          })),
+        },
+        gradeReviews: {
+          connect: fetchedGradeReviews.map((gr) => ({
+            id: gr.id,
           })),
         },
       },
@@ -256,6 +328,13 @@ export class ClassesService {
           })
         : [],
       updateClassDto.classInvitationForStudents
+        ? this.prisma.student.findMany({
+            where: {
+              id: { in: updateClassDto.classInvitationForStudents },
+            },
+          })
+        : [],
+      updateClassDto.gradeReviews
         ? this.prisma.student.findMany({
             where: {
               id: { in: updateClassDto.classInvitationForStudents },
