@@ -192,12 +192,12 @@ export class ClassesService {
       where.status = status;
     }
 
-    return this.prisma.class.findUnique({
+    const allGradeReviews = await this.prisma.class.findUnique({
       where: { id: classId, gradeReviews: { some: {} } },
       select: {
         gradeReviews: {
           where: { ...where },
-          skip: page ?? 0,
+          skip: page * limit ?? 0,
           take: limit ?? 10,
           orderBy: { status: 'asc' },
           select: {
@@ -232,6 +232,19 @@ export class ClassesService {
         },
       },
     });
+    // For total count
+    const totalCount = await this.prisma.gradeReview.count({
+      where: { classId: classId, ...where }, // Add your additional filters as needed
+    });
+
+    const totalRecord = totalCount;
+    const totalPage = Math.ceil(totalRecord / (limit ?? 10));
+    return {
+      ...allGradeReviews,
+      currentPage: page,
+      totalPage: totalPage,
+      totalRecord: totalRecord,
+    };
   }
 
   async getAllGradeCompositionsOfClass(classId: string) {
@@ -262,30 +275,39 @@ export class ClassesService {
     const students = studentsList.students;
 
     try {
+      const nonExistentStudents = [];
+      console.log(students);
       const classMembers = await Promise.all(
         students.map(async (student) => {
-          // Create or update the classMember relationship for each student
-          const classMember = await this.prisma.classMember.upsert({
-            where: {
-              classId_studentId: {
-                classId: classId,
-                studentId: student.studentId,
-              },
-            },
-            update: {},
-            create: {
-              class: { connect: { id: classId } },
-              student: {
-                connect: { id: student.studentId },
-                create: { name: student.name },
-              },
+          // Check if the student exists
+          const existingStudent = await this.prisma.student.findUnique({
+            where: { id: student.studentId },
+          });
+
+          if (!existingStudent) {
+            nonExistentStudents.push({
+              studentId: student.studentId,
+              name: student.name,
+            });
+            return null; // Skip creating class member for non-existent student
+          }
+
+          // Update the class-member relationship for existing students
+          const classMember = await this.prisma.classMember.create({
+            data: {
+              classId: classId,
+              studentId: student.studentId,
             },
           });
+
           return classMember;
         }),
       );
 
-      return classMembers;
+      return {
+        classMembers: classMembers.filter(Boolean),
+        nonExistentStudents,
+      };
     } catch (error) {
       // Handle errors
       throw new Error(
