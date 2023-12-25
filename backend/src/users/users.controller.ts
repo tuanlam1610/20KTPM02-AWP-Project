@@ -36,7 +36,7 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   findUserByAT(@Req() req: any) {
     const user = req.user;
-    return this.usersService.findOne(user['sub']);
+    return this.usersService.getUserProfile(user['sub']);
   }
 
   @Post()

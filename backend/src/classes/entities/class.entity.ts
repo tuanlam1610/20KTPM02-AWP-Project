@@ -27,6 +27,11 @@ export class ClassEntity implements Class {
   gradeComposittions: string[];
 
   @ApiProperty()
+  classOwner: string;
+  @ApiProperty()
+  classOwnerId: string;
+
+  @ApiProperty()
   classTeacher: string[];
 
   @ApiProperty()

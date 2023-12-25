@@ -25,6 +25,7 @@ import { Role } from 'src/auth/enum/roles.enum';
 import { TotalGradeDto } from './dto/total-grade.dto';
 import { GradeComposition, GradeReviewStatus } from '@prisma/client';
 import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
+import { PopulateClassDto } from './dto/class-populate.dto';
 
 enum GradeReviewStatusFilter {
   open = 'open',
@@ -64,6 +65,13 @@ export class ClassesController {
     );
   }
 
+  @Get(':id/getStudentsTeachers')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  getAllStudentsTeachers(@Param('id') id: string) {
+    return this.classesService.getClassStudentsTeachers(id);
+  }
+
   @Get(':id/getGradeReview')
   @ApiOkResponse()
   @ApiQuery({
@@ -100,6 +108,16 @@ export class ClassesController {
   @HttpCode(HttpStatus.OK)
   getAllGradesOfStudent(@Param('id') id: string) {
     return this.classesService.getStudentGradesByClass(id);
+  }
+
+  @Get(':id/populateClassStudents')
+  @ApiCreatedResponse()
+  @HttpCode(HttpStatus.OK)
+  populateClassStudents(
+    @Param('id') id: string,
+    @Body() body: PopulateClassDto,
+  ) {
+    return this.classesService.populateClassWithStudentsList(body, id);
   }
 
   @Post()
