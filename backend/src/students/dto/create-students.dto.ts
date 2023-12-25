@@ -6,6 +6,10 @@ export class CreateStudentDto {
   userId?: string;
 
   @ApiProperty({ required: false })
+  @IsString()
+  name?: string;
+
+  @ApiProperty({ required: false })
   @IsString({ each: true })
   @IsOptional()
   classMember?: string[]; // Assuming these are IDs represented as strings

@@ -48,6 +48,18 @@ export class UsersService {
   // findAllRegistered() {
   //   return this.prisma.user.findMany({ where: { isRegistered: true } });
   // }
+  async getUserProfile(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: id },
+      include: {
+        studentId: { select: { id: true } },
+        teacherId: { select: { id: true } },
+        adminId: { select: { id: true } },
+      },
+    });
+    const userWithoutPassword = exclude(user, ['hash', 'hashedRt']);
+    return userWithoutPassword;
+  }
 
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id: id } });

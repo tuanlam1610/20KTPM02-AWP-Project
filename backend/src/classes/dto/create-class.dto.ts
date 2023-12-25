@@ -16,6 +16,9 @@ export class CreateClassDto {
   @ApiProperty({ required: false, type: [String] })
   gradeCompositions: string[];
 
+  @ApiProperty({ required: false })
+  classOwnerId?: string;
+
   @ApiProperty({ required: false, type: [String] })
   classTeachers: string[];
   @ApiProperty({ required: false, type: [String] })
@@ -24,4 +27,6 @@ export class CreateClassDto {
   classMembers: string[];
   @ApiProperty({ required: false, type: [String] })
   classInvitationForStudents: string[];
+  @ApiProperty({ required: false, type: [String] })
+  gradeReviews: string[];
 }

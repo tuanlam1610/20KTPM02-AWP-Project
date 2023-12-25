@@ -3,12 +3,64 @@ import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { exclude } from 'src/users/users.service';
-import { GradeComposition } from '@prisma/client';
+import { GradeComposition, Prisma } from '@prisma/client';
 import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
+import { PopulateClassDto } from './dto/class-populate.dto';
+
+enum GradeReviewStatusFilter {
+  open = 'open',
+  approved = 'approved',
+  denied = 'denied',
+  all = 'all',
+}
 
 @Injectable()
 export class ClassesService {
   constructor(private prisma: PrismaService) {}
+
+  async getClassStudentsTeachers(classId: string) {
+    const fetchedStudentsTeachers = await this.prisma.class.findUnique({
+      where: { id: classId },
+      select: {
+        classMember: {
+          select: {
+            student: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        classTeacher: {
+          select: {
+            teacher: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return {
+      userStudents: fetchedStudentsTeachers.classMember.map(
+        (cm) => cm.student.user,
+      ),
+      userTeachers: fetchedStudentsTeachers.classTeacher.map(
+        (ct) => ct.teacher.user,
+      ),
+    };
+  }
 
   async updateGradeCompositionOrder(
     classId: string,
@@ -89,15 +141,32 @@ export class ClassesService {
         },
       },
     });
-
     const studentGradesByStudent: Record<string, any> = {};
 
-    classWithGradeCompositions.gradeCompositions.forEach((gradeComposition) => {
-      gradeComposition.studentGrades.forEach((studentGrade) => {
+    for (const gradeComposition of classWithGradeCompositions.gradeCompositions) {
+      for (const studentGrade of gradeComposition.studentGrades) {
         const studentId = studentGrade.studentId;
         if (!studentGradesByStudent[studentId]) {
+          const totalGrade = await this.prisma.classMember.findUnique({
+            where: {
+              classId_studentId: { classId: classId, studentId: studentId },
+            },
+            select: {
+              student: {
+                select: {
+                  name: true,
+                },
+              },
+              totalGrade: true,
+            },
+          });
+          if (totalGrade === null) {
+            continue;
+          }
           studentGradesByStudent[studentId] = {
             studentId: studentGrade.studentId,
+            name: totalGrade.student.name,
+            totalGrade: totalGrade.totalGrade,
             gradeEntries: [],
           };
         }
@@ -107,10 +176,62 @@ export class ClassesService {
           ...gradeCompositionX,
           ...studentGradeX,
         });
-      });
-    });
-
+      }
+    }
     return Object.values(studentGradesByStudent);
+  }
+
+  async getAllClassGradeReview(
+    classId: string,
+    page?: number,
+    limit?: number,
+    status?: GradeReviewStatusFilter,
+  ) {
+    const where: Prisma.GradeReviewWhereInput = {};
+    if (status !== GradeReviewStatusFilter.all) {
+      where.status = status;
+    }
+
+    return this.prisma.class.findUnique({
+      where: { id: classId, gradeReviews: { some: {} } },
+      select: {
+        gradeReviews: {
+          where: { ...where },
+          skip: page ?? 0,
+          take: limit ?? 10,
+          orderBy: { status: 'asc' },
+          select: {
+            id: true,
+            currentGrade: true,
+            expectedGrade: true,
+            finalGrade: true,
+            explanation: true,
+            status: true,
+            studentGrade: {
+              select: {
+                grade: true,
+                gradeComposition: {
+                  select: {
+                    name: true,
+                    percentage: true,
+                  },
+                },
+              },
+            },
+            student: {
+              select: {
+                name: true,
+              },
+            },
+            teacher: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async getAllGradeCompositionsOfClass(classId: string) {
@@ -132,6 +253,45 @@ export class ClassesService {
         },
       },
     });
+  }
+
+  async populateClassWithStudentsList(
+    studentsList: PopulateClassDto,
+    classId: string,
+  ) {
+    const students = studentsList.students;
+
+    try {
+      const classMembers = await Promise.all(
+        students.map(async (student) => {
+          // Create or update the classMember relationship for each student
+          const classMember = await this.prisma.classMember.upsert({
+            where: {
+              classId_studentId: {
+                classId: classId,
+                studentId: student.studentId,
+              },
+            },
+            update: {},
+            create: {
+              class: { connect: { id: classId } },
+              student: {
+                connect: { id: student.studentId },
+                create: { name: student.name },
+              },
+            },
+          });
+          return classMember;
+        }),
+      );
+
+      return classMembers;
+    } catch (error) {
+      // Handle errors
+      throw new Error(
+        `Failed to populate class with students: ${error.message}`,
+      );
+    }
   }
 
   async create(createClassDto: CreateClassDto) {
@@ -174,6 +334,13 @@ export class ClassesService {
             },
           })
         : [],
+      createClassDto.gradeReviews
+        ? this.prisma.gradeReview.findMany({
+            where: {
+              id: { in: createClassDto.gradeReviews },
+            },
+          })
+        : [],
     ]);
 
     const [
@@ -182,9 +349,9 @@ export class ClassesService {
       fetchedClassInvitationForTeachers,
       fetchedClassMembers,
       fetchedClassInvitationForStudents,
+      fetchedGradeReviews,
     ] = batchedFetch;
-    console.log(createClassDto.classTeachers);
-    console.log(fetchedClassTeachers);
+
     return this.prisma.class.create({
       data: {
         name: createClassDto.name,
@@ -194,6 +361,7 @@ export class ClassesService {
         gradeCompositions: {
           connect: fetchedGradeCompositions.map((gc) => ({ id: gc.id })),
         },
+        classOwnerId: createClassDto.classOwnerId,
         //TODO rework all tehse connection.
         classTeacher: {
           create: fetchedClassTeachers.map((ct) => ({
@@ -215,6 +383,11 @@ export class ClassesService {
             invitedStudent: {
               connect: { id: cifs.id },
             },
+          })),
+        },
+        gradeReviews: {
+          connect: fetchedGradeReviews.map((gr) => ({
+            id: gr.id,
           })),
         },
       },
@@ -262,6 +435,13 @@ export class ClassesService {
             },
           })
         : [],
+      updateClassDto.gradeReviews
+        ? this.prisma.student.findMany({
+            where: {
+              id: { in: updateClassDto.classInvitationForStudents },
+            },
+          })
+        : [],
     ]);
 
     const [
@@ -281,6 +461,7 @@ export class ClassesService {
         description: updateClassDto.description,
         code: updateClassDto.code,
         invitationLink: updateClassDto.invitationLink,
+        classOwnerId: updateClassDto.classOwnerId,
         gradeCompositions: {
           connect: fetchedGradeCompositions.map((gc) => ({ id: gc.id })),
         },

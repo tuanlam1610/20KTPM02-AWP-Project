@@ -11,6 +11,10 @@ export class CreateTeacherDto {
   userId?: string;
 
   @ApiProperty({ required: false })
+  @IsString()
+  name?: string;
+
+  @ApiProperty({ required: false })
   @IsString({ each: true })
   @IsOptional()
   classTeacher?: string[]; // Assuming these are IDs represented as strings

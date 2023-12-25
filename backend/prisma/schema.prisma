@@ -44,6 +44,7 @@ model Student {
 
   user                      User?                       @relation(fields: [userId], references: [id])
   userId                    String?                     @unique // 1:1 relation between User and Student
+  name                      String
   classMember               ClassMember[]
   classInvitationForStudent ClassInvitationForStudent[]
   studentGrade              StudentGrade[]
@@ -58,9 +59,11 @@ model Teacher {
 
   user                      User?                       @relation(fields: [userId], references: [id])
   userId                    String?                     @unique
+  name                      String?
   classTeacher              ClassTeacher[]
   classInvitationForTeacher ClassInvitationForTeacher[]
   gradeReview               GradeReview[]
+  classOwned                Class[]
 }
 
 //Module
@@ -86,10 +89,14 @@ model Class {
 
   gradeCompositions GradeComposition[]
 
+  classOwner   Teacher? @relation(fields: [classOwnerId], references: [id])
+  classOwnerId String
+
   classTeacher              ClassTeacher[]
   classInvitationForTeacher ClassInvitationForTeacher[]
   classMember               ClassMember[]
   classInvitationForStudent ClassInvitationForStudent[]
+  gradeReviews              GradeReview[]
 }
 
 model ClassTeacher {
@@ -173,6 +180,7 @@ model GradeReview {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  status        GradeReviewStatus @default(open)
   currentGrade  Float
   expectedGrade Float
   finalGrade    Float?
@@ -181,10 +189,12 @@ model GradeReview {
 
   comment Comment[]
 
-  student   Student @relation(fields: [studentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id])
   studentId String
-  teacher   Teacher @relation(fields: [teacherId], references: [id])
-  teacherId String
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacherId String?
+  class     Class    @relation(fields: [classId], references: [id])
+  classId   String
 
   studentGrade   StudentGrade @relation(fields: [studentGradeId], references: [id])
   studentGradeId String       @unique
@@ -203,4 +213,10 @@ model Comment {
   userId String
 
   content String
+}
+
+enum GradeReviewStatus {
+  open
+  approved
+  denied
 }

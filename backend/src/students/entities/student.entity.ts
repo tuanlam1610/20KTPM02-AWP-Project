@@ -10,6 +10,9 @@ export class StudentEntity implements Student {
   @ApiProperty({ required: false })
   userId: string;
 
+  @ApiProperty({ required: false })
+  name: string;
+
   @ApiProperty()
   createdAt: Date;
 

@@ -10,6 +10,9 @@ export class TeacherEntity implements Teacher {
   @ApiProperty({ required: false })
   userId: string;
 
+  @ApiProperty({ required: false })
+  name: string;
+
   @ApiProperty()
   createdAt: Date;
 

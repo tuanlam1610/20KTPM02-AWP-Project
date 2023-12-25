@@ -30,8 +30,8 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.15",
     "@prisma/client": "5.5.2",
-    "@types/passport-facebook": "^3.0.3",
     "@types/nodemailer": "^6.4.14",
+    "@types/passport-facebook": "^3.0.3",
     "@types/passport-jwt": "^3.0.13",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -45,9 +45,9 @@
     "passport-jwt": "^4.0.1",
     "prisma": "^5.5.2",
     "reflect-metadata": "^0.1.13",
+    "rimraf": "^3.0.2",
     "rxjs": "^7.8.1",
-    "swagger-ui-express": "^5.0.0",
-    "rimraf": "^3.0.2"
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -92,5 +92,6 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
