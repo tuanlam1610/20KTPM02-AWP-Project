@@ -90,7 +90,7 @@ model Class {
   gradeCompositions GradeComposition[]
 
   classOwner   Teacher? @relation(fields: [classOwnerId], references: [id])
-  classOwnerId String
+  classOwnerId String?
 
   classTeacher              ClassTeacher[]
   classInvitationForTeacher ClassInvitationForTeacher[]
