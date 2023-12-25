@@ -1,16 +1,19 @@
 import { UserDeleteOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Divider } from 'antd';
+import { Avatar, Button, Divider, Empty } from 'antd';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import InviteMemberModal from '../Modals/InviteMemberModal';
+import { useAppSelector } from '../../../../redux/store';
 
 export default function ClassMemberTabView() {
   const params = useParams();
-  const classId: number = params.id ? Number(params.id) : 0;
+  const classes = useAppSelector((state) => state.teacher.classes);
+  const classIndex: number = params.id ? Number(params.id) : 0;
+  const classDetails = classes[classIndex];
   const [members, setMembers] = useState<{
-    students: { name: string; type: string }[];
-    teachers: { name: string; type: string }[];
+    students: { id: string; name: string }[];
+    teachers: { id: string; name: string }[];
   }>({ students: [], teachers: [] });
 
   const randomBg = () => {
@@ -22,49 +25,56 @@ export default function ClassMemberTabView() {
 
   const fetchClassMembers = async () => {
     try {
+      console.log('FETHCED');
+      console.log(classDetails);
       const res = await axios.get(
-        `${
-          import.meta.env.VITE_REACT_APP_SERVER_URL
-        }/class/${classId}/getMembers`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
+          classDetails.id
+        }/getStudentsTeachers`,
       );
+      const resultData = res.data;
+      console.log(resultData);
+      setMembers({
+        students: resultData.userStudents,
+        teachers: resultData.userTeachers,
+      });
       return res;
     } catch (err) {
-      const sampleMembers = [
-        {
-          name: 'Nguyen Van A',
-          type: 'teacher',
-        },
-        {
-          name: 'Nguyen Van B',
-          type: 'student',
-        },
-        {
-          name: 'Nguyen Van C',
-          type: 'student',
-        },
-        {
-          name: 'Nguyen Van D',
-          type: 'student',
-        },
-        {
-          name: 'Nguyen Van E',
-          type: 'teacher',
-        },
-      ];
-      const students = sampleMembers.filter(
-        (member) => member.type == 'student',
-      );
-      const teachers = sampleMembers.filter(
-        (member) => member.type == 'teacher',
-      );
+      const sampleMembers = {
+        userStudents: [
+          {
+            id: 'student1',
+            name: 'Nguyen Van B',
+          },
+          {
+            id: 'student2',
+            name: 'Nguyen Van C',
+          },
+          {
+            id: 'student3',
+            name: 'Nguyen Van D',
+          },
+        ],
+        userTeachers: [
+          {
+            id: 'teacher1',
+            name: 'Nguyen Van A',
+          },
+          {
+            id: 'teacher2',
+            name: 'Nguyen Van E',
+          },
+        ],
+      };
       setMembers({
-        students,
-        teachers,
+        students: sampleMembers.userStudents,
+        teachers: sampleMembers.userTeachers,
       });
     }
   };
 
   useEffect(() => {
+    console.log('Fetch class members');
     fetchClassMembers();
   }, []);
 
@@ -88,10 +98,18 @@ export default function ClassMemberTabView() {
           </div>
           <Divider className="mx-0 mt-2 mb-4 rounded-full h-[1px] text-indigo-500 bg-indigo-500" />
           <div>
+            {members.teachers.length <= 0 && (
+              <div className="flex justify-center w-full">
+                <Empty
+                  description="No Teacher Found"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+              </div>
+            )}
             {members.teachers.map((teacher, index) => {
               const bgColor = randomBg();
               return (
-                <div>
+                <div key={index}>
                   <div className="flex justify-between items-center p-4">
                     <div className="flex items-center gap-4">
                       <Avatar
@@ -127,10 +145,18 @@ export default function ClassMemberTabView() {
           </div>
           <Divider className="mx-0 mt-2 mb-4 rounded-full h-[1px] text-indigo-500 bg-indigo-500" />
           <div>
+            {members.students.length <= 0 && (
+              <div className="flex justify-center w-full">
+                <Empty
+                  description="No Student Found"
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                />
+              </div>
+            )}
             {members.students.map((student, index) => {
               const bgColor = randomBg();
               return (
-                <div>
+                <div key={index}>
                   <div className="flex justify-between items-center p-4">
                     <div className="flex items-center gap-4">
                       <Avatar

@@ -21,7 +21,7 @@
     "activateAccount": "Kích hoạt tài khoản",
     "sendEmailTo": "Mail đã được gửi đến",
     "activateAccountContent": "Vui lòng nhấp vào liên kết trong email để kích hoạt tài khoản của bạn.\n Liên kết trong thư sẽ hết hạn sau 5 phút.\n Đừng quên kiểm tra phần thư rác!",
-    "notRecieveMail": "Không nhận được mail?",
+    "notReceiveMail": "Không nhận được mail?",
     "resend": "Gửi lại"
   }
 }
