@@ -63,6 +63,7 @@ model Teacher {
   classTeacher              ClassTeacher[]
   classInvitationForTeacher ClassInvitationForTeacher[]
   gradeReview               GradeReview[]
+  classOwned                Class[]
 }
 
 //Module
@@ -87,6 +88,9 @@ model Class {
   invitationLink String  @unique
 
   gradeCompositions GradeComposition[]
+
+  classOwner   Teacher? @relation(fields: [classOwnerId], references: [id])
+  classOwnerId String
 
   classTeacher              ClassTeacher[]
   classInvitationForTeacher ClassInvitationForTeacher[]

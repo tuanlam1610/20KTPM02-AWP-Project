@@ -53,8 +53,8 @@ export class StudentsService {
 
     return this.prisma.student.create({
       data: {
-        ...createStudentDto,
-
+        userId: createStudentDto.userId,
+        name: createStudentDto.name,
         studentGrade: {
           //TEST: Grade might be missing
           create: fetchedStudentGrade.map((sg) => ({

@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { exclude } from 'src/users/users.service';
 import { GradeComposition, Prisma } from '@prisma/client';
 import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
+import { PopulateClassDto } from './dto/class-populate.dto';
 
 enum GradeReviewStatusFilter {
   open = 'open',
@@ -16,6 +17,50 @@ enum GradeReviewStatusFilter {
 @Injectable()
 export class ClassesService {
   constructor(private prisma: PrismaService) {}
+
+  async getClassStudentsTeachers(classId: string) {
+    const fetchedStudentsTeachers = await this.prisma.class.findUnique({
+      where: { id: classId },
+      select: {
+        classMember: {
+          select: {
+            student: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        classTeacher: {
+          select: {
+            teacher: {
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return {
+      userStudents: fetchedStudentsTeachers.classMember.map(
+        (cm) => cm.student.user,
+      ),
+      userTeachers: fetchedStudentsTeachers.classTeacher.map(
+        (ct) => ct.teacher.user,
+      ),
+    };
+  }
 
   async updateGradeCompositionOrder(
     classId: string,
@@ -96,15 +141,32 @@ export class ClassesService {
         },
       },
     });
-
     const studentGradesByStudent: Record<string, any> = {};
 
-    classWithGradeCompositions.gradeCompositions.forEach((gradeComposition) => {
-      gradeComposition.studentGrades.forEach((studentGrade) => {
+    for (const gradeComposition of classWithGradeCompositions.gradeCompositions) {
+      for (const studentGrade of gradeComposition.studentGrades) {
         const studentId = studentGrade.studentId;
         if (!studentGradesByStudent[studentId]) {
+          const totalGrade = await this.prisma.classMember.findUnique({
+            where: {
+              classId_studentId: { classId: classId, studentId: studentId },
+            },
+            select: {
+              student: {
+                select: {
+                  name: true,
+                },
+              },
+              totalGrade: true,
+            },
+          });
+          if (totalGrade === null) {
+            continue;
+          }
           studentGradesByStudent[studentId] = {
             studentId: studentGrade.studentId,
+            name: totalGrade.student.name,
+            totalGrade: totalGrade.totalGrade,
             gradeEntries: [],
           };
         }
@@ -114,9 +176,8 @@ export class ClassesService {
           ...gradeCompositionX,
           ...studentGradeX,
         });
-      });
-    });
-
+      }
+    }
     return Object.values(studentGradesByStudent);
   }
 
@@ -194,6 +255,45 @@ export class ClassesService {
     });
   }
 
+  async populateClassWithStudentsList(
+    studentsList: PopulateClassDto,
+    classId: string,
+  ) {
+    const students = studentsList.students;
+
+    try {
+      const classMembers = await Promise.all(
+        students.map(async (student) => {
+          // Create or update the classMember relationship for each student
+          const classMember = await this.prisma.classMember.upsert({
+            where: {
+              classId_studentId: {
+                classId: classId,
+                studentId: student.studentId,
+              },
+            },
+            update: {},
+            create: {
+              class: { connect: { id: classId } },
+              student: {
+                connect: { id: student.studentId },
+                create: { name: student.name },
+              },
+            },
+          });
+          return classMember;
+        }),
+      );
+
+      return classMembers;
+    } catch (error) {
+      // Handle errors
+      throw new Error(
+        `Failed to populate class with students: ${error.message}`,
+      );
+    }
+  }
+
   async create(createClassDto: CreateClassDto) {
     if (!createClassDto.invitationLink) {
       createClassDto.invitationLink = 'https://meet.google.com/lookup/abc123';
@@ -261,6 +361,7 @@ export class ClassesService {
         gradeCompositions: {
           connect: fetchedGradeCompositions.map((gc) => ({ id: gc.id })),
         },
+        classOwnerId: createClassDto.classOwnerId,
         //TODO rework all tehse connection.
         classTeacher: {
           create: fetchedClassTeachers.map((ct) => ({
@@ -360,6 +461,7 @@ export class ClassesService {
         description: updateClassDto.description,
         code: updateClassDto.code,
         invitationLink: updateClassDto.invitationLink,
+        classOwnerId: updateClassDto.classOwnerId,
         gradeCompositions: {
           connect: fetchedGradeCompositions.map((gc) => ({ id: gc.id })),
         },
