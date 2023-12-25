@@ -31,7 +31,12 @@ export default function StudentHomePage() {
                   navigate(`/teacher/class/${index}`);
                 }}
               >
-                <img src={course.courseImg} className="h-1/2 object-contain" />
+                <img
+                  src={
+                    'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg'
+                  }
+                  className="h-1/2 object-contain"
+                />
                 <div className="px-4 my-4">
                   <Title level={4} className="truncate">
                     {course.name}

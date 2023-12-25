@@ -190,7 +190,7 @@ export default function GradeManagementPage() {
         ) : (
           <>
             {Object.keys(gradeCompositionMap).map((id) => (
-              <GradeItem id={id} />
+              <GradeItem id={id} key={id} />
             ))}
           </>
         )}

@@ -13,11 +13,13 @@ import { keyBy } from 'lodash';
 import Papa from 'papaparse';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
+import { useAppSelector } from '../../redux/store';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 interface Grade {
   key: React.Key;
   name: string;
-  email: string;
   studentId: string;
   gradeCompositions: {
     id: string;
@@ -30,12 +32,14 @@ interface Grade {
 
 export default function GradeManagementPage() {
   // const dispatch = useAppDispatch()
+  const classes = useAppSelector((state) => state.teacher.classes);
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname;
-  console.log(pathName);
   const classId: number = params.id ? Number(params.id) : 0;
+  let gradeCompositionNameMap: any;
+  let gradeCompositionNames: string[] = [];
 
   const data: Grade[] = [];
   for (let i = 0; i < 20; i++) {
@@ -43,7 +47,6 @@ export default function GradeManagementPage() {
       {
         key: `${i}_1`,
         name: 'Student 1',
-        email: 'student1@gmail.com',
         studentId: '20127001',
         gradeCompositions: [
           {
@@ -100,7 +103,6 @@ export default function GradeManagementPage() {
       {
         key: `${i}_2`,
         name: 'Student 2',
-        email: 'student2@gmail.com',
         studentId: '20127002',
         gradeCompositions: [
           {
@@ -157,7 +159,6 @@ export default function GradeManagementPage() {
       {
         key: `${i}_3`,
         name: 'Student 3',
-        email: 'student3@gmail.com',
         studentId: '20127003',
         gradeCompositions: [
           {
@@ -214,29 +215,52 @@ export default function GradeManagementPage() {
     );
   }
 
-  let gradeCompositionNames: string[] = [];
+  const formatRawDataToTableData = (rawData: any[]) => {
+    return rawData.map((data) => {
+      const gradeCompositionItems = keyBy(data.gradeCompositions, 'name');
+      gradeCompositionNameMap = keyBy(data.gradeCompositions, 'name');
+      Object.keys(gradeCompositionItems).forEach((gradeName) => {
+        gradeCompositionItems[gradeName] =
+          gradeCompositionItems[gradeName].grade;
+      });
+      gradeCompositionNames = Object.keys(gradeCompositionItems);
+      const res = {
+        ...data,
+        ...gradeCompositionItems,
+      };
+      return res;
+    });
+  };
 
-  // const getGradeBoardInformation = async () => {
-  //   try {
-  //     const res = await axios.get(
-  //       `${
-  //         import.meta.env.VITE_REACT_APP_SERVER_URL
-  //       }/teacher/class/${classId}/getGradeBoard`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-  //         },
-  //       },
-  //     );
-  //     console.log(res);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
+  const fetchGradeBoardInformation = async () => {
+    try {
+      const url = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
+        classes[classId].id
+      }/getAllGradesOfStudent`;
+      const res = await axios.get(url);
+      const formattedData = res.data.map((data: any) => {
+        const newGradeCompositions = keyBy(data.gradeEntries, 'name');
+        Object.keys(newGradeCompositions).forEach((gradeName) => {
+          newGradeCompositions[gradeName] =
+            newGradeCompositions[gradeName].grade;
+        });
+        gradeCompositionNames = Object.keys(newGradeCompositions);
+        const res = {
+          ...data,
+          ...newGradeCompositions,
+        };
+        delete res.gradeEntries;
+        return res;
+      });
+      console.log(formattedData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  // useEffect(() => {
-  //   getGradeBoardInformation();
-  // });
+  useEffect(() => {
+    fetchGradeBoardInformation();
+  }, []);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -248,7 +272,6 @@ export default function GradeManagementPage() {
         key: dataRow.key,
         studentId: dataRow.studentId,
         name: dataRow.name,
-        email: dataRow.email,
       };
     });
     return res;
@@ -311,19 +334,7 @@ export default function GradeManagementPage() {
     },
   ];
 
-  const formattedData = data.map((data) => {
-    const newGradeCompositions = keyBy(data.gradeCompositions, 'name');
-    Object.keys(newGradeCompositions).forEach((gradeName) => {
-      newGradeCompositions[gradeName] = newGradeCompositions[gradeName].grade;
-    });
-    gradeCompositionNames = Object.keys(newGradeCompositions);
-    const res = {
-      ...data,
-      ...newGradeCompositions,
-    };
-    delete res.gradeCompositions;
-    return res;
-  });
+  const formattedData = formatRawDataToTableData(data);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -420,7 +431,6 @@ export default function GradeManagementPage() {
               title="Full Name"
               fixed="left"
             />
-            <Column key="email" dataIndex="email" title="Email" />
             <ColumnGroup title="Grade Structure">
               {gradeCompositionNames.map((gradeCompositionName) => (
                 <Column
@@ -430,7 +440,7 @@ export default function GradeManagementPage() {
                     return (
                       <Link
                         to={`${pathName}/${
-                          formattedData[`${gradeCompositionName}`]?.id
+                          gradeCompositionNameMap[`${gradeCompositionName}`]?.id
                         }`}
                       >
                         {gradeCompositionName}

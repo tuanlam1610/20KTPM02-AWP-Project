@@ -1,5 +1,6 @@
 import { Button, Col, Row } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
+import GradeManagementPage from '../../../GradeManagement';
 
 export default function ClassDetailsTabView() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function ClassDetailsTabView() {
         </div>
       </Col>
       <Col xs={{ order: 2, span: 24 }} md={{ order: 2, span: 16 }}>
-        <div className="bg-gray-300 rounded-md h-96 p-4">
+        <div className="border-[1px] rounded-md p-4">
           <div className="flex justify-between items-center">
             <h1 className="text-lg font-semibold">Grade Structure:</h1>
             <Button
@@ -26,6 +27,7 @@ export default function ClassDetailsTabView() {
               Manage Grade
             </Button>
           </div>
+          <GradeManagementPage />
         </div>
       </Col>
     </Row>
