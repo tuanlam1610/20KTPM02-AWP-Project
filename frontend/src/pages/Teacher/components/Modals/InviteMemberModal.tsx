@@ -1,7 +1,7 @@
 import { Button, Form, Input, Modal, Space, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import { useState } from 'react';
-import { UserAddOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
 
 export default function InviteMemberModal(props: { type: string }) {
   const type = props.type;
@@ -9,9 +9,22 @@ export default function InviteMemberModal(props: { type: string }) {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [invitationLink, setInvitationLink] = useState(
+    'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
+  );
+
+  useEffect(() => {
+    setInvitationLink(
+      'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
+    );
+  }, []);
 
   const showModal = () => {
     setOpen(true);
+  };
+
+  const handleCopyClassId = () => {
+    navigator.clipboard.writeText(invitationLink);
   };
 
   const handleOk = async () => {
@@ -101,10 +114,18 @@ export default function InviteMemberModal(props: { type: string }) {
               <span className="bg-white p-2">Or</span>
             </p>
             <p className="mb-2">Send invite to use the link below:</p>
-            <Input
-              readOnly
-              value={'https://www.edulingo/class01/invitationlink-fwienfwef'}
-            />
+            <div className="relative flex items-center">
+              <Input readOnly value={invitationLink} />
+              <Button
+                icon={<CopyOutlined />}
+                className="text-gray-400 absolute right-1"
+                size="small"
+                type="text"
+                onClick={() => {
+                  handleCopyClassId();
+                }}
+              />
+            </div>
           </>
         )}
       </Modal>

@@ -50,7 +50,7 @@ export default function HomePage() {
           </Button>
         </div>
         <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold">{classDetails.name}</p>
+          <p className="text-4xl font-semibold">{classDetails?.name}</p>
           {/* Class Code & Invite Section */}
           <div className="flex justify-between items-center gap-4">
             {/* Class Code */}
@@ -59,7 +59,7 @@ export default function HomePage() {
                 <p>Class Code:</p>
               </div>
               <div className="flex justify-between items-center py-1 px-4">
-                <p>000{classId}</p>
+                <p>{classDetails?.code}</p>
                 <Button
                   icon={<CopyOutlined />}
                   size="small"
@@ -72,7 +72,7 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        <p className="text-gray-500 italic mb-4">{classDetails.description}</p>
+        <p className="text-gray-500 italic mb-4">{classDetails?.description}</p>
 
         <Tabs
           defaultActiveKey="1"
