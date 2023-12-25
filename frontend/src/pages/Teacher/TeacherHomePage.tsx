@@ -1,12 +1,36 @@
 import Search from 'antd/es/input/Search';
 import Title from 'antd/es/typography/Title';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import CreateClassModal from './components/Modals/CreateClassModal';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { Empty } from 'antd';
+import { setClasses } from '../../redux/teacherSlice';
 
 export default function TeacherHomePage() {
+  const dispatch = useAppDispatch();
   const classes = useAppSelector((state) => state.teacher.classes);
   const navigate = useNavigate();
+  const teacherId = '27287ece-69b4-4586-88c1-131b66e64b28';
+
+  const fetchClassList = async () => {
+    try {
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_REACT_APP_SERVER_URL
+        }/teachers/${teacherId}/getAllClasses`,
+      );
+      console.log(res.data);
+      dispatch(setClasses(res.data));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchClassList();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -22,18 +46,31 @@ export default function TeacherHomePage() {
           className="mb-8"
         />
         {/* List Of Courses */}
-        <div className="flex flex-1 flex-wrap justify-center gap-8">
+        <div className="flex flex-1 flex-wrap justify-start gap-8">
+          {classes.length <= 0 && (
+            <div>
+              <Empty
+                description="No Class Found"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            </div>
+          )}
           {classes.map((course, index) => {
             return (
               <div
                 key={index}
-                className="flex flex-col w-1/5 min-h-[50vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
+                className="flex flex-col w-1/5 min-h-[32vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
                 onClick={() => {
                   navigate(`/teacher/class/${index}`);
                 }}
               >
-                <img src={course.courseImg} className="h-1/2 object-contain" />
+                <img
+                  src={
+                    'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg'
+                  }
+                  className="h-1/2 object-contain"
+                />
                 <div className="px-4 my-4">
                   <Title level={4} className="truncate">
                     {course.name}
