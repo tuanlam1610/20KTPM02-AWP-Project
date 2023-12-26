@@ -22,6 +22,9 @@ import {
 } from '@nestjs/swagger';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { StudentEntity } from './entities/student.entity';
+import { PopulateClassDto } from 'src/classes/dto/class-populate.dto';
+import { JoinClassDto, MapUserDto } from './dto/join-class.dto';
+import { UpdateStudentDto } from './dto/update-students.dto';
 
 @Controller('students')
 @ApiTags('students')
@@ -36,6 +39,32 @@ export class StudentsController {
   //   const user = req.user;
   //   return this.studentsService.findOne(user['sub']);
   // }
+  @Get(':id/getAllClassesOfstudent/')
+  @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
+  getAllClassesOfstudent(@Param('id') id: string) {
+    return this.studentsService.getAllClassesOfstudent(id);
+  }
+
+  @Patch(':id/joinClassByCode')
+  @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
+  joinClassByCode(@Param('id') id: string, @Body() body: JoinClassDto) {
+    return this.studentsService.joinClassByCode(body.code, id);
+  }
+
+  @Patch(':id/mapStudentToUser')
+  @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
+  mapStudentToUser(@Param('id') id: string, @Body() body: MapUserDto) {
+    return this.studentsService.mapStudentToUser(id, body.userId);
+  }
+  @Post('populateStudents')
+  @ApiCreatedResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
+  populateStudents(@Body() PopulateClassDto: PopulateClassDto) {
+    return this.studentsService.populateStudents(PopulateClassDto);
+  }
 
   @Post()
   @ApiCreatedResponse({ type: StudentEntity })
@@ -66,7 +95,7 @@ export class StudentsController {
   @Patch(':id')
   @ApiOkResponse({ type: StudentEntity })
   @HttpCode(HttpStatus.OK)
-  update(@Param('id') id: string, @Body() updateStudentDto: CreateStudentDto) {
+  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentsService.update(id, updateStudentDto);
   }
 
