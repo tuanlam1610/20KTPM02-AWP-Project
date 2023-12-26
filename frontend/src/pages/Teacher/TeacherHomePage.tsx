@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { Empty } from 'antd';
-import { setClasses } from '../../redux/teacherSlice';
+import { setClasses } from '../../redux/appSlice';
 
 export default function TeacherHomePage() {
   const dispatch = useAppDispatch();
-  const classes = useAppSelector((state) => state.teacher.classes);
+  const classes = useAppSelector((state) => state.app.classes);
   const userInfo = useAppSelector((state) => state.app.userInfo);
   console.log(userInfo?.teacherId.id);
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ export default function TeacherHomePage() {
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold mb-4">All Courses</p>
+          <p className="text-4xl font-semibold mb-4">All Classes</p>
           <CreateClassModal />
         </div>
         <Search

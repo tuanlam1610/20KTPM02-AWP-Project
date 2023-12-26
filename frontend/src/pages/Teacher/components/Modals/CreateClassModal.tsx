@@ -1,15 +1,18 @@
-import { Button, Form, Input, Modal } from 'antd';
+import { Button, Form, Input, Modal, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import TextArea from 'antd/es/input/TextArea';
 import { useState } from 'react';
-import { useAppDispatch } from '../../../../redux/store';
-import { addClass } from '../../../../redux/teacherSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/store';
+import { addClass } from '../../../../redux/appSlice';
+import axios from 'axios';
 
 export default function CreateClassModal() {
   const dispatch = useAppDispatch();
+  const userInfo = useAppSelector((state) => state.app.userInfo);
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const showModal = () => {
     setOpen(true);
@@ -17,12 +20,28 @@ export default function CreateClassModal() {
 
   const handleOk = async () => {
     setConfirmLoading(true);
-
     const values = await form.validateFields();
     form.resetFields();
     console.log('Submit Values: ', values);
-
-    setTimeout(() => {
+    try {
+      const teacherId = userInfo?.teacherId?.id;
+      const classDetails = {
+        name: values.name,
+        code: values.code,
+        invitationLink: values.code,
+        description: values.description ? values.description : '',
+        classOwnerId: teacherId,
+        classTeachers: [teacherId],
+      };
+      const result = await axios.post(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes`,
+        classDetails,
+      );
+      messageApi.open({
+        type: 'success',
+        content: 'Create class successfully',
+        duration: 1,
+      });
       dispatch(
         addClass({
           name: values.name,
@@ -33,7 +52,16 @@ export default function CreateClassModal() {
       );
       setOpen(false);
       setConfirmLoading(false);
-    }, 2000);
+    } catch (err) {
+      console.log(err);
+      messageApi.open({
+        type: 'success',
+        content: `${err}`,
+        duration: 1,
+      });
+      setOpen(false);
+      setConfirmLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -42,6 +70,7 @@ export default function CreateClassModal() {
 
   return (
     <>
+      {contextHolder}
       <Button onClick={showModal}>Create New Class</Button>
       <Modal
         title={
@@ -75,6 +104,19 @@ export default function CreateClassModal() {
             className="w-full mb-4"
           >
             <Input type="text" placeholder="Enter class name" />
+          </Form.Item>
+          <Form.Item
+            label="Class Code"
+            rules={[
+              {
+                required: true,
+                message: 'Please enter class code!',
+              },
+            ]}
+            name={'code'}
+            className="w-full mb-4"
+          >
+            <Input type="text" placeholder="Enter class code" />
           </Form.Item>
           <Form.Item
             label="Description"

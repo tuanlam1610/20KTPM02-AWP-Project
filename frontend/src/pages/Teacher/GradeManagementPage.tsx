@@ -32,7 +32,7 @@ interface Grade {
 
 export default function GradeManagementPage() {
   // const dispatch = useAppDispatch()
-  const classes = useAppSelector((state) => state.teacher.classes);
+  const classes = useAppSelector((state) => state.app.classes);
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();

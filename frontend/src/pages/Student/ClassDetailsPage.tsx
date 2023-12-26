@@ -7,7 +7,7 @@ import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
 import { useEffect } from 'react';
 import { fetchInitData } from '../../redux/classDetailThunks';
 
-export default function HomePage() {
+export default function ClassDetailsPage() {
   const dispatch = useAppDispatch();
   const params = useParams();
   const [messageApi, contextHolder] = message.useMessage();

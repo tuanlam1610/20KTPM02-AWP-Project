@@ -3,33 +3,14 @@ import { useForm } from 'antd/es/form/Form';
 import { useEffect, useState } from 'react';
 import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
 
-export default function InviteMemberModal(props: { type: string }) {
-  const type = props.type;
+export default function JoinClassModal() {
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const [invitationLink, setInvitationLink] = useState(
-    'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
-  );
-
-  useEffect(() => {
-    setInvitationLink(
-      'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
-    );
-  }, []);
 
   const showModal = () => {
     setOpen(true);
-  };
-
-  const handleCopyClassInvitationLink = () => {
-    navigator.clipboard.writeText(invitationLink);
-    messageApi.open({
-      type: 'success',
-      content: 'Invitation link copied to clipboard',
-      duration: 1,
-    });
   };
 
   const handleOk = async () => {
@@ -43,7 +24,7 @@ export default function InviteMemberModal(props: { type: string }) {
       content: (
         <span>
           Send invitation to
-          <span className="font-semibold">{values.email}</span> successfully
+          <span className="font-semibold">{values.code}</span> successfully
         </span>
       ),
       duration: 1,
@@ -63,13 +44,11 @@ export default function InviteMemberModal(props: { type: string }) {
   return (
     <>
       {contextHolder}
-      <Button onClick={showModal} icon={<UserAddOutlined />}>
-        Invite
-      </Button>
+      <Button onClick={showModal}>Join Class</Button>
       <Modal
         title={
           <h1 className="text-2xl text-indigo-500 pb-4 mb-4 border-b-[1px] border-gray-300 uppercase">
-            {`Invite ${type}`}
+            {`Join Class`}
           </h1>
         }
         centered
@@ -88,51 +67,27 @@ export default function InviteMemberModal(props: { type: string }) {
       >
         <Form form={form} layout="vertical">
           <Form.Item
-            label={<p className="">{`Invite new ${type} by email:`}</p>}
+            label={<p className="">{`Join class by code`}</p>}
             rules={[
               {
                 required: true,
-                message: 'Please enter your email!',
-              },
-              {
-                pattern: RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i),
-                message: 'Invalid email. Example: example@email.com',
+                message: 'Please enter class code',
               },
             ]}
-            name={'email'}
+            name={'code'}
             className="w-full mb-4"
           >
             <Space.Compact className="w-full">
-              <Input type="text" placeholder="example@email.com" />
+              <Input type="text" placeholder="Enter class code..." />
               <Button
                 onClick={handleOk}
                 className="bg-indigo-500 text-white hover:text-white"
               >
-                Invite
+                Join
               </Button>
             </Space.Compact>
           </Form.Item>
         </Form>
-        {type == 'student' && (
-          <>
-            <p className="text-center text-lg font-semibold border-b-[1px] border-b-black leading-[0.1em] my-8">
-              <span className="bg-white p-2">Or</span>
-            </p>
-            <p className="mb-2">Send invite to use the link below:</p>
-            <div className="relative flex items-center">
-              <Input readOnly value={invitationLink} />
-              <Button
-                icon={<CopyOutlined />}
-                className="text-gray-400 absolute right-1"
-                size="small"
-                type="text"
-                onClick={() => {
-                  handleCopyClassInvitationLink();
-                }}
-              />
-            </div>
-          </>
-        )}
       </Modal>
     </>
   );
