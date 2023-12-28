@@ -28,6 +28,9 @@ export class SignUpDto extends AuthDto {
   @ApiProperty()
   @IsDateString()
   dob: Date;
+
+  @ApiProperty()
+  roles: string[];
 }
 
 export class AccountToResetPasswordDto {
