@@ -12,6 +12,7 @@ import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
 import TeacherHomePage from './pages/Teacher/TeacherHomePage';
 import UserProfilePage from './pages/UserProfilePage';
 import StudentHomePage from './pages/Student/StudentHomePage';
+import StudentClassDetailsPage from './pages/Student/StudentClassDetailsPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import ChooseRolePage from './pages/ChooseRolePage';
@@ -55,6 +56,7 @@ function App() {
           element={<ProtectedRoute allowedRole="student" />}
         >
           <Route path="home" element={<StudentHomePage />} />
+          <Route path="class/:id" element={<StudentClassDetailsPage />} />
         </Route>
 
         {/* Error */}
