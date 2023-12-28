@@ -18,6 +18,7 @@ import UnauthorizedPage from './pages/UnauthorizedPage';
 import ChooseRolePage from './pages/ChooseRolePage';
 import GradeManagementPage from './pages/Teacher/GradeManagementPage';
 import GradeCompositionPage from './pages/Teacher/GradeCompositionPage';
+import SignUpTeacherPage from './pages/SignUpTeacherPage';
 import GradeReviewDetailPage from './pages/Teacher/GradeReviewDetailPage';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -35,6 +36,7 @@ function App() {
         {/* Authentication */}
         <Route path="/login" element={<SignInPage />} />
         <Route path="/register" element={<SignUpPage />} />
+        <Route path="/register/teacher" element={<SignUpTeacherPage />} />
         <Route path="/recover" element={<RecoverPasswordPage />} />
         <Route path="/resetPassword" element={<ResetPasswordPage />} />
         <Route path="/activateEmail" element={<ActivateEmailPage />} />

@@ -4,7 +4,7 @@ import {
   FileTextOutlined,
   LeftOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, MenuProps, Space } from 'antd';
+import { Button, Dropdown, MenuProps, Space, message } from 'antd';
 import Search from 'antd/es/input/Search';
 import Table from 'antd/es/table';
 import Column from 'antd/es/table/Column';
@@ -15,13 +15,13 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { useAppSelector } from '../../redux/store';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 interface Grade {
   key: React.Key;
   name: string;
   studentId: string;
-  gradeCompositions: {
+  gradeEntries: {
     id: string;
     name: string;
     grade: number | null;
@@ -33,13 +33,16 @@ interface Grade {
 export default function GradeManagementPage() {
   // const dispatch = useAppDispatch()
   const classes = useAppSelector((state) => state.app.classes);
+  const [messageApi, contextHolder] = message.useMessage();
   const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname;
-  const classId: number = params.id ? Number(params.id) : 0;
+  const classId: string = params.id ? params.id : '';
   let gradeCompositionNameMap: any;
-  let gradeCompositionNames: string[] = [];
+  const [gradeCompositionNames, setGradeCompositionNames] = useState<string[]>(
+    [],
+  );
 
   const data: Grade[] = [];
   for (let i = 0; i < 20; i++) {
@@ -48,7 +51,7 @@ export default function GradeManagementPage() {
         key: `${i}_1`,
         name: 'Student 1',
         studentId: '20127001',
-        gradeCompositions: [
+        gradeEntries: [
           {
             id: 'composition1',
             name: 'Exercise 1',
@@ -104,7 +107,7 @@ export default function GradeManagementPage() {
         key: `${i}_2`,
         name: 'Student 2',
         studentId: '20127002',
-        gradeCompositions: [
+        gradeEntries: [
           {
             id: 'composition1',
             name: 'Exercise 1',
@@ -160,7 +163,7 @@ export default function GradeManagementPage() {
         key: `${i}_3`,
         name: 'Student 3',
         studentId: '20127003',
-        gradeCompositions: [
+        gradeEntries: [
           {
             id: 'composition1',
             name: 'Exercise 1',
@@ -217,13 +220,14 @@ export default function GradeManagementPage() {
 
   const formatRawDataToTableData = (rawData: any[]) => {
     return rawData.map((data) => {
-      const gradeCompositionItems = keyBy(data.gradeCompositions, 'name');
-      gradeCompositionNameMap = keyBy(data.gradeCompositions, 'name');
+      const gradeCompositionItems = keyBy(data.gradeEntries, 'name');
+      gradeCompositionNameMap = keyBy(data.gradeEntries, 'name');
+      console.log(gradeCompositionNameMap);
       Object.keys(gradeCompositionItems).forEach((gradeName) => {
         gradeCompositionItems[gradeName] =
           gradeCompositionItems[gradeName].grade;
       });
-      gradeCompositionNames = Object.keys(gradeCompositionItems);
+      setGradeCompositionNames(Object.keys(gradeCompositionItems));
       const res = {
         ...data,
         ...gradeCompositionItems,
@@ -232,35 +236,83 @@ export default function GradeManagementPage() {
     });
   };
 
+  const [formattedData, setFormattedData] = useState<any>([]);
+
   const fetchGradeBoardInformation = async () => {
     try {
-      const url = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
-        classes[classId].id
-      }/getAllGradesOfStudent`;
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/classes/${classId}/getAllGradesOfStudent`;
       const res = await axios.get(url);
-      const formattedData = res.data.map((data: any) => {
-        const newGradeCompositions = keyBy(data.gradeEntries, 'name');
-        Object.keys(newGradeCompositions).forEach((gradeName) => {
-          newGradeCompositions[gradeName] =
-            newGradeCompositions[gradeName].grade;
-        });
-        gradeCompositionNames = Object.keys(newGradeCompositions);
-        const res = {
-          ...data,
-          ...newGradeCompositions,
-        };
-        delete res.gradeEntries;
-        return res;
-      });
+      console.log(res.data);
+      const formattedData = formatRawDataToTableData(res.data);
       console.log(formattedData);
+      setFormattedData(formattedData);
     } catch (err) {
       console.log(err);
     }
   };
 
+  const doUploadStudentList = async (data: any) => {
+    // Upload List Student
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/classes/${classId}/populateClassStudents`;
+      const result = await axios.post(url, {
+        students: data,
+      });
+      console.log(result);
+      messageApi.open({
+        type: 'success',
+        content: 'Success',
+        duration: 1,
+      });
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `${error}`,
+        duration: 1,
+      });
+    }
+  };
+
+  const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileData: File = e.target.files[0];
+      console.log(fileData);
+      if (fileData.type == 'text/csv') {
+        console.log('Parse CSV File');
+        Papa.parse(fileData, {
+          header: true,
+          complete: function (results) {
+            console.log(results.data);
+            doUploadStudentList(results.data);
+          },
+        });
+      } else {
+        console.log('Parse XLSX File');
+        const data = await fileData.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const wsName = workbook.SheetNames[0];
+        const worksheet = XLSX.utils
+          .sheet_to_json(workbook.Sheets[wsName])
+          .map((row: any) => {
+            return {
+              ...row,
+              studentId: `${row.studentId}`,
+            };
+          });
+        console.log(worksheet);
+        doUploadStudentList(worksheet);
+      }
+    }
+  };
+
   useEffect(() => {
     fetchGradeBoardInformation();
-  }, []);
+  }, [classId]);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -334,10 +386,9 @@ export default function GradeManagementPage() {
     },
   ];
 
-  const formattedData = formatRawDataToTableData(data);
-
   return (
     <div className="flex flex-col min-h-screen">
+      {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="">
@@ -354,31 +405,7 @@ export default function GradeManagementPage() {
             <input
               type="file"
               accept=".xlsx, .csv"
-              onChange={async (e) => {
-                if (e.target.files) {
-                  const fileData: File = e.target.files[0];
-                  console.log(fileData);
-                  if (fileData.type == 'text/csv') {
-                    console.log('Parse CSV File');
-                    Papa.parse(fileData, {
-                      header: true,
-                      complete: function (results) {
-                        console.log(results.data);
-                        console.log(data);
-                      },
-                    });
-                  } else {
-                    console.log('Parse XLSX File');
-                    const data = await fileData.arrayBuffer();
-                    const workbook = XLSX.read(data);
-                    const wsName = workbook.SheetNames[0];
-                    const worksheet = XLSX.utils.sheet_to_json(
-                      workbook.Sheets[wsName],
-                    );
-                    console.log(worksheet);
-                  }
-                }
-              }}
+              onChange={handleUploadStudentList}
             />
             {/* <Upload
               beforeUpload={(file) => {
@@ -432,34 +459,27 @@ export default function GradeManagementPage() {
               fixed="left"
             />
             <ColumnGroup title="Grade Structure">
-              {gradeCompositionNames.map((gradeCompositionName) => (
-                <Column
-                  key={gradeCompositionName}
-                  dataIndex={gradeCompositionName}
-                  title={() => {
-                    return (
-                      <Link
-                        to={`${pathName}/${
-                          gradeCompositionNameMap[`${gradeCompositionName}`]?.id
-                        }`}
-                      >
-                        {gradeCompositionName}
-                      </Link>
-                      // <Button
-                      //   onClick={() => {
-                      //     navigate(
-                      //       `${pathName}/${
-                      //         formattedData[`${gradeCompositionName}`]?.id
-                      //       }`,
-                      //     );
-                      //   }}
-                      // >
-                      //   {gradeCompositionName}
-                      // </Button>
-                    );
-                  }}
-                />
-              ))}
+              {gradeCompositionNames.map((gradeCompositionName) => {
+                console.log(gradeCompositionNames);
+                return (
+                  <Column
+                    key={gradeCompositionName}
+                    dataIndex={gradeCompositionName}
+                    title={() => {
+                      return (
+                        <Link
+                          to={`${pathName}/${
+                            gradeCompositionNameMap?.[`${gradeCompositionName}`]
+                              ?.id
+                          }`}
+                        >
+                          {gradeCompositionName}
+                        </Link>
+                      );
+                    }}
+                  />
+                );
+              })}
             </ColumnGroup>
             <Column
               key="totalGrade"

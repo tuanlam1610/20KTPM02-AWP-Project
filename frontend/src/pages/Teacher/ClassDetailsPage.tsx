@@ -21,7 +21,7 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const handleCopyClassId = () => {
-    navigator.clipboard.writeText(`000${classId}`);
+    navigator.clipboard.writeText(classDetails.code);
     messageApi.open({
       type: 'success',
       content: 'Class code copied to clipboard',
