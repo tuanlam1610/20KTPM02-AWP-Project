@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
@@ -13,7 +13,7 @@ export class StudentsService {
     });
     if (!classToJoin) {
       //return error: class not found
-      return HttpStatus.NOT_FOUND;
+      throw new BadRequestException('Class not found');
     }
     return this.prisma.student.update({
       where: { id: studentId },

@@ -6,17 +6,21 @@ import { exclude } from 'src/users/users.service';
 import { GradeComposition, Prisma } from '@prisma/client';
 import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
 import { PopulateClassDto } from './dto/class-populate.dto';
+import { GradeCompositionsService } from 'src/grade-compositions/grade-compositions.service';
 
 enum GradeReviewStatusFilter {
-  open = 'open',
-  approved = 'approved',
-  denied = 'denied',
-  all = 'all',
+  Open = 'Open',
+  Approved = 'Approved',
+  Denied = 'Denied',
+  All = 'All',
 }
 
 @Injectable()
 export class ClassesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gradeCompositionsService: GradeCompositionsService,
+  ) {}
 
   async getClassStudentsTeachers(classId: string) {
     const fetchedStudentsTeachers = await this.prisma.class.findUnique({
@@ -188,7 +192,7 @@ export class ClassesService {
     status?: GradeReviewStatusFilter,
   ) {
     const where: Prisma.GradeReviewWhereInput = {};
-    if (status !== GradeReviewStatusFilter.all) {
+    if (status !== GradeReviewStatusFilter.All) {
       where.status = status;
     }
 
@@ -303,6 +307,13 @@ export class ClassesService {
           return classMember;
         }),
       );
+
+      const gc = await this.prisma.gradeComposition.findMany({
+        where: { classId: classId },
+      });
+      gc.forEach(async (gc) => {
+        await this.gradeCompositionsService.populateStudentGrade(gc.id);
+      });
 
       return {
         classMembers: classMembers.filter(Boolean),

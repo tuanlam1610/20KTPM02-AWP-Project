@@ -180,7 +180,7 @@ model GradeReview {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  status        GradeReviewStatus @default(open)
+  status        GradeReviewStatus @default(Open)
   currentGrade  Float
   expectedGrade Float
   finalGrade    Float?
@@ -216,7 +216,7 @@ model Comment {
 }
 
 enum GradeReviewStatus {
-  open
-  approved
-  denied
+  Open
+  Approved
+  Denied
 }
