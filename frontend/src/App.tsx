@@ -18,6 +18,11 @@ import UnauthorizedPage from './pages/UnauthorizedPage';
 import ChooseRolePage from './pages/ChooseRolePage';
 import GradeManagementPage from './pages/Teacher/GradeManagementPage';
 import GradeCompositionPage from './pages/Teacher/GradeCompositionPage';
+import GradeReviewDetailPage from './pages/Teacher/GradeReviewDetailPage';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 function App() {
   return (
@@ -42,6 +47,10 @@ function App() {
           <Route
             path="class/:id/grademanagement"
             element={<GradeManagementPage />}
+          />
+          <Route
+            path="class/:id/gradeReview/:gradeReviewId"
+            element={<GradeReviewDetailPage />}
           />
           <Route
             path="class/:id/grademanagement/:gradeCompositionId"
