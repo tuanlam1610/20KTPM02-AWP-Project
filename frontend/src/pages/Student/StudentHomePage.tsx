@@ -17,6 +17,7 @@ export default function StudentHomePage() {
   const fetchClassList = async () => {
     try {
       const studentId = userInfo?.studentId.id;
+      console.log(studentId);
       const res = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
@@ -30,8 +31,9 @@ export default function StudentHomePage() {
   };
 
   useEffect(() => {
+    console.log('Fetch class list');
     fetchClassList();
-  }, []);
+  }, [userInfo]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -63,7 +65,7 @@ export default function StudentHomePage() {
                 className="flex flex-col w-1/5 min-h-[32vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
                 onClick={() => {
-                  navigate(`/teacher/class/${index}`);
+                  navigate(`/student/class/${classes[index].id}`);
                 }}
               >
                 <img

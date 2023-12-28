@@ -63,7 +63,7 @@ export default function JoinClassModal() {
       console.log(err);
       messageApi.open({
         type: 'error',
-        content: `${err}`,
+        content: `Join Class Failed`,
         duration: 1,
       });
       setOpen(false);
