@@ -110,7 +110,7 @@ export class ClassesController {
     return this.classesService.getStudentGradesByClass(id);
   }
 
-  @Get(':id/populateClassStudents')
+  @Post(':id/populateClassStudents')
   @ApiCreatedResponse()
   @HttpCode(HttpStatus.OK)
   populateClassStudents(

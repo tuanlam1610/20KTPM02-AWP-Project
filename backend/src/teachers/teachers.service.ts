@@ -87,11 +87,11 @@ export class TeachersService {
   }
 
   findAll() {
-    return this.prisma.student.findMany();
+    return this.prisma.teacher.findMany();
   }
 
   findOne(id: string) {
-    return this.prisma.student.findUnique({ where: { id: id } });
+    return this.prisma.teacher.findUnique({ where: { id: id } });
   }
 
   async update(id: string, updateTeacherDto: UpdateTeacherDto) {
@@ -148,6 +148,6 @@ export class TeachersService {
   }
 
   remove(id: string) {
-    return this.prisma.student.delete({ where: { id: id } });
+    return this.prisma.teacher.delete({ where: { id: id } });
   }
 }
