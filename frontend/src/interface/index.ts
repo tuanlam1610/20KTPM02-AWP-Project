@@ -1,4 +1,22 @@
 import User from './User.interface';
-import Temp from './temp.interface';
+import GradeReview from './GradeReview.interface';
+import GradeComposition from './GradeComposition.interface';
+import Class from './Class.interface';
+import Comment from './Comment.interface';
 
-export { User, Temp };
+export interface Teacher {
+  id: string;
+  fullname: string;
+}
+
+export interface Student {
+  id: string;
+  fullname: string;
+}
+
+export interface Admin {
+  id: string;
+  user: Partial<Pick<User, 'id' | 'name'>>;
+}
+
+export { User, GradeComposition, GradeReview, Class, Comment };
