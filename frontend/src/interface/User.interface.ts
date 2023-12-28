@@ -4,4 +4,7 @@ export default interface User {
   email: string;
   dob: string;
   roles: string[];
+  studentId: any;
+  teacherId: any;
+  adminId: any;
 }

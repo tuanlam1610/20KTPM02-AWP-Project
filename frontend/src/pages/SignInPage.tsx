@@ -286,7 +286,7 @@ export default function SignInPage() {
                 <p>{t('text.signInPage.activateAccountContent')}</p>
               </div>
               <p className="">
-                {t('text.signInPage.activateAccountContent')}
+                {t('text.signInPage.notReceiveMail')}
                 <span className="underline text-indigo-500 font-semibold hover:cursor-pointer">
                   {t('text.signInPage.resend')}
                 </span>

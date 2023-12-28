@@ -3,7 +3,6 @@ import { Avatar, Button, Divider, Empty } from 'antd';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import InviteMemberModal from '../Modals/InviteMemberModal';
 import { useAppSelector } from '../../../../redux/store';
 
 export default function ClassMemberTabView() {
@@ -25,7 +24,7 @@ export default function ClassMemberTabView() {
 
   const fetchClassMembers = async () => {
     try {
-      console.log('FETHCED');
+      console.log('FETCHED');
       console.log(classDetails);
       const res = await axios.get(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
@@ -92,8 +91,6 @@ export default function ClassMemberTabView() {
               <p className="text-lg font-semibold text-indigo-500 me-2">
                 {`${members.teachers.length} teachers`}
               </p>
-              {/* Invite */}
-              <InviteMemberModal type="teacher" />
             </div>
           </div>
           <Divider className="mx-0 mt-2 mb-4 rounded-full h-[1px] text-indigo-500 bg-indigo-500" />
@@ -119,7 +116,6 @@ export default function ClassMemberTabView() {
                       />
                       <p className="font-semibold">{teacher.name}</p>
                     </div>
-                    <Button icon={<UserDeleteOutlined />} type="text" />
                   </div>
                   {index !== members.teachers.length - 1 && (
                     <Divider className="m-0 rounded-full bg-gray-300" />
@@ -139,8 +135,6 @@ export default function ClassMemberTabView() {
               <p className="text-lg font-semibold text-indigo-500 me-2">
                 {`${members.students.length} students`}
               </p>
-              {/* Invite */}
-              <InviteMemberModal type="student" />
             </div>
           </div>
           <Divider className="mx-0 mt-2 mb-4 rounded-full h-[1px] text-indigo-500 bg-indigo-500" />
@@ -166,7 +160,6 @@ export default function ClassMemberTabView() {
                       />
                       <p className="font-semibold">{student.name}</p>
                     </div>
-                    <Button icon={<UserDeleteOutlined />} type="text" />
                   </div>
                   {index != members.students.length - 1 && (
                     <Divider className="m-0 rounded-full bg-gray-300" />
