@@ -4,16 +4,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import ClassDetailsTabView from './components/TabViews/ClassDetailsTabView';
 import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchInitData } from '../../redux/classDetailThunks';
+import axios from 'axios';
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
   const params = useParams();
   const [messageApi, contextHolder] = message.useMessage();
   const classId: string = params.id ? params.id : '';
-  const classes = useAppSelector((state) => state.app.classes);
-  const classDetails = classes[classId];
+  const [classDetails, setClassDetails] = useState({
+    name: '',
+    description: '',
+    code: '',
+  });
   const navigate = useNavigate();
 
   const handleCopyClassId = () => {
@@ -42,7 +46,19 @@ export default function HomePage() {
     },
   ];
 
+  const fetchClassDetails = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${classId}`,
+      );
+      setClassDetails(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
+    fetchClassDetails();
     dispatch(fetchInitData({ id: classId }));
   }, [classId]);
 
