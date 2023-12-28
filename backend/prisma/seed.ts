@@ -47,6 +47,7 @@ async function main() {
       name: 'Truong Gia Huy',
       email: 'rexfury1211@gmail.com',
       hash: hashPass,
+      roles: ['admin'],
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
     },
@@ -55,6 +56,7 @@ async function main() {
     data: {
       name: 'Truong Gia Huy',
       email: 'rexfury1212@gmail.com',
+      roles: ['admin'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
@@ -64,6 +66,7 @@ async function main() {
     data: {
       name: 'Nguyen Ngoc Quang',
       email: 'nnquanglop96dt@gmail.com',
+      roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: false,
@@ -73,6 +76,7 @@ async function main() {
     data: {
       name: 'Ha Tuan Lam',
       email: 'tuanlam16102002@gmail.com',
+      roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
@@ -82,6 +86,7 @@ async function main() {
     data: {
       name: 'Truong Gia Huy Teacher',
       email: 'rexfury121TEACH@gmail.com',
+      roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
@@ -91,6 +96,7 @@ async function main() {
     data: {
       name: 'Nguyen Ngoc Quang Teacher',
       email: 'TEACH@gmail.com',
+      roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: false,
@@ -100,6 +106,7 @@ async function main() {
     data: {
       name: 'Ha Tuan Lam Teacher',
       email: 'tuanlam16102002TEACH@gmail.com',
+      roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
