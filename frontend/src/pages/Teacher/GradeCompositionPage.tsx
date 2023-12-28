@@ -30,7 +30,7 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
 export default function GradeCompositionPage() {
   const params = useParams();
   const navigate = useNavigate();
-  const classes = useAppSelector((state) => state.teacher.classes);
+  const classes = useAppSelector((state) => state.app.classes);
   const classId: number = params.id ? Number(params.id) : 0;
   const gradeCompositionId = params?.gradeCompositionId;
   const [data, setData] = useState<any>([]);

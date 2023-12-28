@@ -1,18 +1,47 @@
 import Search from 'antd/es/input/Search';
 import Title from 'antd/es/typography/Title';
-import { useAppSelector } from '../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import axios from 'axios';
+import { Empty } from 'antd';
+import { setClasses } from '../../redux/appSlice';
+import JoinClassModal from './components/Modals/JoinClassModal';
 
 export default function StudentHomePage() {
-  const classes = useAppSelector((state) => state.teacher.classes);
+  const dispatch = useAppDispatch();
+  const classes = useAppSelector((state) => state.app.classes);
+  const userInfo = useAppSelector((state) => state.app.userInfo);
   const navigate = useNavigate();
+
+  const fetchClassList = async () => {
+    try {
+      const studentId = userInfo?.studentId.id;
+      console.log(studentId);
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_REACT_APP_SERVER_URL
+        }/students/${studentId}/getAllClassesOfstudent`,
+      );
+      console.log(res.data);
+      dispatch(setClasses(res.data));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    console.log('Fetch class list');
+    fetchClassList();
+  }, [userInfo]);
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold mb-4">Student Courses</p>
+          <p className="text-4xl font-semibold mb-4">Joined Classes</p>
+          <JoinClassModal />
         </div>
         <Search
           placeholder="Search course name..."
@@ -20,15 +49,23 @@ export default function StudentHomePage() {
           className="mb-8"
         />
         {/* List Of Courses */}
-        <div className="flex flex-1 flex-wrap justify-center gap-8">
+        <div className="flex flex-1 flex-wrap justify-start gap-8">
+          {classes.length <= 0 && (
+            <div className="flex justify-center w-full">
+              <Empty
+                description="No Class Found"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            </div>
+          )}
           {classes.map((course, index) => {
             return (
               <div
                 key={index}
-                className="flex flex-col w-1/5 min-h-[50vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
+                className="flex flex-col w-1/5 min-h-[32vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
                 onClick={() => {
-                  navigate(`/teacher/class/${index}`);
+                  navigate(`/student/class/${classes[index].id}`);
                 }}
               >
                 <img
@@ -45,6 +82,11 @@ export default function StudentHomePage() {
                     {course.description}
                   </p>
                 </div>
+                {/* <div className="flex flex-1 justify-center items-center">
+                  <Button className="flex-1 py-4 mx-4 bg-indigo-500 text-white hover:bg-white rounded-full flex justify-center items-center">
+                    Assign Course
+                  </Button>
+                </div> */}
               </div>
             );
           })}

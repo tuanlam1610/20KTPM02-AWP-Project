@@ -8,9 +8,10 @@ import { useEffect, useState } from 'react';
 import { fetchInitData } from '../../redux/classDetailThunks';
 import axios from 'axios';
 
-export default function HomePage() {
+export default function StudentClassDetailsPage() {
   const dispatch = useAppDispatch();
   const params = useParams();
+  const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const classId: string = params.id ? params.id : '';
   const [classDetails, setClassDetails] = useState({
@@ -18,7 +19,6 @@ export default function HomePage() {
     description: '',
     code: '',
   });
-  const navigate = useNavigate();
 
   const handleCopyClassId = () => {
     navigator.clipboard.writeText(`000${classId}`);
@@ -31,6 +31,17 @@ export default function HomePage() {
 
   const handleBackButton = () => {
     navigate(-1);
+  };
+
+  const fetchClassDetails = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${classId}`,
+      );
+      setClassDetails(res.data);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const tabItems: TabsProps['items'] = [
@@ -46,27 +57,16 @@ export default function HomePage() {
     },
   ];
 
-  const fetchClassDetails = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${classId}`,
-      );
-      setClassDetails(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   useEffect(() => {
     fetchClassDetails();
     dispatch(fetchInitData({ id: classId }));
   }, [classId]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-screen">
       {contextHolder}
       {/* Content */}
-      <div className="flex flex-col mx-8 my-4 gap-4">
+      <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="">
           <Button icon={<LeftOutlined />} onClick={handleBackButton}>
             Back

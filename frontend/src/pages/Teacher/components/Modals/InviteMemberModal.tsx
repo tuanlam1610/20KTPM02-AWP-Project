@@ -23,8 +23,13 @@ export default function InviteMemberModal(props: { type: string }) {
     setOpen(true);
   };
 
-  const handleCopyClassId = () => {
+  const handleCopyClassInvitationLink = () => {
     navigator.clipboard.writeText(invitationLink);
+    messageApi.open({
+      type: 'success',
+      content: 'Invitation link copied to clipboard',
+      duration: 1,
+    });
   };
 
   const handleOk = async () => {
@@ -122,7 +127,7 @@ export default function InviteMemberModal(props: { type: string }) {
                 size="small"
                 type="text"
                 onClick={() => {
-                  handleCopyClassId();
+                  handleCopyClassInvitationLink();
                 }}
               />
             </div>

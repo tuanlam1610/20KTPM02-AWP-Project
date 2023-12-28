@@ -6,16 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { Empty } from 'antd';
-import { setClasses } from '../../redux/teacherSlice';
+import { setClasses } from '../../redux/appSlice';
 
 export default function TeacherHomePage() {
   const dispatch = useAppDispatch();
-  const classes = useAppSelector((state) => state.teacher.classes);
+  const classes = useAppSelector((state) => state.app.classes);
+  const userInfo = useAppSelector((state) => state.app.userInfo);
+  console.log(userInfo?.teacherId.id);
   const navigate = useNavigate();
-  const teacherId = '27287ece-69b4-4586-88c1-131b66e64b28';
 
   const fetchClassList = async () => {
     try {
+      const teacherId = userInfo?.teacherId.id;
       const res = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
@@ -30,14 +32,14 @@ export default function TeacherHomePage() {
 
   useEffect(() => {
     fetchClassList();
-  }, []);
+  }, [userInfo]);
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold mb-4">All Courses</p>
+          <p className="text-4xl font-semibold mb-4">All Classes</p>
           <CreateClassModal />
         </div>
         <Search
@@ -48,7 +50,7 @@ export default function TeacherHomePage() {
         {/* List Of Courses */}
         <div className="flex flex-1 flex-wrap justify-start gap-8">
           {classes.length <= 0 && (
-            <div>
+            <div className="flex justify-center w-full">
               <Empty
                 description="No Class Found"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -62,7 +64,7 @@ export default function TeacherHomePage() {
                 className="flex flex-col w-1/5 min-h-[32vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
                 onClick={() => {
-                  navigate(`/teacher/class/${index}`);
+                  navigate(`/teacher/class/${classes[index].id}`);
                 }}
               >
                 <img

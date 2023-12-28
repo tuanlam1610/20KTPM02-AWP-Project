@@ -57,6 +57,7 @@ export default function Navbar() {
       dispatch(setUserInfo(res.data));
       console.log(userInfo);
     } catch (error) {
+      console.log(error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       dispatch(setUserInfo(undefined));

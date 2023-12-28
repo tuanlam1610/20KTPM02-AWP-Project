@@ -1,6 +1,6 @@
 import GradeComposition from './GradeComposition.interface';
 
-export interface Class {
+export default interface Class {
   id: string;
   name: string;
   description: string;

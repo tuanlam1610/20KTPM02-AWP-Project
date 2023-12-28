@@ -12,11 +12,17 @@ import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
 import TeacherHomePage from './pages/Teacher/TeacherHomePage';
 import UserProfilePage from './pages/UserProfilePage';
 import StudentHomePage from './pages/Student/StudentHomePage';
+import StudentClassDetailsPage from './pages/Student/StudentClassDetailsPage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import ChooseRolePage from './pages/ChooseRolePage';
 import GradeManagementPage from './pages/Teacher/GradeManagementPage';
 import GradeCompositionPage from './pages/Teacher/GradeCompositionPage';
+import GradeReviewDetailPage from './pages/Teacher/GradeReviewDetailPage';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 function App() {
   return (
@@ -43,6 +49,10 @@ function App() {
             element={<GradeManagementPage />}
           />
           <Route
+            path="class/:id/gradeReview/:gradeReviewId"
+            element={<GradeReviewDetailPage />}
+          />
+          <Route
             path="class/:id/grademanagement/:gradeCompositionId"
             element={<GradeCompositionPage />}
           />
@@ -50,11 +60,9 @@ function App() {
         </Route>
 
         {/* Student Routes */}
-        <Route
-          path="/student"
-          element={<ProtectedRoute allowedRole="student" />}
-        >
+        <Route path="/student">
           <Route path="home" element={<StudentHomePage />} />
+          <Route path="class/:id" element={<StudentClassDetailsPage />} />
         </Route>
 
         {/* Error */}
