@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClassDto } from './dto/create-class.dto';
-import { UpdateClassDto } from './dto/update-class.dto';
+import { GradeComposition, Prisma } from '@prisma/client';
+import { GradeCompositionsService } from 'src/grade-compositions/grade-compositions.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { exclude } from 'src/users/users.service';
-import { GradeComposition, Prisma } from '@prisma/client';
-import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
 import { PopulateClassDto } from './dto/class-populate.dto';
-import { GradeCompositionsService } from 'src/grade-compositions/grade-compositions.service';
+import { CreateClassDto } from './dto/create-class.dto';
+import { UpdateClassDto } from './dto/update-class.dto';
 
 enum GradeReviewStatusFilter {
   Open = 'Open',
@@ -296,6 +295,21 @@ export class ClassesService {
               });
               return null; // Skip creating class member for non-existent student
             }
+            const inDB = await prisma.classMember.findUnique({
+              where: {
+                classId_studentId: {
+                  studentId: student.studentId,
+                  classId: classId,
+                },
+              },
+            });
+            if (inDB) {
+              nonExistentStudents.push({
+                studentId: student.studentId,
+                name: student.name,
+              });
+              return null;
+            }
 
             // Update the class-member relationship for existing students
             const classMember = await prisma.classMember.create({
@@ -312,10 +326,9 @@ export class ClassesService {
         const gc = await prisma.gradeComposition.findMany({
           where: { classId: classId },
         });
-        await Promise.all(
-          gc.map((gc) =>
-            this.gradeCompositionsService.populateStudentGrade(gc.id),
-          ),
+
+        gc.map((gc) =>
+          this.gradeCompositionsService.populateStudentGrade(gc.id),
         );
 
         return {

@@ -39,7 +39,9 @@ export default function GradeManagementPage() {
   const location = useLocation();
   const pathName = location.pathname;
   const classId: string = params.id ? params.id : '';
-  let gradeCompositionNameMap: any;
+  const [gradeCompositionNameMap, setGradeCompositionNameMap] = useState<any>(
+    {},
+  );
   const [gradeCompositionNames, setGradeCompositionNames] = useState<string[]>(
     [],
   );
@@ -221,7 +223,7 @@ export default function GradeManagementPage() {
   const formatRawDataToTableData = (rawData: any[]) => {
     return rawData.map((data) => {
       const gradeCompositionItems = keyBy(data.gradeEntries, 'name');
-      gradeCompositionNameMap = keyBy(data.gradeEntries, 'name');
+      setGradeCompositionNameMap(keyBy(data.gradeEntries, 'name'));
       console.log(gradeCompositionNameMap);
       Object.keys(gradeCompositionItems).forEach((gradeName) => {
         gradeCompositionItems[gradeName] =
@@ -263,6 +265,7 @@ export default function GradeManagementPage() {
         students: data,
       });
       console.log(result);
+      fetchGradeBoardInformation();
       messageApi.open({
         type: 'success',
         content: 'Success',
