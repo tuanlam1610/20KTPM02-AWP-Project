@@ -12,7 +12,6 @@ export default function StudentHomePage() {
   const dispatch = useAppDispatch();
   const classes = useAppSelector((state) => state.app.classes);
   const userInfo = useAppSelector((state) => state.app.userInfo);
-  console.log(userInfo?.studentId.id);
   const navigate = useNavigate();
 
   const fetchClassList = async () => {
@@ -21,7 +20,7 @@ export default function StudentHomePage() {
       const res = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
-        }/students/${studentId}/getAllClasses`,
+        }/students/${studentId}/getAllClassesOfstudent`,
       );
       console.log(res.data);
       dispatch(setClasses(res.data));
