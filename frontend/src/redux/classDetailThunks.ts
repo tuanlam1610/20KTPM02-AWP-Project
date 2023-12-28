@@ -8,15 +8,20 @@ export const fetchInitData = createAsyncThunk(
   'classDetail/fetchInitData',
   async ({ id }: { id: string }, { rejectWithValue }) => {
     try {
-      const gradeCompositionList: GradeComposition[] = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/class/${id}/grade`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      const [gradeCompositionList] = await Promise.all([
+        (await axios.get(
+          `${import.meta.env.VITE_REACT_APP_SERVER_URL}/class/${id}/grade`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
           },
-        },
-      );
-      return { gradeCompositionList };
+        )) as GradeComposition[],
+      ]);
+
+      return {
+        gradeCompositionList,
+      };
     } catch (error) {
       const gradeCompositionList: GradeComposition[] = [
         {

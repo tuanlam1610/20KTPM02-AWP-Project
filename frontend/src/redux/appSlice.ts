@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Loading } from '../utils/enum';
 import { User } from '../interface/';
-import { Class } from '../interface/Class.interface';
+import Class from '../interface/Class.interface';
 
 interface AppState {
   loading: Loading;
