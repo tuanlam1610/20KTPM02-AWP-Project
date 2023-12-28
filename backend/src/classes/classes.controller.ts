@@ -28,10 +28,10 @@ import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-gra
 import { PopulateClassDto } from './dto/class-populate.dto';
 
 enum GradeReviewStatusFilter {
-  open = 'open',
-  approved = 'approved',
-  denied = 'denied',
-  all = 'all',
+  Open = 'Open',
+  Approved = 'Approved',
+  Denied = 'Denied',
+  All = 'All',
 }
 @Controller('classes')
 @ApiTags('classes')

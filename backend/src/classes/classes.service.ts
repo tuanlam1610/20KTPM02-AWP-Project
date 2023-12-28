@@ -8,10 +8,10 @@ import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-gra
 import { PopulateClassDto } from './dto/class-populate.dto';
 
 enum GradeReviewStatusFilter {
-  open = 'open',
-  approved = 'approved',
-  denied = 'denied',
-  all = 'all',
+  Open = 'Open',
+  Approved = 'Approved',
+  Denied = 'Denied',
+  All = 'All',
 }
 
 @Injectable()
@@ -188,7 +188,7 @@ export class ClassesService {
     status?: GradeReviewStatusFilter,
   ) {
     const where: Prisma.GradeReviewWhereInput = {};
-    if (status !== GradeReviewStatusFilter.all) {
+    if (status !== GradeReviewStatusFilter.All) {
       where.status = status;
     }
 
