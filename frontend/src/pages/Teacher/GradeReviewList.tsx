@@ -24,7 +24,7 @@ export default function GradeReviewList() {
       key: 'student',
       width: 150,
       fixed: 'left',
-      render: (student) => <p className="truncate">{student.user.name}</p>,
+      render: (student) => <p className="truncate">{student?.user?.name}</p>,
     },
     {
       title: 'Status',
@@ -82,13 +82,13 @@ export default function GradeReviewList() {
       title: 'Grade',
       dataIndex: 'grade',
       key: 'grade',
-      render: (grade) => <p className="truncate">{grade.name}</p>,
+      render: (grade) => <p className="truncate">{grade?.name}</p>,
     },
     {
       title: 'Resolved by',
       dataIndex: 'teacher',
       key: 'teacher',
-      render: (teacher) => <p className="truncate">{teacher?.user.name}</p>,
+      render: (teacher) => <p className="truncate">{teacher?.user?.name}</p>,
     },
   ];
 
