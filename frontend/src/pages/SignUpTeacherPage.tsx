@@ -21,7 +21,7 @@ type FieldType = {
   roles: string[];
 };
 
-export default function SignUpPage() {
+export default function SignUpTeacherPage() {
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,7 +32,7 @@ export default function SignUpPage() {
       values = {
         ...values,
         dob: dayjs(values.dob).toDate().toISOString(),
-        roles: ['student'],
+        roles: ['teacher'],
       };
       await axios.post(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/signup`,
