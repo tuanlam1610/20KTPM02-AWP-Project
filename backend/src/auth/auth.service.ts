@@ -85,16 +85,35 @@ export class AuthService {
 
   async signupLocal(dto: SignUpDto): Promise<String> {
     const hash = await this.hashData(dto.password);
-    await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        hash: hash,
-        name: dto.name,
-        dob: dto.dob,
-        roles: ['student'], //TODO CHANGE LATER
-        comment: undefined,
-      },
-    });
+    if (dto.roles.includes('teacher')) {
+      const teacher = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          hash: hash,
+          name: dto.name,
+          dob: dto.dob,
+          roles: dto.roles,
+          comment: undefined,
+        },
+      });
+
+      await this.prisma.teacher.create({
+        data: {
+          userId: teacher.id,
+          name: dto.name,
+        },
+      });
+    } else {
+      await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          hash: hash,
+          name: dto.name,
+          dob: dto.dob,
+          comment: undefined,
+        },
+      });
+    }
     return STATUS_CODES.OK;
   }
 

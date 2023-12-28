@@ -279,46 +279,52 @@ export class ClassesService {
     const students = studentsList.students;
 
     try {
-      const nonExistentStudents = [];
-      console.log(students);
-      const classMembers = await Promise.all(
-        students.map(async (student) => {
-          // Check if the student exists
-          const existingStudent = await this.prisma.student.findUnique({
-            where: { id: student.studentId },
-          });
-
-          if (!existingStudent) {
-            nonExistentStudents.push({
-              studentId: student.studentId,
-              name: student.name,
+      const result = await this.prisma.$transaction(async (prisma) => {
+        const nonExistentStudents = [];
+        console.log(students);
+        const classMembers = await Promise.all(
+          students.map(async (student) => {
+            // Check if the student exists
+            const existingStudent = await prisma.student.findUnique({
+              where: { id: student.studentId },
             });
-            return null; // Skip creating class member for non-existent student
-          }
 
-          // Update the class-member relationship for existing students
-          const classMember = await this.prisma.classMember.create({
-            data: {
-              classId: classId,
-              studentId: student.studentId,
-            },
-          });
+            if (!existingStudent) {
+              nonExistentStudents.push({
+                studentId: student.studentId,
+                name: student.name,
+              });
+              return null; // Skip creating class member for non-existent student
+            }
 
-          return classMember;
-        }),
-      );
+            // Update the class-member relationship for existing students
+            const classMember = await prisma.classMember.create({
+              data: {
+                classId: classId,
+                studentId: student.studentId,
+              },
+            });
 
-      const gc = await this.prisma.gradeComposition.findMany({
-        where: { classId: classId },
+            return classMember;
+          }),
+        );
+
+        const gc = await prisma.gradeComposition.findMany({
+          where: { classId: classId },
+        });
+        await Promise.all(
+          gc.map((gc) =>
+            this.gradeCompositionsService.populateStudentGrade(gc.id),
+          ),
+        );
+
+        return {
+          classMembers: classMembers.filter(Boolean),
+          nonExistentStudents,
+        };
       });
-      gc.forEach(async (gc) => {
-        await this.gradeCompositionsService.populateStudentGrade(gc.id);
-      });
 
-      return {
-        classMembers: classMembers.filter(Boolean),
-        nonExistentStudents,
-      };
+      return result;
     } catch (error) {
       // Handle errors
       throw new Error(
