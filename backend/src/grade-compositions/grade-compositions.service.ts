@@ -34,10 +34,11 @@ export class GradeCompositionsService {
       student: { connect: { id: studentId } },
     }));
 
-    await this.prisma.gradeComposition.update({
+    const result = await this.prisma.gradeComposition.update({
       where: { id: gradeCompositionId },
       data: { studentGrades: { create: studentGradesToCreate } },
     });
+    console.log(result);
   }
 
   async create(createGradeCompositionDto: CreateGradeCompositionDto) {
