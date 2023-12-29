@@ -172,6 +172,9 @@ async function main() {
   const teacher1 = await prisma.teacher.create({
     data: {
       userId: userTeacher.id,
+      classOwned: {
+        connect: { id: class1.id },
+      },
       classTeacher: {
         create: {
           class: { connect: { id: class1.id } },
@@ -251,7 +254,7 @@ async function main() {
       currentGrade: 5,
       expectedGrade: 10,
       finalGrade: 10,
-      status: 'Approved',
+      status: 'Accepted',
       explanation: 'I am a good student',
       student: { connect: { id: student1.id } },
       teacher: { connect: { id: teacher1.id } },

@@ -9,7 +9,7 @@ import { UpdateClassDto } from './dto/update-class.dto';
 
 enum GradeReviewStatusFilter {
   Open = 'Open',
-  Approved = 'Approved',
+  Accepted = 'Accepted',
   Denied = 'Denied',
   All = 'All',
 }
@@ -120,6 +120,34 @@ export class ClassesService {
       where: { classId_studentId: { classId: classId, studentId: studentId } },
       data: {
         totalGrade: grade,
+      },
+    });
+  }
+  async calculateStudenTotalGrade(classId: string, studentId: string) {
+    const studentGrades = await this.prisma.studentGrade.findMany({
+      where: {
+        studentId: studentId,
+        gradeComposition: {
+          classId: classId,
+        },
+      },
+      select: {
+        grade: true,
+        gradeComposition: {
+          select: {
+            percentage: true,
+          },
+        },
+      },
+    });
+    const totalGrade =
+      studentGrades.reduce((acc, sg) => {
+        return acc + sg.grade * (sg.gradeComposition.percentage / 100);
+      }, 0) ?? 0;
+    return this.prisma.classMember.update({
+      where: { classId_studentId: { classId: classId, studentId: studentId } },
+      data: {
+        totalGrade: totalGrade,
       },
     });
   }
