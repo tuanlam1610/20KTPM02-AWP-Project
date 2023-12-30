@@ -41,6 +41,12 @@ export class GradeReviewsService {
             select: {
               id: true,
               grade: true,
+              gradeComposition: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
           comment: {

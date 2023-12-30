@@ -3,10 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import EmailService from '../emails/emails.service';
 import { UsersService } from '../users/users.service';
-import VerificationTokenPayload from 'src/emails/interface/verificationTokenPayload.interface';
+import VerificationTokenPayload, {
+  VerificationTokenInvitePayload,
+} from 'src/emails/interface/verificationTokenPayload.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { AuthService } from 'src/auth/auth.service';
 import { STATUS_CODES } from 'http';
+import { ClassesService } from 'src/classes/classes.service';
+import { AuthService } from 'src/auth/auth.service';
+import { ClassEntity } from 'src/classes/entities/class.entity';
 
 @Injectable()
 export class EmailConfirmationService {
@@ -16,13 +20,14 @@ export class EmailConfirmationService {
     private readonly emailService: EmailService,
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
+    private readonly classesService: ClassesService,
   ) {}
 
   public sendVerificationLink(email: string) {
     const payload: VerificationTokenPayload = { email };
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
-      expiresIn: '5m',
+      expiresIn: '30d',
     });
 
     const url = `${this.configService.get(
@@ -58,6 +63,28 @@ export class EmailConfirmationService {
     });
   }
 
+  public sendInviteLink(email: string, classData: ClassEntity) {
+    const payload: VerificationTokenInvitePayload = {
+      email,
+      classId: classData.id,
+    };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
+      expiresIn: '7d',
+    });
+
+    const url = `${this.configService.get('EMAIL_INVITE_URL')}?token=${token}`;
+
+    const text = `The class welcome you to join everyone, to keep up to date with your subject. \n
+    Click here to join:  ${url}`;
+
+    return this.emailService.sendMail({
+      to: email,
+      subject: `[Invite] Invitation to join class ${classData.name}`,
+      text,
+    });
+  }
+
   public async confirmEmail(email: string): Promise<UserEntity> {
     const user = await this.usersService.findOneByEmail(email);
     if (user.isEmailConfirm) {
@@ -79,6 +106,18 @@ export class EmailConfirmationService {
     return STATUS_CODES.OK;
   }
 
+  public async confirmInviteEmail(
+    email: string,
+    classId: string,
+  ): Promise<any> {
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('Email not found');
+    }
+    await this.classesService.addUserToClass(classId, user.id);
+
+    return STATUS_CODES.OK;
+  }
   public async decodeConfirmationToken(token: string) {
     try {
       const payload = await this.jwtService.verify(token, {
