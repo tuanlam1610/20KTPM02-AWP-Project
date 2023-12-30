@@ -75,13 +75,27 @@ export class GradeCompositionsService {
         studentGrades: {
           select: {
             id: true,
-            studentId: true,
+            student: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
             grade: true,
           },
         },
       },
     });
-    return gradeComposition.studentGrades;
+    const grade = gradeComposition.studentGrades.map((sg) => {
+      return {
+        id: sg.id,
+        studentId: sg.student.id,
+        name: sg.student.name,
+        grade: sg.grade,
+      };
+    });
+
+    return grade;
   }
 
   async populateStudentGrade(gradeCompositionId: string) {
