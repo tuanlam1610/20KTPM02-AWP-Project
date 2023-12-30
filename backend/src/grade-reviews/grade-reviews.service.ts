@@ -50,9 +50,7 @@ export class GradeReviewsService {
             },
           },
           comment: {
-            select: {
-              id: true,
-              content: true,
+            include: {
               user: {
                 select: {
                   id: true,
