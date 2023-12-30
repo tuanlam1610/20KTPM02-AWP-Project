@@ -95,7 +95,7 @@ export class GradeCompositionsService {
       };
     });
 
-    return grade;
+    return { name: gradeComposition.name, studentGrades: grade };
   }
 
   async populateStudentGrade(gradeCompositionId: string) {

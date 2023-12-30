@@ -14,3 +14,14 @@ export class ResendVerificationDto {
   @IsEmail()
   email: string;
 }
+
+export class InvitationEmailDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  classId: string;
+}

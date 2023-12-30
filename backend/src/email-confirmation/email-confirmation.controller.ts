@@ -12,7 +12,10 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ResendVerificationDto } from './dto/confirmEmail.dto';
+import {
+  InvitationEmailDto,
+  ResendVerificationDto,
+} from './dto/confirmEmail.dto';
 import { EmailConfirmationService } from './email-confirmation.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
@@ -88,6 +91,18 @@ export class EmailConfirmationController {
     if (!user) throw new BadRequestException('User not found');
     await this.emailConfirmationService.sendVerificationLink(
       registrationData.email,
+    );
+    return STATUS_CODES.OK;
+  }
+
+  @Post('sendInviteEmail')
+  @HttpCode(HttpStatus.OK)
+  async sendInviteEmail(@Body() registrationData: InvitationEmailDto) {
+    const user = this.usersService.findOneByEmail(registrationData.email);
+    if (!user) throw new BadRequestException('User not found');
+    await this.emailConfirmationService.sendInviteLink(
+      registrationData.email,
+      registrationData.classId,
     );
     return STATUS_CODES.OK;
   }
