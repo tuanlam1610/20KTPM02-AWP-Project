@@ -17,6 +17,8 @@ export class GradeReviewsService {
           expectedGrade: true,
           finalGrade: true,
           explanation: true,
+          createdAt: true,
+          updatedAt: true,
           student: {
             select: {
               id: true,
