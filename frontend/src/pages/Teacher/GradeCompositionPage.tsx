@@ -1,10 +1,18 @@
-import { LeftOutlined } from '@ant-design/icons';
+import {
+  DownloadOutlined,
+  FileExcelOutlined,
+  FileTextOutlined,
+  LeftOutlined,
+} from '@ant-design/icons';
 import {
   Button,
+  Dropdown,
   Form,
   Input,
   InputNumber,
+  MenuProps,
   Popconfirm,
+  Space,
   Table,
   Typography,
 } from 'antd';
@@ -16,6 +24,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { useAppSelector } from '../../redux/store';
+import { downloadCSV, downloadXLSX } from '../../utils/helper';
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
@@ -30,10 +39,10 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
 export default function GradeCompositionPage() {
   const params = useParams();
   const navigate = useNavigate();
-  const classes = useAppSelector((state) => state.app.classes);
-  const classId: number = params.id ? Number(params.id) : 0;
+  const classId: string = params.id ? params.id : '';
   const gradeCompositionId = params?.gradeCompositionId;
   const [data, setData] = useState<any>([]);
+  const [gradeCompositionName, setGradeCompositionName] = useState<string>('');
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
 
@@ -96,13 +105,38 @@ export default function GradeCompositionPage() {
     navigate(-1);
   };
 
+  const handleFinalize = async () => {
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-compositions/1ad733a1-97b5-4fac-9f92-3f53f46f9092`;
+      const values = {
+        isFinalized: true,
+      };
+      const result = await axios.patch(url, values);
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const fetchGradeComposition = async () => {
     try {
-      const url = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
-        classes[classId].id
-      }/gradeComposition/${gradeCompositionId}`;
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-compositions/1ad733a1-97b5-4fac-9f92-3f53f46f9092/getStudentsGrade`;
+      console.log(url);
       const res = await axios.get(url);
       console.log(res.data);
+      let resultData = res.data?.studentGrades || [];
+      resultData = resultData.map((row: any) => {
+        const rowData = { ...row };
+        delete rowData.id;
+        return rowData;
+      });
+      console.log(resultData);
+      setData(resultData);
+      setGradeCompositionName(res.data?.name || '');
     } catch (err) {
       setData([...sampleGradeCompositionData]);
       console.log(err);
@@ -110,7 +144,6 @@ export default function GradeCompositionPage() {
   };
 
   useEffect(() => {
-    console.log('Grade Composition Fetch');
     fetchGradeComposition();
   }, []);
 
@@ -148,6 +181,23 @@ export default function GradeCompositionPage() {
     );
   };
 
+  const exportGradeCompositionOptions: MenuProps['items'] = [
+    {
+      key: '1',
+      label: 'CSV',
+      icon: <FileTextOutlined />,
+      onClick: () =>
+        downloadCSV(data, `Class${classId}_${gradeCompositionName}`),
+    },
+    {
+      key: '2',
+      label: 'XLSX',
+      icon: <FileExcelOutlined />,
+      onClick: () =>
+        downloadXLSX(data, `Class${classId}_${gradeCompositionName}`),
+    },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Content */}
@@ -159,41 +209,57 @@ export default function GradeCompositionPage() {
         </div>
         <div className="flex justify-between items-center">
           <p className="text-4xl font-semibold">
-            Grade Composition - Exercise 01
+            {`Grade Composition - ${gradeCompositionName}`}
           </p>
         </div>
         <div className="flex justify-between items-center px-4 mt-4">
           <Search placeholder="Search student ID" className="w-1/2" />
-          <div className="flex gap-2 justify-center items-center">
-            <input
-              type="file"
-              accept=".xlsx, .csv"
-              onChange={async (e) => {
-                if (e.target.files) {
-                  const fileData: File = e.target.files[0];
-                  console.log(fileData);
-                  if (fileData.type == 'text/csv') {
-                    console.log('Parse CSV File');
-                    Papa.parse(fileData, {
-                      header: true,
-                      complete: function (results) {
-                        console.log(results.data);
-                        console.log(data);
-                      },
-                    });
-                  } else {
-                    console.log('Parse XLSX File');
-                    const data = await fileData.arrayBuffer();
-                    const workbook = XLSX.read(data);
-                    const wsName = workbook.SheetNames[0];
-                    const worksheet = XLSX.utils.sheet_to_json(
-                      workbook.Sheets[wsName],
-                    );
-                    console.log(worksheet);
+          <div className="flex gap-2 justify-start items-center">
+            <div className="w-fit">
+              <input
+                className="w-fit"
+                type="file"
+                accept=".xlsx, .csv"
+                onChange={async (e) => {
+                  if (e.target.files) {
+                    const fileData: File = e.target.files[0];
+                    console.log(fileData);
+                    if (fileData.type == 'text/csv') {
+                      console.log('Parse CSV File');
+                      Papa.parse(fileData, {
+                        header: true,
+                        complete: function (results) {
+                          console.log(results.data);
+                          console.log(data);
+                        },
+                      });
+                    } else {
+                      console.log('Parse XLSX File');
+                      const data = await fileData.arrayBuffer();
+                      const workbook = XLSX.read(data);
+                      const wsName = workbook.SheetNames[0];
+                      const worksheet = XLSX.utils.sheet_to_json(
+                        workbook.Sheets[wsName],
+                      );
+                      console.log(worksheet);
+                    }
                   }
-                }
+                }}
+              />
+            </div>
+            <Dropdown
+              menu={{
+                items: exportGradeCompositionOptions,
               }}
-            />
+            >
+              <Button>
+                <Space>
+                  Export Grade Board
+                  <DownloadOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+            <Button onClick={handleFinalize}>Finalize</Button>
           </div>
         </div>
         <div className="px-4 mt-4">
@@ -212,9 +278,9 @@ export default function GradeCompositionPage() {
             />
 
             <Column
-              key="Exercise 01"
-              dataIndex="Exercise 01"
-              title="Exercise 01"
+              key="grade"
+              dataIndex="grade"
+              title={`${gradeCompositionName}`}
             />
             <Column
               render={(_: any, record: any) => {
