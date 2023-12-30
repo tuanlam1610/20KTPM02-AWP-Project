@@ -248,7 +248,7 @@ export class ClassesService {
           where: { ...where },
           skip: page * limit ?? 0,
           take: limit ?? 10,
-          orderBy: { status: 'asc' },
+          orderBy: { updatedAt: 'desc' },
           select: {
             id: true,
             currentGrade: true,
