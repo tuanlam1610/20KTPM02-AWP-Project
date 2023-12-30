@@ -56,5 +56,5 @@ export class NotificationsGateway {
 // OnGatewayConnection	Forces to implement the handleConnection() method. Takes library-specific client socket instance as an argument.
 // OnGatewayDisconnect	Forces to implement the handleDisconnect() method. Takes library-specific client socket instance as an argument.
 
-@WebSocketServer()
-server: Server;
+// @WebSocketServer()
+// server: Server;

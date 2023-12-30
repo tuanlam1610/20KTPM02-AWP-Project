@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
@@ -32,7 +32,10 @@ export class StudentsService {
       where: { id: studentId },
       data: {
         classMember: {
-          create: { class: { connect: { id: classToJoin.id } } },
+          create: {
+            isJoined: true,
+            class: { connect: { id: classToJoin.id } },
+          },
         },
       },
     });
