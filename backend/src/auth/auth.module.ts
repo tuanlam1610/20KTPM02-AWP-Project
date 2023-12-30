@@ -9,9 +9,16 @@ import { EmailConfirmationService } from 'src/email-confirmation/email-confirmat
 import { EmailsModule } from 'src/emails/emails.module';
 import { UsersModule } from 'src/users/users.module';
 import { FirebaseModule } from 'src/firebase/firebase.module';
+import { ClassesModule } from 'src/classes/classes.module';
 
 @Module({
-  imports: [JwtModule.register({}), EmailsModule, UsersModule, FirebaseModule],
+  imports: [
+    JwtModule.register({}),
+    EmailsModule,
+    UsersModule,
+    ClassesModule,
+    FirebaseModule,
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,

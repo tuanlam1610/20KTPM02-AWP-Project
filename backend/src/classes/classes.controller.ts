@@ -85,7 +85,7 @@ export class ClassesController {
     @Param('id') id: string,
     @Query('status')
     status?: GradeReviewStatusFilter,
-    @Query('page', new DefaultValuePipe('1')) page?: string,
+    @Query('page', new DefaultValuePipe('0')) page?: string,
     @Query('limit', new DefaultValuePipe('10')) limit?: string,
   ) {
     return this.classesService.getAllClassGradeReview(
