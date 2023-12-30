@@ -29,7 +29,7 @@ import { PopulateClassDto } from './dto/class-populate.dto';
 
 enum GradeReviewStatusFilter {
   Open = 'Open',
-  Approved = 'Approved',
+  Accepted = 'Accepted',
   Denied = 'Denied',
   All = 'All',
 }

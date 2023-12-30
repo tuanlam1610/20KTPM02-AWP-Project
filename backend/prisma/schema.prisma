@@ -217,6 +217,6 @@ model Comment {
 
 enum GradeReviewStatus {
   Open
-  Approved
+  Accepted
   Denied
 }

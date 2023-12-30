@@ -17,6 +17,18 @@ import { ApiTags } from '@nestjs/swagger';
 export class StudentGradesController {
   constructor(private readonly studentGradesService: StudentGradesService) {}
 
+  @Patch(':sgId/updateOneStudentGrade/:classId')
+  updateOneStudentGrade(
+    @Param('sgId') studentGradeId: string,
+    @Param('classId') classId: string,
+    @Body() body: any,
+  ) {
+    return this.studentGradesService.updateOneStudentGrade(
+      studentGradeId,
+      classId,
+      body.grade,
+    );
+  }
   @Post()
   create(@Body() createStudentGradeDto: CreateStudentGradeDto) {
     return this.studentGradesService.create(createStudentGradeDto);

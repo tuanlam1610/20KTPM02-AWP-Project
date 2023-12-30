@@ -1,11 +1,88 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGradeCompositionDto } from './dto/create-grade-composition.dto';
 import { UpdateGradeCompositionDto } from './dto/update-grade-composition.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { StudentGradesService } from 'src/student-grades/student-grades.service';
+import { UpdateAllStudentGradeDto } from './dto/update-all-student-grade.dto';
 
 @Injectable()
 export class GradeCompositionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private sgService: StudentGradesService,
+  ) {}
+
+  async updateAllStudentGrades(
+    gradeCompositionId: string,
+    classId: string,
+    updateAllStudentGradeDto: UpdateAllStudentGradeDto,
+  ) {
+    const { studentGrades } = updateAllStudentGradeDto;
+
+    // Fetch all students based on the provided studentGrades
+    const studentToUpdate = await this.prisma.student.findMany({
+      where: { id: { in: studentGrades.map((sg) => sg.studentId) } },
+    });
+
+    // Check if all students from DTO exist in the database
+    const foundStudentIds = studentToUpdate.map((student) => student.id);
+    const notFoundIds = studentGrades
+      .filter((sg) => !foundStudentIds.includes(sg.studentId))
+      .map((sgId) => sgId.studentId);
+
+    if (notFoundIds.length > 0) {
+      throw new NotFoundException(
+        `Student grades with IDs ${notFoundIds.join(', ')} not found`,
+      );
+    }
+
+    // Update each student's grade
+    const updatedStudentGrades = await Promise.all(
+      studentGrades.map(async (sg) => {
+        try {
+          // Fetch existing student grade or create a new one if it doesn't exist
+          const existingStudentGrade = await this.sgService.findStudentGrade(
+            sg.studentId,
+            gradeCompositionId,
+          );
+
+          const updatedStudentGrade =
+            await this.sgService.updateOneStudentGrade(
+              existingStudentGrade?.id,
+              classId,
+              sg.grade,
+            );
+
+          return updatedStudentGrade;
+        } catch (error) {
+          // Handle individual student grade update errors
+          // You might log these errors or handle them according to your application's requirements
+          console.error(
+            `Failed to update grade for student ${sg.studentId}: ${error}`,
+          );
+          return null;
+        }
+      }),
+    );
+
+    return updatedStudentGrades.filter((grade) => grade !== null);
+  }
+
+  async getStudentsGrade(gradeCompositionId: string) {
+    const gradeComposition = await this.prisma.gradeComposition.findUnique({
+      where: { id: gradeCompositionId },
+      include: {
+        studentGrades: {
+          select: {
+            id: true,
+            studentId: true,
+            grade: true,
+          },
+        },
+      },
+    });
+    return gradeComposition.studentGrades;
+  }
 
   async populateStudentGrade(gradeCompositionId: string) {
     const gradeComposition = await this.prisma.gradeComposition.findUnique({
