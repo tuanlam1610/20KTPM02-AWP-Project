@@ -3,3 +3,8 @@ interface VerificationTokenPayload {
 }
 
 export default VerificationTokenPayload;
+
+export interface VerificationTokenInvitePayload {
+  email: string;
+  classId: string;
+}

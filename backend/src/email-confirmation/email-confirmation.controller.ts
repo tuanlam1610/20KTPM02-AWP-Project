@@ -45,6 +45,23 @@ export class EmailConfirmationController {
     await this.authService.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
   }
+
+  @Get('confirm') //TODO CHANGE HANDLE
+  @HttpCode(HttpStatus.OK)
+  async confirmInviteToClassLink(@Query('token') token: string) {
+    if (!token) {
+      throw new BadRequestException('Token must be provided');
+    }
+
+    const { email, classId } =
+      await this.emailConfirmationService.decodeConfirmationToken(token);
+    //TODO: This probably insecure AF
+    const user = await this.emailConfirmationService.confirmInviteEmail(
+      email,
+      classId,
+    );
+  }
+
   @Post('confirm-password-reset')
   @HttpCode(HttpStatus.OK)
   async confirmResetPassword(

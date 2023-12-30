@@ -15,6 +15,19 @@ export class StudentsService {
       //return error: class not found
       throw new BadRequestException('Class not found');
     }
+
+    const classInvitationForStudent =
+      await this.prisma.classInvitationForStudent.delete({
+        where: {
+          classId_studentId: { classId: classToJoin.id, studentId: studentId },
+        },
+      });
+
+    if (!classInvitationForStudent) {
+      //return error: class invitation not found
+      throw new BadRequestException('Class invitation not found');
+    }
+
     return this.prisma.student.update({
       where: { id: studentId },
       data: {

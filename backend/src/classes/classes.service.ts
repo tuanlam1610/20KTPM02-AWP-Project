@@ -1,16 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { CreateClassDto } from './dto/create-class.dto';
-import { UpdateClassDto } from './dto/update-class.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { GradeComposition, Prisma } from '@prisma/client';
+import { GradeCompositionsService } from 'src/grade-compositions/grade-compositions.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { exclude } from 'src/users/users.service';
-import { GradeComposition, Prisma } from '@prisma/client';
-import { CreateGradeCompositionDto } from 'src/grade-compositions/dto/create-grade-composition.dto';
 import { PopulateClassDto } from './dto/class-populate.dto';
-import { GradeCompositionsService } from 'src/grade-compositions/grade-compositions.service';
+import { CreateClassDto } from './dto/create-class.dto';
+import { UpdateClassDto } from './dto/update-class.dto';
 
 enum GradeReviewStatusFilter {
   Open = 'Open',
-  Approved = 'Approved',
+  Accepted = 'Accepted',
   Denied = 'Denied',
   All = 'All',
 }
@@ -22,6 +21,23 @@ export class ClassesService {
     private gradeCompositionsService: GradeCompositionsService,
   ) {}
 
+  async addUserToClass(classId: string, userId: string) {
+    const user = await this.prisma.classInvitationForStudent.delete({
+      where: { classId_studentId: { classId: classId, studentId: userId } },
+    });
+    if (!user) {
+      throw new NotFoundException(
+        `Invitation for user with id ${userId} not found`,
+      );
+    }
+    return this.prisma.classMember.update({
+      where: { classId_studentId: { classId: classId, studentId: userId } },
+      data: {
+        isJoined: true,
+      },
+    });
+  }
+
   async getClassStudentsTeachers(classId: string) {
     const fetchedStudentsTeachers = await this.prisma.class.findUnique({
       where: { id: classId },
@@ -30,26 +46,19 @@ export class ClassesService {
           select: {
             student: {
               select: {
-                user: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
+                id: true,
+                name: true,
               },
             },
           },
+          where: { isJoined: true },
         },
         classTeacher: {
           select: {
             teacher: {
               select: {
-                user: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
+                id: true,
+                name: true,
               },
             },
           },
@@ -57,11 +66,9 @@ export class ClassesService {
       },
     });
     return {
-      userStudents: fetchedStudentsTeachers.classMember.map(
-        (cm) => cm.student.user,
-      ),
+      userStudents: fetchedStudentsTeachers.classMember.map((cm) => cm.student),
       userTeachers: fetchedStudentsTeachers.classTeacher.map(
-        (ct) => ct.teacher.user,
+        (ct) => ct.teacher,
       ),
     };
   }
@@ -121,6 +128,34 @@ export class ClassesService {
       where: { classId_studentId: { classId: classId, studentId: studentId } },
       data: {
         totalGrade: grade,
+      },
+    });
+  }
+  async calculateStudenTotalGrade(classId: string, studentId: string) {
+    const studentGrades = await this.prisma.studentGrade.findMany({
+      where: {
+        studentId: studentId,
+        gradeComposition: {
+          classId: classId,
+        },
+      },
+      select: {
+        grade: true,
+        gradeComposition: {
+          select: {
+            percentage: true,
+          },
+        },
+      },
+    });
+    const totalGrade =
+      studentGrades.reduce((acc, sg) => {
+        return acc + sg.grade * (sg.gradeComposition.percentage / 100);
+      }, 0) ?? 0;
+    return this.prisma.classMember.update({
+      where: { classId_studentId: { classId: classId, studentId: studentId } },
+      data: {
+        totalGrade: totalGrade,
       },
     });
   }
@@ -195,6 +230,16 @@ export class ClassesService {
     if (status !== GradeReviewStatusFilter.All) {
       where.status = status;
     }
+    const totalCount = await this.prisma.gradeReview.count({
+      where: { classId: classId, ...where }, // Add your additional filters as needed
+    });
+    const totalRecord = totalCount;
+    const totalPage = Math.ceil(totalRecord / (limit ?? 10));
+    if (page * limit > totalCount) {
+      throw new NotFoundException(
+        `Page limit out of bound. Total Page: ${totalPage} `,
+      );
+    }
 
     const allGradeReviews = await this.prisma.class.findUnique({
       where: { id: classId, gradeReviews: { some: {} } },
@@ -237,12 +282,7 @@ export class ClassesService {
       },
     });
     // For total count
-    const totalCount = await this.prisma.gradeReview.count({
-      where: { classId: classId, ...where }, // Add your additional filters as needed
-    });
 
-    const totalRecord = totalCount;
-    const totalPage = Math.ceil(totalRecord / (limit ?? 10));
     return {
       ...allGradeReviews,
       currentPage: page,
@@ -296,6 +336,21 @@ export class ClassesService {
               });
               return null; // Skip creating class member for non-existent student
             }
+            const inDB = await prisma.classMember.findUnique({
+              where: {
+                classId_studentId: {
+                  studentId: student.studentId,
+                  classId: classId,
+                },
+              },
+            });
+            if (inDB) {
+              nonExistentStudents.push({
+                studentId: student.studentId,
+                name: student.name,
+              });
+              return null;
+            }
 
             // Update the class-member relationship for existing students
             const classMember = await prisma.classMember.create({
@@ -312,10 +367,9 @@ export class ClassesService {
         const gc = await prisma.gradeComposition.findMany({
           where: { classId: classId },
         });
-        await Promise.all(
-          gc.map((gc) =>
-            this.gradeCompositionsService.populateStudentGrade(gc.id),
-          ),
+
+        gc.map((gc) =>
+          this.gradeCompositionsService.populateStudentGrade(gc.id),
         );
 
         return {

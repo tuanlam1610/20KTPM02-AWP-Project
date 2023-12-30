@@ -5,15 +5,11 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { EmailsModule } from './emails/emails.module';
-import { EmailConfirmationController } from './email-confirmation/email-confirmation.controller';
-import { EmailConfirmationService } from './email-confirmation/email-confirmation.service';
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module';
 import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from './prisma/prisma.module';
 import { FirebaseService } from './firebase/firebase.service';
 import { FirebaseModule } from './firebase/firebase.module';
-import { StudentsController } from './students/students.controller';
-import { StudentsService } from './students/students.service';
 import { StudentsModule } from './students/students.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { ClassesModule } from './classes/classes.module';
@@ -46,11 +42,10 @@ import { NotificationsModule } from './notifications/notifications.module';
     StudentGradesModule,
     NotificationsModule,
   ],
-  controllers: [AppController, EmailConfirmationController, StudentsController],
+  controllers: [AppController],
   providers: [
     AppService,
-    EmailConfirmationService,
-    StudentsService,
+
     // {
     //   provide: APP_GUARD,
     //   useClass: RolesGuard,
