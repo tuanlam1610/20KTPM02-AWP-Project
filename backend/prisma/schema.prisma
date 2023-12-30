@@ -115,6 +115,7 @@ model ClassMember {
   studentId String
 
   totalGrade Float?
+  isJoined   Boolean @default(false)
 
   @@id([classId, studentId])
 }
