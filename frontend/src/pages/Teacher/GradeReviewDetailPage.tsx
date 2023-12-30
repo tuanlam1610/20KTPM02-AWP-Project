@@ -1,5 +1,3 @@
-import { Avatar, Button, Card, Col, Form, Row, Tooltip } from 'antd';
-import { GradeReview, Comment as CommentData } from '../../interface';
 import { Comment } from '@ant-design/compatible';
 import {
   CheckCircleFilled,
@@ -7,60 +5,59 @@ import {
   MinusCircleFilled,
   UserOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../../redux/store';
-import dayjs from 'dayjs';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
+import { Avatar, Button, Card, Col, Form, Row, Spin, Tooltip } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
+import axios from 'axios';
+import dayjs from 'dayjs';
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Comment as CommentData, GradeReview } from '../../interface';
+import { useAppSelector } from '../../redux/store';
 
 export interface GradeReviewDetail extends GradeReview {
   comment: CommentData[];
 }
 
+const queryClient = new QueryClient();
+
+export function GradeReviewDetailProvider() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <GradeReviewDetailPage />
+    </QueryClientProvider>
+  );
+}
+
 export default function GradeReviewDetailPage() {
   const userInfo = useAppSelector((state) => state.app.userInfo);
-  const data: GradeReviewDetail = {
-    student: {
-      id: '123',
-      name: 'Ha Tuan Lam',
-    },
-    class: {
-      name: 'ADVANCED WEB',
-    },
-    id: '1234',
-    status: 'Open',
-    expectedGrade: 9.5,
-    currentGrade: 8,
-    studentGrade: {
-      grade: 8,
-      gradeComposition: {
-        name: 'Assignment 2',
-      },
-    },
-    // teacher: {
-    //   id: 'hehe',
-    //   name: 'Nguyen Ngoc Quang',
-    // },
-    explanation: 'Toi gioi toi muon cao diem',
-    createdAt: '2023-12-12 13:22',
-    updatedAt: '2023-24-12 13:22',
-    comment: [
+  const params = useParams();
+  const gradeReviewId: string = params.gradeReviewId
+    ? params.gradeReviewId
+    : '';
+
+  const fetchGradeReviewDetail = async () => {
+    const res = await axios.get(
+      `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-reviews/${gradeReviewId}/details`,
       {
-        user: {
-          name: 'Ha Tuan Lam',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
         },
-        createdAt: '2023-12-12 13:22',
-        content: 'Giai quyet cho em',
       },
-      {
-        user: {
-          name: 'Ha Tuan Lam',
-        },
-        createdAt: '2023-12-12 13:22',
-        content: 'Giai quyet cho em',
-      },
-    ],
+    );
+    return res.data as GradeReviewDetail;
   };
+
+  const { isLoading, isError, error, data, isFetching } = useQuery({
+    queryKey: ['gradeReviews', gradeReviewId],
+    queryFn: () => fetchGradeReviewDetail(),
+  });
 
   const navigate = useNavigate();
 
@@ -81,6 +78,13 @@ export default function GradeReviewDetailPage() {
     setValue(e.target.value);
   };
 
+  if (isLoading)
+    return (
+      <div className="h-screen w-screen flex justify-center items-center">
+        <Spin />
+      </div>
+    );
+  console.log(data);
   return (
     <div className="overflow-auto">
       {/* Content */}
@@ -92,27 +96,27 @@ export default function GradeReviewDetailPage() {
         </div>
         <div className="px-40">
           <div className="text-4xl font-bold my-6">
-            Grade review on {data.studentGrade.gradeComposition.name}
+            Grade review on {data?.studentGrade.gradeComposition.name}
           </div>
           <div className="my-6 flex justify-between items-center">
             <div className="flex gap-2 items-center">
               <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
               <div>
-                {data.student.name}
+                {data?.student.name}
 
                 <Tooltip
-                  title={dayjs(data.createdAt).format('YYYY-MM-DD HH:mm')}
+                  title={dayjs(data?.createdAt).format('YYYY-MM-DD HH:mm')}
                   mouseEnterDelay={0.5}
                 >
                   <div className="cursor-default text-sm">
-                    {dayjs(data.createdAt).fromNow()}
+                    {dayjs(data?.createdAt).fromNow()}
                   </div>
                 </Tooltip>
               </div>
             </div>
             <div className="flex gap-2">
               {userInfo?.roles.includes('teacher') &&
-                data.status === 'Open' && (
+                data?.status === 'Open' && (
                   <>
                     <Button
                       className="bg-slate-100 w-40"
@@ -137,21 +141,38 @@ export default function GradeReviewDetailPage() {
             </div>
           </div>
           <div className="my-6">
-            {data.status === 'Denied' ? (
-              <div className="flex gap-4 px-8 py-4 bg-red-100 rounded">
+            {data?.status === 'Denied' ? (
+              <div className="flex gap-4 px-8 py-4 bg-red-100 rounded-lg">
                 <MinusCircleFilled style={{ color: 'red' }} />
                 <div className="flex flex-col gap-2">
                   <div className="text-xl font-semibold">
                     The request has been denied
                   </div>
                   <div>
-                    Denied by: <span>{data.teacher?.name}</span>
+                    Denied by: <span>{data?.teacher?.name}</span>
                   </div>
-                  <div>Denied on: {data.updatedAt}</div>
+                  <div>
+                    Denied on:{' '}
+                    {dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm')}
+                  </div>
                 </div>
               </div>
-            ) : data.status === 'Accepted' ? (
-              <div></div>
+            ) : data?.status === 'Accepted' ? (
+              <div className="flex gap-4 px-8 py-4 bg-green-100 rounded-lg">
+                <CheckCircleFilled style={{ color: 'green' }} />
+                <div className="flex flex-col gap-2">
+                  <div className="text-xl font-semibold">
+                    The request has been accepted
+                  </div>
+                  <div>
+                    Accepted by: <span>{data?.teacher?.name}</span>
+                  </div>
+                  <div>
+                    Accepted on:{' '}
+                    {dayjs(data.updatedAt).format('YYYY-MM-DD HH:mm')}
+                  </div>
+                </div>
+              </div>
             ) : (
               <></>
             )}
@@ -166,7 +187,7 @@ export default function GradeReviewDetailPage() {
                 title="Current grade"
                 bordered={false}
               >
-                {data.currentGrade}
+                {data?.currentGrade}
               </Card>
             </Col>
             <Col span={8}>
@@ -180,7 +201,7 @@ export default function GradeReviewDetailPage() {
                 title="Expected grade"
                 bordered={false}
               >
-                {data.expectedGrade}
+                {data?.expectedGrade}
               </Card>
             </Col>
             <Col span={8}>
@@ -196,27 +217,15 @@ export default function GradeReviewDetailPage() {
                 title="Final grade"
                 bordered={false}
               >
-                {data.finalGrade}
+                {data?.finalGrade}
               </Card>
             </Col>
           </Row>
           <div className="text-xl font-semibold mb-2">Explanation</div>
-          <p className="mb-4 indent-8">
-            It is a long established fact that a reader will be distracted by
-            the readable content of a page when looking at its layout. The point
-            of using Lorem Ipsum is that it has a more-or-less normal
-            distribution of letters, as opposed to using 'Content here, content
-            here', making it look like readable English. Many desktop publishing
-            packages and web page editors now use Lorem Ipsum as their default
-            model text, and a search for 'lorem ipsum' will uncover many web
-            sites still in their infancy. Various versions have evolved over the
-            years, sometimes by accident, sometimes on purpose (injected humour
-            and the like).
-          </p>
+          <p className="mb-4 indent-8">{data?.explanation}</p>
           <div className="text-xl font-semibold mb-2">Comment</div>
           <div className="flex flex-col gap-2 mb-12">
-            {data.comment.map((c) => {
-              console.log(dayjs(c.createdAt));
+            {data?.comment.map((c) => {
               return (
                 <Comment
                   className="border-b rounded p-4 drop-shadow"
