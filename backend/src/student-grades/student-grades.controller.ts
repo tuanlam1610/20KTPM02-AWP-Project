@@ -21,7 +21,7 @@ export class StudentGradesController {
   updateOneStudentGrade(
     @Param('sgId') studentGradeId: string,
     @Param('classId') classId: string,
-    @Body() body: any,
+    @Body() body: UpdateStudentGradeDto,
   ) {
     return this.studentGradesService.updateOneStudentGrade(
       studentGradeId,
