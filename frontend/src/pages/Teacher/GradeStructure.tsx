@@ -16,7 +16,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Button, Modal } from 'antd';
+import { Button, Form, Modal } from 'antd';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -147,55 +147,57 @@ export default function GradeStructure() {
 
       <div className="flex flex-col gap-4 max-h-[650px] overflow-auto">
         {isEditing ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex flex-col gap-1">
-              <SortableContext
-                items={gradeCompositionIds}
-                strategy={verticalListSortingStrategy}
-              >
-                {fields.map((item, index) => (
-                  <EditGradeItem
-                    className="cursor-grab"
-                    index={index}
-                    key={index}
-                    data={item}
-                    onRemove={() => {
-                      remove(index);
-                    }}
-                  />
-                ))}
-              </SortableContext>
-              {createPortal(
-                <DragOverlay>
-                  {activeId ? (
-                    <EditGradeItemSkeleton data={fields[activeId]} />
-                  ) : null}
-                </DragOverlay>,
-                document.body,
-              )}
-              <Button
-                className="w-1/3"
-                shape="round"
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  append({
-                    name: '',
-                    gradeId: '',
-                    percentage: 0,
-                    isFinalized: false,
-                  });
-                }}
-              >
-                Add New Grade
-              </Button>
-            </div>
-          </DndContext>
+          <Form>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="flex flex-col gap-1">
+                <SortableContext
+                  items={gradeCompositionIds}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {fields.map((item, index) => (
+                    <EditGradeItem
+                      className="cursor-grab"
+                      index={index}
+                      key={index}
+                      data={item}
+                      onRemove={() => {
+                        remove(index);
+                      }}
+                    />
+                  ))}
+                </SortableContext>
+                {createPortal(
+                  <DragOverlay>
+                    {activeId ? (
+                      <EditGradeItemSkeleton data={fields[activeId]} />
+                    ) : null}
+                  </DragOverlay>,
+                  document.body,
+                )}
+                <Button
+                  className="w-1/3"
+                  shape="round"
+                  icon={<PlusOutlined />}
+                  onClick={() => {
+                    append({
+                      name: '',
+                      gradeId: '',
+                      percentage: 0,
+                      isFinalized: false,
+                    });
+                  }}
+                >
+                  Add New Grade
+                </Button>
+              </div>
+            </DndContext>
+          </Form>
         ) : (
           <>
             {Object.keys(gradeCompositionMap).map((id) => (

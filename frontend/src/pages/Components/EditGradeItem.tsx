@@ -65,6 +65,7 @@ export const EditGradeItem = ({
           className="w-2/3"
           placeholder="Name"
           value={data.name}
+          // onChange={}
         />
         <InputNumber
           placeholder="Percentage"

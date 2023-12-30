@@ -22,7 +22,7 @@ export default function GradeReviewDetailPage() {
   const data: GradeReviewDetail = {
     student: {
       id: '123',
-      fullname: 'Ha Tuan Lam',
+      name: 'Ha Tuan Lam',
     },
     class: {
       name: 'ADVANCED WEB',
@@ -31,12 +31,15 @@ export default function GradeReviewDetailPage() {
     status: 'Open',
     expectedGrade: 9.5,
     currentGrade: 8,
-    grade: {
-      name: 'Final',
+    studentGrade: {
+      grade: 8,
+      gradeComposition: {
+        name: 'Assignment 2',
+      },
     },
     // teacher: {
     //   id: 'hehe',
-    //   fullname: 'Nguyen Ngoc Quang',
+    //   name: 'Nguyen Ngoc Quang',
     // },
     explanation: 'Toi gioi toi muon cao diem',
     createdAt: '2023-12-12 13:22',
@@ -89,13 +92,13 @@ export default function GradeReviewDetailPage() {
         </div>
         <div className="px-40">
           <div className="text-4xl font-bold my-6">
-            Grade review on {data.grade.name}
+            Grade review on {data.studentGrade.gradeComposition.name}
           </div>
           <div className="my-6 flex justify-between items-center">
             <div className="flex gap-2 items-center">
               <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
               <div>
-                {data.student.fullname}
+                {data.student.name}
 
                 <Tooltip
                   title={dayjs(data.createdAt).format('YYYY-MM-DD HH:mm')}
@@ -142,7 +145,7 @@ export default function GradeReviewDetailPage() {
                     The request has been denied
                   </div>
                   <div>
-                    Denied by: <span>{data.teacher?.fullname}</span>
+                    Denied by: <span>{data.teacher?.name}</span>
                   </div>
                   <div>Denied on: {data.updatedAt}</div>
                 </div>

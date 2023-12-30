@@ -14,10 +14,11 @@ const initialState: AppState = {
   gradeCompositionMap: {},
 };
 
-const appSlice = createSlice({
-  name: 'app',
+const classDetailSlice = createSlice({
+  name: 'class',
   initialState,
   reducers: {
+    reset: () => initialState,
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -33,6 +34,7 @@ const appSlice = createSlice({
       .addCase(fetchInitData.fulfilled, (state, action) => {
         state.loading = Loading.fulfilled;
         const { gradeCompositionList } = action.payload;
+        console.log(gradeCompositionList);
         gradeCompositionList.forEach((grade) => {
           assign(state.gradeCompositionMap, { [grade.id]: grade });
         });
@@ -40,5 +42,6 @@ const appSlice = createSlice({
   },
 });
 
-export const { setLoading, deleteGradeCompositionInMap } = appSlice.actions;
-export default appSlice;
+export const { setLoading, deleteGradeCompositionInMap, reset } =
+  classDetailSlice.actions;
+export default classDetailSlice;

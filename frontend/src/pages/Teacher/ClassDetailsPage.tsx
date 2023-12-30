@@ -7,6 +7,7 @@ import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
 import { useEffect, useState } from 'react';
 import { fetchInitData } from '../../redux/classDetailThunks';
 import axios from 'axios';
+import { reset } from '../../redux/classDetailSlice';
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
@@ -58,6 +59,7 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    dispatch(reset());
     fetchClassDetails();
     dispatch(fetchInitData({ id: classId }));
   }, [classId]);

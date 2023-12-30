@@ -75,9 +75,7 @@ export default function SignUpTeacherPage() {
             <Form.Item<FieldType>
               label="Fullname"
               name="name"
-              rules={[
-                { required: true, message: 'Please input your fullname!' },
-              ]}
+              rules={[{ required: true, message: 'Please input your name!' }]}
               className="w-full mb-4"
             >
               <Input type="text" placeholder="Enter your name" />
