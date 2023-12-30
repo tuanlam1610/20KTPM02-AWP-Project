@@ -17,6 +17,8 @@ export class GradeReviewsService {
           expectedGrade: true,
           finalGrade: true,
           explanation: true,
+          createdAt: true,
+          updatedAt: true,
           student: {
             select: {
               id: true,
@@ -50,9 +52,7 @@ export class GradeReviewsService {
             },
           },
           comment: {
-            select: {
-              id: true,
-              content: true,
+            include: {
               user: {
                 select: {
                   id: true,
