@@ -3,7 +3,7 @@ import { useForm } from 'antd/es/form/Form';
 import TextArea from 'antd/es/input/TextArea';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../redux/store';
-import { addClass } from '../../../../redux/appSlice';
+import { setClasses } from '../../../../redux/appSlice';
 import axios from 'axios';
 
 export default function CreateClassModal() {
@@ -16,6 +16,21 @@ export default function CreateClassModal() {
 
   const showModal = () => {
     setOpen(true);
+  };
+
+  const fetchClassList = async () => {
+    try {
+      const teacherId = userInfo?.teacherId.id;
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_REACT_APP_SERVER_URL
+        }/teachers/${teacherId}/getAllClasses`,
+      );
+      console.log(res.data);
+      dispatch(setClasses(res.data));
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleOk = async () => {
@@ -37,26 +52,19 @@ export default function CreateClassModal() {
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes`,
         classDetails,
       );
+      await fetchClassList();
       messageApi.open({
         type: 'success',
         content: 'Create class successfully',
         duration: 1,
       });
-      dispatch(
-        addClass({
-          name: values.name,
-          description: values.description ? values.description : '',
-          courseImg:
-            'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg',
-        }),
-      );
       setOpen(false);
       setConfirmLoading(false);
     } catch (err) {
       console.log(err);
       messageApi.open({
-        type: 'success',
-        content: `${err}`,
+        type: 'error',
+        content: 'Create class failed',
         duration: 1,
       });
       setOpen(false);

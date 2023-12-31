@@ -7,9 +7,7 @@ import { useAppSelector } from '../../../../redux/store';
 
 export default function ClassMemberTabView() {
   const params = useParams();
-  const classes = useAppSelector((state) => state.app.classes);
-  const classIndex: number = params.id ? Number(params.id) : 0;
-  const classDetails = classes[classIndex];
+  const classId: string = params.id ? params.id : '';
   const [members, setMembers] = useState<{
     students: { id: string; name: string }[];
     teachers: { id: string; name: string }[];
@@ -25,11 +23,10 @@ export default function ClassMemberTabView() {
   const fetchClassMembers = async () => {
     try {
       console.log('FETCHED');
-      console.log(classDetails);
       const res = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
-          classDetails.id
-        }/getStudentsTeachers`,
+        `${
+          import.meta.env.VITE_REACT_APP_SERVER_URL
+        }/classes/${classId}/getStudentsTeachers`,
       );
       const resultData = res.data;
       console.log(resultData);
@@ -158,7 +155,7 @@ export default function ClassMemberTabView() {
                         icon={<UserOutlined />}
                         style={{ backgroundColor: `#${bgColor}` }}
                       />
-                      <p className="font-semibold">{student.name}</p>
+                      <p className="font-semibold">{student?.name}</p>
                     </div>
                   </div>
                   {index != members.students.length - 1 && (
