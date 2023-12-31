@@ -15,12 +15,13 @@ import {
   Space,
   Table,
   Typography,
+  message,
 } from 'antd';
 import Search from 'antd/es/input/Search';
 import Column from 'antd/es/table/Column';
 import axios from 'axios';
 import Papa from 'papaparse';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { useAppSelector } from '../../redux/store';
@@ -40,7 +41,10 @@ export default function GradeCompositionPage() {
   const params = useParams();
   const navigate = useNavigate();
   const classId: string = params.id ? params.id : '';
-  const gradeCompositionId = params?.gradeCompositionId;
+  // const gradeCompositionId = params?.gradeCompositionId;
+  const gradeCompositionId = '1ad733a1-97b5-4fac-9f92-3f53f46f9092';
+
+  const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState<any>([]);
   const [gradeCompositionName, setGradeCompositionName] = useState<string>('');
   const [form] = Form.useForm();
@@ -109,7 +113,7 @@ export default function GradeCompositionPage() {
     try {
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/grade-compositions/1ad733a1-97b5-4fac-9f92-3f53f46f9092`;
+      }/grade-compositions/${gradeCompositionId}`;
       const values = {
         isFinalized: true,
       };
@@ -124,7 +128,7 @@ export default function GradeCompositionPage() {
     try {
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/grade-compositions/1ad733a1-97b5-4fac-9f92-3f53f46f9092/getStudentsGrade`;
+      }/grade-compositions/${gradeCompositionId}/getStudentsGrade`;
       console.log(url);
       const res = await axios.get(url);
       console.log(res.data);
@@ -147,40 +151,6 @@ export default function GradeCompositionPage() {
     fetchGradeComposition();
   }, []);
 
-  const EditableCell: React.FC<EditableCellProps> = ({
-    editing,
-    dataIndex,
-    title,
-    inputType,
-    record,
-    index,
-    children,
-    ...restProps
-  }) => {
-    const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item
-            name={dataIndex}
-            style={{ margin: 0 }}
-            rules={[
-              {
-                required: true,
-                message: `Please Input ${title}!`,
-              },
-            ]}
-          >
-            {inputNode}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
-  };
-
   const exportGradeCompositionOptions: MenuProps['items'] = [
     {
       key: '1',
@@ -198,8 +168,70 @@ export default function GradeCompositionPage() {
     },
   ];
 
+  const doUploadStudentList = async (data: any) => {
+    // Upload List Student
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-compositions/${gradeCompositionId}/updateAllStudentGrades/${classId}`;
+      const result = await axios.patch(url, {
+        studentGrades: data,
+      });
+      console.log(result);
+      fetchGradeComposition();
+      messageApi.open({
+        type: 'success',
+        content: 'Upload grade composition successfully',
+        duration: 1,
+      });
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Something wrong when upload grade composition`,
+        duration: 1,
+      });
+    }
+  };
+
+  const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileData: File = e.target.files[0];
+      console.log(fileData);
+      if (fileData.type == 'text/csv') {
+        console.log('Parse CSV File');
+        Papa.parse(fileData, {
+          header: true,
+          complete: function (results: any) {
+            const data = results.data.map((row: any) => {
+              return { ...row, grade: Number(row?.grade) };
+            });
+            console.log(data);
+            doUploadStudentList(data);
+          },
+        });
+      } else {
+        console.log('Parse XLSX File');
+        const data = await fileData.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const wsName = workbook.SheetNames[0];
+        const worksheet = XLSX.utils
+          .sheet_to_json(workbook.Sheets[wsName])
+          .map((row: any) => {
+            return {
+              ...row,
+              studentId: `${row.studentId}`,
+            };
+          });
+        console.log(worksheet);
+        doUploadStudentList(worksheet);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="">
@@ -220,31 +252,7 @@ export default function GradeCompositionPage() {
                 className="w-fit"
                 type="file"
                 accept=".xlsx, .csv"
-                onChange={async (e) => {
-                  if (e.target.files) {
-                    const fileData: File = e.target.files[0];
-                    console.log(fileData);
-                    if (fileData.type == 'text/csv') {
-                      console.log('Parse CSV File');
-                      Papa.parse(fileData, {
-                        header: true,
-                        complete: function (results) {
-                          console.log(results.data);
-                          console.log(data);
-                        },
-                      });
-                    } else {
-                      console.log('Parse XLSX File');
-                      const data = await fileData.arrayBuffer();
-                      const workbook = XLSX.read(data);
-                      const wsName = workbook.SheetNames[0];
-                      const worksheet = XLSX.utils.sheet_to_json(
-                        workbook.Sheets[wsName],
-                      );
-                      console.log(worksheet);
-                    }
-                  }
-                }}
+                onChange={handleUploadStudentList}
               />
             </div>
             <Dropdown
@@ -313,3 +321,37 @@ export default function GradeCompositionPage() {
     </div>
   );
 }
+
+const EditableCell: React.FC<EditableCellProps> = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  ...restProps
+}) => {
+  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
