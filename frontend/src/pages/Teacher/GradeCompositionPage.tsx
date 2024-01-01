@@ -3,6 +3,7 @@ import {
   FileExcelOutlined,
   FileTextOutlined,
   LeftOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -249,11 +250,27 @@ export default function GradeCompositionPage() {
           <div className="flex gap-2 justify-start items-center">
             <div className="w-fit">
               <input
-                className="w-fit"
                 type="file"
                 accept=".xlsx, .csv"
+                onClick={(e) => {
+                  const element = e.target as HTMLInputElement;
+                  element.value = '';
+                }}
                 onChange={handleUploadStudentList}
+                id="buttonFile"
+                className="hidden"
               />
+              <Button className="p-0">
+                <label
+                  htmlFor="buttonFile"
+                  className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
+                >
+                  <span className=" w-full h-full text-center flex justify-center items-center">
+                    Upload
+                  </span>
+                  <UploadOutlined />
+                </label>
+              </Button>
             </div>
             <Dropdown
               menu={{
