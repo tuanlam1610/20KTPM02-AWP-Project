@@ -8,6 +8,7 @@ interface AppState {
   userInfo?: User;
   isAuthenticated: boolean;
   classes: Class[];
+  isEditingGradeComposition: boolean;
 }
 
 const initialState: AppState = {
@@ -15,6 +16,7 @@ const initialState: AppState = {
   userInfo: undefined,
   isAuthenticated: false,
   classes: [],
+  isEditingGradeComposition: false,
 };
 
 const appSlice = createSlice({
@@ -36,6 +38,9 @@ const appSlice = createSlice({
     addClass: (state, action) => {
       state.classes = [...state.classes, action.payload];
     },
+    setIsEditingGradeComposition: (state, action) => {
+      state.isEditingGradeComposition = action.payload;
+    },
   },
   extraReducers(builder) {
     builder;
@@ -48,5 +53,6 @@ export const {
   setIsAuthenticated,
   setClasses,
   addClass,
+  setIsEditingGradeComposition,
 } = appSlice.actions;
 export default appSlice;

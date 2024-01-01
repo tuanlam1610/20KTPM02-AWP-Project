@@ -5,19 +5,7 @@ import {
   LeftOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import {
-  Button,
-  Dropdown,
-  Form,
-  Input,
-  InputNumber,
-  MenuProps,
-  Popconfirm,
-  Space,
-  Table,
-  Typography,
-  message,
-} from 'antd';
+import { Button, Dropdown, MenuProps, Space, Table, message } from 'antd';
 import Search from 'antd/es/input/Search';
 import Column from 'antd/es/table/Column';
 import axios from 'axios';
@@ -25,18 +13,9 @@ import Papa from 'papaparse';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
-import { useAppSelector } from '../../redux/store';
 import { downloadCSV, downloadXLSX } from '../../utils/helper';
-
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  editing: boolean;
-  dataIndex: string;
-  title: any;
-  inputType: 'number' | 'text';
-  record: any;
-  index: number;
-  children: React.ReactNode;
-}
+import EditGradeCompositionModal from './components/Modals/EditGradeCompositionModal';
+import { useAppSelector } from '../../redux/store';
 
 export default function GradeCompositionPage() {
   const params = useParams();
@@ -48,40 +27,7 @@ export default function GradeCompositionPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState<any>([]);
   const [gradeCompositionName, setGradeCompositionName] = useState<string>('');
-  const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
-
-  const isEditing = (record: any) => record.key === editingKey;
-  const edit = (record: any & { key: React.Key }) => {
-    form.setFieldsValue({ name: '', age: '', address: '', ...record });
-    setEditingKey(record.key);
-  };
-  const cancel = () => {
-    setEditingKey('');
-  };
-  const save = async (key: React.Key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...data];
-      console.log(newData);
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setData(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-  };
+  const { isEditingGradeComposition } = useAppSelector((state) => state.app);
 
   const sampleGradeCompositionData: any = [];
   for (let i = 0; i < 20; i++) {
@@ -106,6 +52,7 @@ export default function GradeCompositionPage() {
       },
     );
   }
+
   const handleBackButton = () => {
     navigate(-1);
   };
@@ -134,11 +81,6 @@ export default function GradeCompositionPage() {
       const res = await axios.get(url);
       console.log(res.data);
       let resultData = res.data?.studentGrades || [];
-      resultData = resultData.map((row: any) => {
-        const rowData = { ...row };
-        delete rowData.id;
-        return rowData;
-      });
       console.log(resultData);
       setData(resultData);
       setGradeCompositionName(res.data?.name || '');
@@ -150,7 +92,8 @@ export default function GradeCompositionPage() {
 
   useEffect(() => {
     fetchGradeComposition();
-  }, []);
+    console.log('Fetch Grade Composition');
+  }, [isEditingGradeComposition]);
 
   const exportGradeCompositionOptions: MenuProps['items'] = [
     {
@@ -308,29 +251,10 @@ export default function GradeCompositionPage() {
               title={`${gradeCompositionName}`}
             />
             <Column
-              render={(_: any, record: any) => {
-                const editable = isEditing(record);
-                return editable ? (
-                  <span>
-                    <Typography.Link
-                      onClick={() => save(record.key)}
-                      style={{ marginRight: 8 }}
-                    >
-                      Save
-                    </Typography.Link>
-                    <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                      <a>Cancel</a>
-                    </Popconfirm>
-                  </span>
-                ) : (
-                  <Typography.Link
-                    disabled={editingKey !== ''}
-                    onClick={() => edit(record)}
-                  >
-                    Edit
-                  </Typography.Link>
-                );
-              }}
+              key="name"
+              render={(value) => (
+                <EditGradeCompositionModal value={value} classId={classId} />
+              )}
             />
           </Table>
         </div>
@@ -338,37 +262,3 @@ export default function GradeCompositionPage() {
     </div>
   );
 }
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  ...restProps
-}) => {
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{ margin: 0 }}
-          rules={[
-            {
-              required: true,
-              message: `Please Input ${title}!`,
-            },
-          ]}
-        >
-          {inputNode}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
