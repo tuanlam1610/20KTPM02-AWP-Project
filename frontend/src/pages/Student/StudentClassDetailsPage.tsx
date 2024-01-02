@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/store';
 import ClassDetailsTabView from './components/TabViews/ClassDetailsTabView';
 import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
 import { useEffect, useState } from 'react';
-import { fetchInitData } from '../../redux/classDetailThunks';
+import { getGradeComposition } from '../../redux/classDetailThunks';
 import axios from 'axios';
 
 export default function StudentClassDetailsPage() {
@@ -59,7 +59,7 @@ export default function StudentClassDetailsPage() {
 
   useEffect(() => {
     fetchClassDetails();
-    dispatch(fetchInitData({ id: classId }));
+    dispatch(getGradeComposition({ id: classId }));
   }, [classId]);
 
   return (

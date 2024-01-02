@@ -1,60 +1,37 @@
 import {
-  ConnectedSocket,
-  MessageBody,
-  SubscribeMessage,
   WebSocketGateway,
-  WsResponse,
+  SubscribeMessage,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'dgram';
-import { Observable, from, map } from 'rxjs';
+import { Server, Socket } from 'socket.io';
+import { NotificationsService } from './notifications.service';
 
-@WebSocketGateway(80, { namespace: 'notifications' })
+@WebSocketGateway()
 export class NotificationsGateway {
-  @SubscribeMessage('notifcations')
-  handleNotifcations(@MessageBody() data: string): string {
-    return data;
+  constructor(private readonly notificationService: NotificationsService) {}
+  @WebSocketServer()
+  server: Server;
+
+  @SubscribeMessage('joinNotifications')
+  handleJoinNotifications(client: Socket, classId: string): void {
+    const room = `notificationRoom-${classId}`; // Room name includes class ID
+    client.join(room); // Join a specific notification room for that class ID
+    this.server
+      .to(room)
+      .emit(
+        'newUserNotification',
+        `${client.id} joined notifications for class ${classId}`,
+      );
   }
 
-  @SubscribeMessage('notificationsId')
-  handleNotificationsId(@MessageBody('id') id: number): number {
-    // id === messageBody.id
-    return id;
-  }
-
-  @SubscribeMessage('events')
-  handleEvent(client: Socket, data: string): string {
-    return data;
-  }
-
-  @SubscribeMessage('events')
-  handleReply(
-    @MessageBody() data: string,
-    @ConnectedSocket() client: Socket,
-  ): string {
-    return data; //ignore
-  }
-
-  //socket client
-  //   socket.emit('events', { name: 'Nest' }, (data) => console.log(data));
-
-  @SubscribeMessage('events')
-  handleMultiEvent(@MessageBody() data: unknown): WsResponse<unknown> {
-    const event = 'events';
-    return { event, data };
-  }
-
-  @SubscribeMessage('events')
-  onEvent(@MessageBody() data: unknown): Observable<WsResponse<number>> {
-    const event = 'events';
-    const response = [1, 2, 3];
-
-    return from(response).pipe(map((data) => ({ event, data })));
+  @SubscribeMessage('sendNotification')
+  sendNotification(
+    client: Socket,
+    { classId, notification }: { classId: string; notification: any },
+  ): void {
+    const room = `notificationRoom-${classId}`; // Room name includes class ID
+    this.server
+      .to(room)
+      .emit('newNotification', { notification, senderId: client.id });
   }
 }
-
-// OnGatewayInit	Forces to implement the afterInit() method. Takes library-specific server instance as an argument (and spreads the rest if required).
-// OnGatewayConnection	Forces to implement the handleConnection() method. Takes library-specific client socket instance as an argument.
-// OnGatewayDisconnect	Forces to implement the handleDisconnect() method. Takes library-specific client socket instance as an argument.
-
-@WebSocketServer()
-server: Server;

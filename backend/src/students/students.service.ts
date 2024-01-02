@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
@@ -17,23 +17,32 @@ export class StudentsService {
     }
 
     const classInvitationForStudent =
-      await this.prisma.classInvitationForStudent.delete({
+      await this.prisma.classInvitationForStudent.findUnique({
         where: {
           classId_studentId: { classId: classToJoin.id, studentId: studentId },
         },
       });
 
-    if (!classInvitationForStudent) {
+    if (classInvitationForStudent) {
       //return error: class invitation not found
-      throw new BadRequestException('Class invitation not found');
+      await this.prisma.classInvitationForStudent.delete({
+        where: {
+          classId_studentId: { classId: classToJoin.id, studentId: studentId },
+        },
+      });
     }
 
-    return this.prisma.student.update({
-      where: { id: studentId },
-      data: {
-        classMember: {
-          create: { class: { connect: { id: classToJoin.id } } },
-        },
+    return this.prisma.classMember.upsert({
+      where: {
+        classId_studentId: { classId: classToJoin.id, studentId: studentId },
+      },
+      update: {
+        isJoined: true,
+      },
+      create: {
+        classId: classToJoin.id,
+        studentId: studentId,
+        isJoined: true,
       },
     });
   }

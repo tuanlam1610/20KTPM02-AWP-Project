@@ -34,6 +34,9 @@ model User {
   isBanned       Boolean @default(false)
 
   comment Comment[]
+
+  sentNotifications     Notification[] @relation("SentNotifications")
+  receivedNotifications Notification[] @relation("ReceivedNotifications")
 }
 
 //Module
@@ -221,3 +224,25 @@ enum GradeReviewStatus {
   Accepted
   Denied
 }
+
+model Notification {
+  id         String  @id @default(uuid())
+  action     String
+  object     String
+  objectId   String
+  objectType String
+  content    String
+  sender     User    @relation("SentNotifications", fields: [senderId], references: [id])
+  senderId   String
+  isRead     Boolean @default(false)
+  receiver   User    @relation("ReceivedNotifications", fields: [receiverId], references: [id])
+  receiverId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//Notification cho comment va otehr actions
+//sender action add a comment on object grade review
+//object ten hanh dong, action crud type/
+//objectId is affected 

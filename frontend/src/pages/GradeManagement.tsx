@@ -44,7 +44,7 @@ export default function GradeManagementPage() {
       grade: [
         {
           name: '',
-          gradeId: '',
+          id: '',
           percentage: 0,
           isFinalized: false,
         },
@@ -101,7 +101,7 @@ export default function GradeManagementPage() {
       remove(0);
       for (const grade of Object.values(gradeCompositionMap)) {
         const data = {
-          gradeId: grade.id,
+          id: grade.id,
           name: grade.name,
           percentage: grade.percentage,
           isFinalized: grade.isFinalized,
@@ -155,7 +155,6 @@ export default function GradeManagementPage() {
                     className="cursor-grab"
                     index={index}
                     key={index}
-                    data={item}
                     onRemove={() => {
                       remove(index);
                     }}
@@ -177,7 +176,7 @@ export default function GradeManagementPage() {
                 onClick={() => {
                   append({
                     name: '',
-                    gradeId: '',
+                    id: '',
                     percentage: 0,
                     isFinalized: false,
                   });

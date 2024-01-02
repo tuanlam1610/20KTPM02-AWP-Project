@@ -1,73 +1,33 @@
-import { LeftOutlined } from '@ant-design/icons';
 import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Popconfirm,
-  Table,
-  Typography,
-} from 'antd';
+  DownloadOutlined,
+  FileExcelOutlined,
+  FileTextOutlined,
+  LeftOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
+import { Button, Dropdown, MenuProps, Space, Table, message } from 'antd';
 import Search from 'antd/es/input/Search';
 import Column from 'antd/es/table/Column';
 import axios from 'axios';
 import Papa from 'papaparse';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
+import { downloadCSV, downloadXLSX } from '../../utils/helper';
+import EditGradeCompositionModal from './components/Modals/EditGradeCompositionModal';
 import { useAppSelector } from '../../redux/store';
-
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  editing: boolean;
-  dataIndex: string;
-  title: any;
-  inputType: 'number' | 'text';
-  record: any;
-  index: number;
-  children: React.ReactNode;
-}
 
 export default function GradeCompositionPage() {
   const params = useParams();
   const navigate = useNavigate();
-  const classes = useAppSelector((state) => state.app.classes);
-  const classId: number = params.id ? Number(params.id) : 0;
-  const gradeCompositionId = params?.gradeCompositionId;
-  const [data, setData] = useState<any>([]);
-  const [form] = Form.useForm();
-  const [editingKey, setEditingKey] = useState('');
+  const classId: string = params.id ? params.id : '';
+  // const gradeCompositionId = params?.gradeCompositionId;
+  const gradeCompositionId = '1ad733a1-97b5-4fac-9f92-3f53f46f9092';
 
-  const isEditing = (record: any) => record.key === editingKey;
-  const edit = (record: any & { key: React.Key }) => {
-    form.setFieldsValue({ name: '', age: '', address: '', ...record });
-    setEditingKey(record.key);
-  };
-  const cancel = () => {
-    setEditingKey('');
-  };
-  const save = async (key: React.Key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...data];
-      console.log(newData);
-      const index = newData.findIndex((item) => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setData(newData);
-        setEditingKey('');
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-  };
+  const [messageApi, contextHolder] = message.useMessage();
+  const [data, setData] = useState<any>([]);
+  const [gradeCompositionName, setGradeCompositionName] = useState<string>('');
+  const { isEditingGradeComposition } = useAppSelector((state) => state.app);
 
   const sampleGradeCompositionData: any = [];
   for (let i = 0; i < 20; i++) {
@@ -92,17 +52,38 @@ export default function GradeCompositionPage() {
       },
     );
   }
+
   const handleBackButton = () => {
     navigate(-1);
   };
 
+  const handleFinalize = async () => {
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-compositions/${gradeCompositionId}`;
+      const values = {
+        isFinalized: true,
+      };
+      const result = await axios.patch(url, values);
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const fetchGradeComposition = async () => {
     try {
-      const url = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${
-        classes[classId].id
-      }/gradeComposition/${gradeCompositionId}`;
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-compositions/${gradeCompositionId}/getStudentsGrade`;
+      console.log(url);
       const res = await axios.get(url);
       console.log(res.data);
+      let resultData = res.data?.studentGrades || [];
+      console.log(resultData);
+      setData(resultData);
+      setGradeCompositionName(res.data?.name || '');
     } catch (err) {
       setData([...sampleGradeCompositionData]);
       console.log(err);
@@ -110,46 +91,91 @@ export default function GradeCompositionPage() {
   };
 
   useEffect(() => {
-    console.log('Grade Composition Fetch');
     fetchGradeComposition();
-  }, []);
+    console.log('Fetch Grade Composition');
+  }, [isEditingGradeComposition]);
 
-  const EditableCell: React.FC<EditableCellProps> = ({
-    editing,
-    dataIndex,
-    title,
-    inputType,
-    record,
-    index,
-    children,
-    ...restProps
-  }) => {
-    const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  const exportGradeCompositionOptions: MenuProps['items'] = [
+    {
+      key: '1',
+      label: 'CSV',
+      icon: <FileTextOutlined />,
+      onClick: () =>
+        downloadCSV(data, `Class${classId}_${gradeCompositionName}`),
+    },
+    {
+      key: '2',
+      label: 'XLSX',
+      icon: <FileExcelOutlined />,
+      onClick: () =>
+        downloadXLSX(data, `Class${classId}_${gradeCompositionName}`),
+    },
+  ];
 
-    return (
-      <td {...restProps}>
-        {editing ? (
-          <Form.Item
-            name={dataIndex}
-            style={{ margin: 0 }}
-            rules={[
-              {
-                required: true,
-                message: `Please Input ${title}!`,
-              },
-            ]}
-          >
-            {inputNode}
-          </Form.Item>
-        ) : (
-          children
-        )}
-      </td>
-    );
+  const doUploadStudentList = async (data: any) => {
+    // Upload List Student
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-compositions/${gradeCompositionId}/updateAllStudentGrades/${classId}`;
+      const result = await axios.patch(url, {
+        studentGrades: data,
+      });
+      console.log(result);
+      fetchGradeComposition();
+      messageApi.open({
+        type: 'success',
+        content: 'Upload grade composition successfully',
+        duration: 1,
+      });
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Something wrong when upload grade composition`,
+        duration: 1,
+      });
+    }
+  };
+
+  const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileData: File = e.target.files[0];
+      console.log(fileData);
+      if (fileData.type == 'text/csv') {
+        console.log('Parse CSV File');
+        Papa.parse(fileData, {
+          header: true,
+          complete: function (results: any) {
+            const data = results.data.map((row: any) => {
+              return { ...row, grade: Number(row?.grade) };
+            });
+            console.log(data);
+            doUploadStudentList(data);
+          },
+        });
+      } else {
+        console.log('Parse XLSX File');
+        const data = await fileData.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const wsName = workbook.SheetNames[0];
+        const worksheet = XLSX.utils
+          .sheet_to_json(workbook.Sheets[wsName])
+          .map((row: any) => {
+            return {
+              ...row,
+              studentId: `${row.studentId}`,
+            };
+          });
+        console.log(worksheet);
+        doUploadStudentList(worksheet);
+      }
+    }
   };
 
   return (
     <div className="flex flex-col min-h-screen">
+      {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="">
@@ -159,41 +185,49 @@ export default function GradeCompositionPage() {
         </div>
         <div className="flex justify-between items-center">
           <p className="text-4xl font-semibold">
-            Grade Composition - Exercise 01
+            {`Grade Composition - ${gradeCompositionName}`}
           </p>
         </div>
         <div className="flex justify-between items-center px-4 mt-4">
           <Search placeholder="Search student ID" className="w-1/2" />
-          <div className="flex gap-2 justify-center items-center">
-            <input
-              type="file"
-              accept=".xlsx, .csv"
-              onChange={async (e) => {
-                if (e.target.files) {
-                  const fileData: File = e.target.files[0];
-                  console.log(fileData);
-                  if (fileData.type == 'text/csv') {
-                    console.log('Parse CSV File');
-                    Papa.parse(fileData, {
-                      header: true,
-                      complete: function (results) {
-                        console.log(results.data);
-                        console.log(data);
-                      },
-                    });
-                  } else {
-                    console.log('Parse XLSX File');
-                    const data = await fileData.arrayBuffer();
-                    const workbook = XLSX.read(data);
-                    const wsName = workbook.SheetNames[0];
-                    const worksheet = XLSX.utils.sheet_to_json(
-                      workbook.Sheets[wsName],
-                    );
-                    console.log(worksheet);
-                  }
-                }
+          <div className="flex gap-2 justify-start items-center">
+            <div className="w-fit">
+              <input
+                type="file"
+                accept=".xlsx, .csv"
+                onClick={(e) => {
+                  const element = e.target as HTMLInputElement;
+                  element.value = '';
+                }}
+                onChange={handleUploadStudentList}
+                id="buttonFile"
+                className="hidden"
+              />
+              <Button className="p-0">
+                <label
+                  htmlFor="buttonFile"
+                  className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
+                >
+                  <span className=" w-full h-full text-center flex justify-center items-center">
+                    Upload
+                  </span>
+                  <UploadOutlined />
+                </label>
+              </Button>
+            </div>
+            <Dropdown
+              menu={{
+                items: exportGradeCompositionOptions,
               }}
-            />
+            >
+              <Button>
+                <Space>
+                  Export Grade Board
+                  <DownloadOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+            <Button onClick={handleFinalize}>Finalize</Button>
           </div>
         </div>
         <div className="px-4 mt-4">
@@ -212,32 +246,21 @@ export default function GradeCompositionPage() {
             />
 
             <Column
-              key="Exercise 01"
-              dataIndex="Exercise 01"
-              title="Exercise 01"
+              key="grade"
+              dataIndex="grade"
+              title={`${gradeCompositionName}`}
             />
             <Column
-              render={(_: any, record: any) => {
-                const editable = isEditing(record);
-                return editable ? (
-                  <span>
-                    <Typography.Link
-                      onClick={() => save(record.key)}
-                      style={{ marginRight: 8 }}
-                    >
-                      Save
-                    </Typography.Link>
-                    <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                      <a>Cancel</a>
-                    </Popconfirm>
-                  </span>
-                ) : (
-                  <Typography.Link
-                    disabled={editingKey !== ''}
-                    onClick={() => edit(record)}
-                  >
-                    Edit
-                  </Typography.Link>
+              key="id"
+              dataIndex="id"
+              title="Edit"
+              render={(value, record, index) => {
+                // console.log(value, record, index);
+                return (
+                  <EditGradeCompositionModal
+                    record={data[index]}
+                    classId={classId}
+                  />
                 );
               }}
             />

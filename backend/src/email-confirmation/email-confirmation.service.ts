@@ -63,10 +63,10 @@ export class EmailConfirmationService {
     });
   }
 
-  public sendInviteLink(email: string, classData: ClassEntity) {
+  public sendInviteLink(email: string, classId: string) {
     const payload: VerificationTokenInvitePayload = {
       email,
-      classId: classData.id,
+      classId: classId,
     };
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
@@ -80,7 +80,7 @@ export class EmailConfirmationService {
 
     return this.emailService.sendMail({
       to: email,
-      subject: `[Invite] Invitation to join class ${classData.name}`,
+      subject: `[Invite] Invitation to join class ${classId}`,
       text,
     });
   }
