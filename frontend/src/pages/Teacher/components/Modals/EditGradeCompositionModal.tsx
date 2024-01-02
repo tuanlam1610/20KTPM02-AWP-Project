@@ -17,7 +17,7 @@ import { setIsEditingGradeComposition } from '../../../../redux/appSlice';
 export default function EditGradeCompositionModal(props: any) {
   const dispatch = useAppDispatch();
   const [studentGrade, setStudentGrade] = useState(
-    props?.value || {
+    props?.record || {
       id: '',
       studentId: '',
       name: '',
@@ -44,6 +44,8 @@ export default function EditGradeCompositionModal(props: any) {
   const handleOk = async () => {
     setConfirmLoading(true);
     const values = await form.validateFields();
+    form.resetFields();
+    console.log(values, studentGrade);
     try {
       const newGrade = {
         grade: values?.grade,

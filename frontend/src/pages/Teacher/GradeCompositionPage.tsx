@@ -251,10 +251,18 @@ export default function GradeCompositionPage() {
               title={`${gradeCompositionName}`}
             />
             <Column
-              key="name"
-              render={(value) => (
-                <EditGradeCompositionModal value={value} classId={classId} />
-              )}
+              key="id"
+              dataIndex="id"
+              title="Edit"
+              render={(value, record, index) => {
+                // console.log(value, record, index);
+                return (
+                  <EditGradeCompositionModal
+                    record={data[index]}
+                    classId={classId}
+                  />
+                );
+              }}
             />
           </Table>
         </div>
