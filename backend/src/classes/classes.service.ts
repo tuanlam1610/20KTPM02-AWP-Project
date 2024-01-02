@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { GradeComposition, Prisma } from '@prisma/client';
 import { GradeCompositionsService } from 'src/grade-compositions/grade-compositions.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -181,6 +185,12 @@ export class ClassesService {
       },
     });
     const studentGradesByStudent: Record<string, any> = {};
+    if (!classWithGradeCompositions) {
+      throw new NotFoundException(
+        `Class id ${classId} not found`,
+        // `Class id ${classId} has no grade composition`,
+      );
+    }
 
     for (const gradeComposition of classWithGradeCompositions.gradeCompositions) {
       for (const studentGrade of gradeComposition.studentGrades) {
@@ -217,7 +227,13 @@ export class ClassesService {
         });
       }
     }
-    return Object.values(studentGradesByStudent);
+    const gcList = classWithGradeCompositions.gradeCompositions.map((gc) =>
+      exclude(gc, ['studentGrades']),
+    );
+    return {
+      gradeCompositions: [...gcList],
+      students: Object.values(studentGradesByStudent),
+    };
   }
 
   async getAllClassGradeReview(
