@@ -41,9 +41,13 @@ function App() {
         <Route path="/resetPassword" element={<ResetPasswordPage />} />
         <Route path="/activateEmail" element={<ActivateEmailPage />} />
         <Route path="/chooserole" element={<ChooseRolePage />} />
+        <Route path="/profile" element={<UserProfilePage />} />
 
         {/* Teacher Routes */}
-        <Route path="/teacher">
+        <Route
+          path="/teacher"
+          element={<ProtectedRoute allowedRole={'teacher'} />}
+        >
           <Route path="home" element={<TeacherHomePage />} />
           <Route path="class/:id" element={<ClassDetailsPage />} />
           <Route
@@ -58,11 +62,13 @@ function App() {
             path="class/:id/grademanagement/:gradeCompositionId"
             element={<GradeCompositionPage />}
           />
-          <Route path="profile" element={<UserProfilePage />} />
         </Route>
 
         {/* Student Routes */}
-        <Route path="/student">
+        <Route
+          path="/student"
+          element={<ProtectedRoute allowedRole={'student'} />}
+        >
           <Route path="home" element={<StudentHomePage />} />
           <Route path="class/:id" element={<StudentClassDetailsPage />} />
         </Route>

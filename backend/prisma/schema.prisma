@@ -237,6 +237,9 @@ model Notification {
   isRead     Boolean @default(false)
   receiver   User    @relation("ReceivedNotifications", fields: [receiverId], references: [id])
   receiverId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 //Notification cho comment va otehr actions
