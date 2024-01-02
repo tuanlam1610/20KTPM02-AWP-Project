@@ -21,6 +21,7 @@ import { GradeReviewDetailProvider } from './pages/Teacher/GradeReviewDetailPage
 import TeacherHomePage from './pages/Teacher/TeacherHomePage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import UserProfilePage from './pages/UserProfilePage';
+import { ProtectedRoute } from './routes/ProtectedRoute';
 
 dayjs.extend(relativeTime);
 
