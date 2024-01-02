@@ -222,16 +222,18 @@ export default function GradeManagementPage() {
     );
   }
 
-  const formatRawDataToTableData = (rawData: any[]) => {
-    return rawData.map((data) => {
+  const formatRawDataToTableData = (rawData: any) => {
+    const students: any[] = rawData.students || [];
+    const gradeCompositions: any[] = rawData.gradeCompositions || [];
+    const gradeCompositionsMap = keyBy(gradeCompositions, 'name');
+    setGradeCompositionNameMap(gradeCompositionsMap);
+    setGradeCompositionNames(Object.keys(gradeCompositionsMap));
+    return students.map((data) => {
       const gradeCompositionItems = keyBy(data.gradeEntries, 'name');
-      setGradeCompositionNameMap(keyBy(data.gradeEntries, 'name'));
-      console.log(gradeCompositionNameMap);
       Object.keys(gradeCompositionItems).forEach((gradeName) => {
         gradeCompositionItems[gradeName] =
           gradeCompositionItems[gradeName].grade;
       });
-      setGradeCompositionNames(Object.keys(gradeCompositionItems));
       const res = {
         ...data,
         ...gradeCompositionItems,
@@ -454,7 +456,7 @@ export default function GradeManagementPage() {
               fixed="left"
             />
             <ColumnGroup title="Grade Structure">
-              {gradeCompositionNames.map((gradeCompositionName) => {
+              {gradeCompositionNames.map((gradeCompositionName: any) => {
                 console.log(gradeCompositionNames);
                 return (
                   <Column

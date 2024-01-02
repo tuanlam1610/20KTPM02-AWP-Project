@@ -21,8 +21,7 @@ export default function GradeCompositionPage() {
   const params = useParams();
   const navigate = useNavigate();
   const classId: string = params.id ? params.id : '';
-  // const gradeCompositionId = params?.gradeCompositionId;
-  const gradeCompositionId = '1ad733a1-97b5-4fac-9f92-3f53f46f9092';
+  const gradeCompositionId = params?.gradeCompositionId;
 
   const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState<any>([]);
