@@ -3,6 +3,7 @@ import {
   FileExcelOutlined,
   FileTextOutlined,
   LeftOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import { Button, Dropdown, MenuProps, Space, message } from 'antd';
 import Search from 'antd/es/input/Search';
@@ -286,7 +287,7 @@ export default function GradeManagementPage() {
     if (e.target.files) {
       const fileData: File = e.target.files[0];
       console.log(fileData);
-      if (fileData.type == 'text/csv') {
+      if (fileData?.type == 'text/csv') {
         console.log('Parse CSV File');
         Papa.parse(fileData, {
           header: true,
@@ -392,19 +393,26 @@ export default function GradeManagementPage() {
             <input
               type="file"
               accept=".xlsx, .csv"
-              onChange={handleUploadStudentList}
-            />
-            {/* <Upload
-              beforeUpload={(file) => {
-                const isValidFormat =
-                  file.type === 'text/csv' ||
-                  file.type ===
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                return isValidFormat || Upload.LIST_IGNORE;
+              onClick={(e) => {
+                const element = e.target as HTMLInputElement;
+                element.value = '';
               }}
-            >
-              <Button icon={<UploadOutlined />}>Upload Student List</Button>
-            </Upload> */}
+              onChange={handleUploadStudentList}
+              id="buttonFile"
+              className="hidden"
+            />
+
+            <Button className="p-0">
+              <label
+                htmlFor="buttonFile"
+                className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
+              >
+                <span className=" w-full h-full text-center flex justify-center items-center">
+                  Upload
+                </span>
+                <UploadOutlined />
+              </label>
+            </Button>
             <Dropdown
               menu={{
                 items: exportStudentListOptions,
