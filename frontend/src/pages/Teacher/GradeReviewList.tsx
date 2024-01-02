@@ -1,15 +1,33 @@
 import { Select, Table, Tag } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GradeReview } from '../../interface';
 import { useAppDispatch } from '../../redux/store';
 import { ColumnsType } from 'antd/es/table';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+import axios from 'axios';
+
+const queryClient = new QueryClient();
+
+export function GradePreviewListProvider() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <GradeReviewList />
+    </QueryClientProvider>
+  );
+}
 
 export interface GradeReviewItem extends GradeReview {
   numOfComment: number;
 }
 
 export default function GradeReviewList() {
+  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
   const [type, setType] = useState('Open');
   const [page, setPage] = useState(0);
@@ -24,7 +42,7 @@ export default function GradeReviewList() {
       key: 'student',
       width: 150,
       fixed: 'left',
-      render: (student) => <p className="truncate">{student?.user?.name}</p>,
+      render: (student) => <p className="truncate">{student.name}</p>,
     },
     {
       title: 'Status',
@@ -80,238 +98,64 @@ export default function GradeReviewList() {
     },
     {
       title: 'Grade',
-      dataIndex: 'grade',
-      key: 'grade',
-      render: (grade) => <p className="truncate">{grade?.name}</p>,
+      dataIndex: 'studentGrade',
+      key: 'studentGrade',
+      render: (studentGrade) => (
+        <p className="truncate">{studentGrade.gradeComposition.name}</p>
+      ),
     },
     {
       title: 'Resolved by',
       dataIndex: 'teacher',
       key: 'teacher',
-      render: (teacher) => <p className="truncate">{teacher?.user?.name}</p>,
+      render: (teacher) => <p className="truncate">{teacher?.name}</p>,
     },
   ];
 
-  // const fetchProjects = (page = 0) =>
-  //   fetch('/api/projects?page=' + page).then((res) => res.json());
+  const fetchGradeReviews = async (page = 0, type = 'Open') => {
+    const res = await axios.get(
+      `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/classes/${classId}/getGradeReview?status=${type}&page=${page}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      },
+    );
+    setPage(res.data.currentPage);
+    return {
+      gradeReviews: res.data.gradeReviews as GradeReviewItem[],
+      hasMore: res.data.currentPage < res.data.totalPage - 1,
+      totalReviews: res.data.totalRecord,
+    };
+  };
 
-  // const { isLoading, isError, error, data, isFetching, isPreviousData } =
-  //   useQuery({
-  //     queryKey: ['projects', page],
-  //     queryFn: () => fetchProjects(page),
-  //   });
-
-  const dataSource: GradeReviewItem[] = [
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      id: '1234',
-      status: 'Open',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      grade: {
-        name: 'Final',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      teacher: {
-        id: '12344',
-        fullname: 'Tran Duy Quang',
-      },
-      id: '1234',
-      status: 'Accepted',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      finalGrade: 9,
-      grade: {
-        name: 'Midterm',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      id: '1234',
-      status: 'Open',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      grade: {
-        name: 'Final',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      teacher: {
-        id: '12344',
-        fullname: 'Tran Duy Quang',
-      },
-      id: '1234',
-      status: 'Accepted',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      finalGrade: 9,
-      grade: {
-        name: 'Midterm',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      id: '1234',
-      status: 'Open',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      grade: {
-        name: 'Final',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      teacher: {
-        id: '12344',
-        fullname: 'Tran Duy Quang',
-      },
-      id: '1234',
-      status: 'Accepted',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      finalGrade: 9,
-      grade: {
-        name: 'Midterm',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      id: '1234',
-      status: 'Open',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      grade: {
-        name: 'Final',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      teacher: {
-        id: '12344',
-        fullname: 'Tran Duy Quang',
-      },
-      id: '1234',
-      status: 'Accepted',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      finalGrade: 9,
-      grade: {
-        name: 'Midterm',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      id: '1234',
-      status: 'Open',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      grade: {
-        name: 'Final',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-    {
-      student: {
-        id: '123',
-        fullname: 'Ha Tuan Lam',
-      },
-      class: {
-        name: 'ADVANCED WEB',
-      },
-      teacher: {
-        id: '12344',
-        fullname: 'Tran Duy Quang',
-      },
-      id: '1234',
-      status: 'Accepted',
-      expectedGrade: 9.5,
-      currentGrade: 8,
-      finalGrade: 9,
-      grade: {
-        name: 'Midterm',
-      },
-      explanation: 'Toi gioi toi muon cao diem',
-      numOfComment: 0,
-    },
-  ];
+  const { isLoading, isError, error, data, isFetching } = useQuery({
+    queryKey: ['gradeReviews', page, type],
+    queryFn: () => fetchGradeReviews(page, type),
+  });
 
   const handleChange = (value: string) => {
     setType(value);
   };
+
+  useEffect(() => {
+    if (data?.hasMore) {
+      queryClient.prefetchQuery({
+        queryKey: ['gradeReviews', page, type],
+        queryFn: () => fetchGradeReviews(page, type),
+      });
+    }
+  }, [page]);
+
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ['gradeReviews', 0, type],
+      queryFn: () => fetchGradeReviews(0, type),
+    });
+    setPage(0);
+  }, [type]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -341,9 +185,17 @@ export default function GradeReviewList() {
               }, // click row
             };
           }}
-          dataSource={dataSource}
+          dataSource={isLoading ? [] : data?.gradeReviews}
           columns={columns}
           scroll={{ y: 480, x: 1000 }}
+          pagination={{
+            onChange: (page, pageSize) => {
+              setPage(page - 1);
+            },
+            current: page + 1,
+            defaultPageSize: 1,
+            total: data?.totalReviews,
+          }}
         />
       </div>
     </div>

@@ -74,11 +74,8 @@ export default function Navbar() {
   }, []);
 
   return (
-    <div className="flex items-center justify-between h-12 shadow-lg sticky">
-      <Link
-        to={!userInfo ? '/' : `${userInfo.roles[0]}/home`}
-        className="flex h-full items-center gap-2 mx-4"
-      >
+    <div className="flex items-center justify-between h-12 shadow-lg sticky p-0">
+      <Link to={'/'} className="flex h-full items-center gap-2 mx-4">
         <img
           src={Logo}
           alt="Logo"

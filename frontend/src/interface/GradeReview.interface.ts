@@ -9,7 +9,10 @@ export default interface GradeReview {
   expectedGrade: number;
   currentGrade: number;
   finalGrade?: number;
-  grade: Partial<Pick<GradeComposition, 'id' | 'name'>>;
+  studentGrade: {
+    grade: number;
+    gradeComposition: Partial<GradeComposition>;
+  };
   explanation: string;
   status: 'Open' | 'Denied' | 'Accepted';
   createdAt?: string;
