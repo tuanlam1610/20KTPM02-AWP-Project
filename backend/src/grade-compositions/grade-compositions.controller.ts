@@ -22,6 +22,20 @@ export class GradeCompositionsController {
   constructor(
     private readonly gradeCompositionsService: GradeCompositionsService,
   ) {}
+
+  @Patch(':id/finalize')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  finalizeGradeComposition(
+    @Param('id') gradeCompositionId: string,
+    @Body() user: any,
+  ) {
+    return this.gradeCompositionsService.finalizeGradeComposition(
+      gradeCompositionId,
+      user.teacherId,
+    );
+  }
+
   @Patch(':id/updateAllStudentGrades/:classId')
   @ApiOkResponse()
   @HttpCode(HttpStatus.OK)
