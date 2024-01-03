@@ -22,6 +22,7 @@ import SignUpTeacherPage from './pages/SignUpTeacherPage';
 import GradeReviewDetailPage from './pages/Teacher/GradeReviewDetailPage';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import JoinClassByLink from './pages/JoinClassByLink';
 
 dayjs.extend(relativeTime);
 
@@ -42,6 +43,7 @@ function App() {
         <Route path="/activateEmail" element={<ActivateEmailPage />} />
         <Route path="/chooserole" element={<ChooseRolePage />} />
         <Route path="/profile" element={<UserProfilePage />} />
+        <Route path="/joinClass/:id" element={<JoinClassByLink />} />
 
         {/* Teacher Routes */}
         <Route

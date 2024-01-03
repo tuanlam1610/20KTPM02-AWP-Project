@@ -2,22 +2,19 @@ import { Button, Form, Input, Modal, Space, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { useEffect, useState } from 'react';
 import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router-dom';
 
 export default function InviteMemberModal(props: { type: string }) {
+  const params = useParams();
+  const classId: string = params.id ? params.id : '';
   const type = props.type;
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [invitationLink, setInvitationLink] = useState(
-    'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
+    `${window.location.protocol}//${window.location.host}/joinClass/${classId}`,
   );
-
-  useEffect(() => {
-    setInvitationLink(
-      'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
-    );
-  }, []);
 
   const showModal = () => {
     setOpen(true);
