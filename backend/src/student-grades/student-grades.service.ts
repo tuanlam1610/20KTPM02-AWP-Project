@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { CreateStudentGradeDto } from './dto/create-student-grade.dto';
 import { UpdateStudentGradeDto } from './dto/update-student-grade.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ClassesService } from 'src/classes/classes.service';
 
 @Injectable()
 export class StudentGradesService {

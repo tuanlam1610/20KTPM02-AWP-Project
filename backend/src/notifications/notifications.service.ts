@@ -2,10 +2,49 @@ import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AppGateway } from 'src/gateway/gateway';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private appGateway: AppGateway,
+  ) {}
+
+  async createAndSendNotifications(notifications: any[], classId: string) {
+    const createdNotifications = await this.saveNotifications(notifications);
+    await this.sendNotificationsToOnlineUsers(createdNotifications, classId);
+    return createdNotifications;
+  }
+
+  private async saveNotifications(notifications: any[]) {
+    // Save notifications in the database using Prisma
+    const createdNotifications = await Promise.all(
+      notifications.map(async (notification) => {
+        return await this.prisma.notification.create({
+          data: notification,
+        });
+      }),
+    );
+
+    return createdNotifications;
+  }
+
+  private async sendNotificationsToOnlineUsers(
+    notifications: any[],
+    classId: string,
+  ) {
+    const roomId = `classRoom-${classId}`; // `classRoom-${classId}
+    const onlineUsers = this.appGateway.getOnlineUsers(`classRoom-${classId}`); // Get a list of online users
+    for (const notification of notifications) {
+      if (onlineUsers.includes(notification.receiverId)) {
+        // If the receiver is online, emit the notification
+        console.log('emitting notification');
+        await this.appGateway.emitNotification(roomId, notification);
+      }
+    }
+  }
+
   create(createNotificationDto: CreateNotificationDto) {
     return this.prisma.notification.create({
       data: createNotificationDto,

@@ -25,8 +25,4 @@ export class CreateNotificationDto {
   @ApiProperty()
   @IsString()
   receiverId: string;
-  @ApiProperty()
-  createdAt: Date;
-  @ApiProperty()
-  updatedAt: Date;
 }

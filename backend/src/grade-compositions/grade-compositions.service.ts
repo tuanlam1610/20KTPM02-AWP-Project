@@ -1,16 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateGradeCompositionDto } from './dto/create-grade-composition.dto';
 import { UpdateGradeCompositionDto } from './dto/update-grade-composition.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { StudentGradesService } from 'src/student-grades/student-grades.service';
 import { UpdateAllStudentGradeDto } from './dto/update-all-student-grade.dto';
+import { CreateNotificationDto } from 'src/notifications/dto/create-notification.dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class GradeCompositionsService {
   constructor(
     private prisma: PrismaService,
     private sgService: StudentGradesService,
+    private notiService: NotificationsService,
   ) {}
+  async finalizeGradeComposition(
+    gradeCompositionId: string,
+    teacherId: string,
+  ) {
+    const gradeComposition = await this.prisma.gradeComposition.update({
+      where: { id: gradeCompositionId },
+      data: { isFinalized: true },
+    });
+
+    const notificationData: CreateNotificationDto = {
+      action: 'GC_FINALIZED_NOTIFICATION_SEND',
+      object: 'grade composition finalized',
+      objectId: gradeComposition.id,
+      objectType: 'gradeComposition',
+      content: `Your grade for ${gradeComposition.name} has been finalized.`,
+      senderId: teacherId,
+      isRead: false,
+      receiverId: '',
+    };
+    const students = await this.prisma.student.findMany({
+      where: { classMember: { some: { classId: gradeComposition.classId } } },
+    });
+    console.log(students);
+    const notifications = students.map((student) => ({
+      ...notificationData,
+      receiverId: student.userId,
+    }));
+    console.log(
+      notifications[0].senderId,
+      'Bismalaah',
+      notifications[0].receiverId,
+    );
+    await this.notiService.createAndSendNotifications(
+      notifications,
+      gradeComposition.classId,
+    );
+
+    if (gradeComposition) {
+    } else {
+      throw new BadRequestException(
+        `Grade composition with ID ${gradeCompositionId} not found`,
+      );
+    }
+  }
 
   async updateAllStudentGrades(
     gradeCompositionId: string,

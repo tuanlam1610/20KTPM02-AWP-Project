@@ -2,10 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { CreateGradeReviewDto } from './dto/create-grade-review.dto';
 import { UpdateGradeReviewDto } from './dto/update-grade-review.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { CreateNotificationDto } from 'src/notifications/dto/create-notification.dto';
 
 @Injectable()
 export class GradeReviewsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notiService: NotificationsService,
+  ) {}
+
+  async finalizeGradeReview(id: string, finalGrade: number) {
+    const gr = await this.prisma.gradeReview.update({
+      where: { id },
+      data: { finalGrade, status: 'Accepted' },
+    });
+    const notificationData: CreateNotificationDto = {
+      action: 'GR_FINALIZED_NOTIFICATION_SEND',
+      object: 'grade review finalized',
+      objectId: id,
+      objectType: 'gradeReview',
+      content: `Your grade review has been finalized.`,
+      senderId: gr.teacherId,
+      isRead: false,
+      receiverId: gr.studentId,
+    };
+    await this.notiService.createAndSendNotifications(
+      [notificationData],
+      gr.studentId,
+    );
+  }
+
   async getGradeReviewDetails(id: string) {
     try {
       const gradeReview = await this.prisma.gradeReview.findUnique({
@@ -106,6 +133,23 @@ export class GradeReviewsService {
           studentGradeId: createGradeReviewDto.studentGradeId,
         },
       });
+
+      //Send notification to teachers
+      //Todo make this adapt to a list of Teacher
+      const notificationData: CreateNotificationDto = {
+        action: 'GR_CREATED_NOTIFICATION_SEND',
+        object: 'grade review',
+        objectId: newGradeReview.id,
+        objectType: 'gradeReview',
+        content: `New grade review has been created.`,
+        senderId: newGradeReview.studentId,
+        isRead: false,
+        receiverId: newGradeReview.teacherId,
+      };
+      await this.notiService.createAndSendNotifications(
+        [notificationData],
+        newGradeReview.teacherId,
+      );
 
       return newGradeReview;
     } catch (error) {
