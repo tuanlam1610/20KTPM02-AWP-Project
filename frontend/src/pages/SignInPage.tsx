@@ -87,6 +87,7 @@ export default function SignInPage() {
       localStorage.setItem('refreshToken', signInResult.data.refreshToken);
       localStorage.setItem('accessToken', signInResult.data.accessToken);
       await getUserProfile();
+      document.body.style.cursor = 'default';
     } catch (err: any) {
       console.log(err.response.data.message);
       if (

@@ -6,12 +6,12 @@ import Comment from './Comment.interface';
 
 export interface Teacher {
   id: string;
-  fullname: string;
+  name: string;
 }
 
 export interface Student {
   id: string;
-  fullname: string;
+  name: string;
 }
 
 export interface Admin {

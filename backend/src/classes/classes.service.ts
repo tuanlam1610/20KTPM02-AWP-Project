@@ -24,12 +24,44 @@ export class ClassesService {
     private prisma: PrismaService,
     private gradeCompositionsService: GradeCompositionsService,
   ) {}
-
-  async addUserToClass(classId: string, userId: string) {
-    const user = await this.prisma.classInvitationForStudent.delete({
-      where: { classId_studentId: { classId: classId, studentId: userId } },
+  async inviteUserToClass(classId: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
     });
     if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+    if (user.roles.includes('student')) {
+      const student = await this.prisma.student.findUnique({
+        where: { userId: userId },
+      });
+      return await this.prisma.classInvitationForStudent.create({
+        data: {
+          classId: classId,
+          studentId: student.id,
+        },
+      });
+    } else {
+      const teacher = await this.prisma.teacher.findUnique({
+        where: { userId: userId },
+      });
+      return await this.prisma.classInvitationForTeacher.create({
+        data: {
+          classId: classId,
+          teacherId: teacher.id,
+        },
+      });
+    }
+  }
+
+  async addStudentToClass(classId: string, userId: string) {
+    const student = await this.prisma.student.findUnique({
+      where: { userId: userId },
+    });
+    const studentInvite = await this.prisma.classInvitationForStudent.delete({
+      where: { classId_studentId: { classId: classId, studentId: student.id } },
+    });
+    if (!studentInvite) {
       throw new NotFoundException(
         `Invitation for user with id ${userId} not found`,
       );
@@ -39,6 +71,22 @@ export class ClassesService {
       data: {
         isJoined: true,
       },
+    });
+  }
+  async addTeacherToClass(classId: string, userId: string) {
+    const teacher = await this.prisma.student.findUnique({
+      where: { userId: userId },
+    });
+    const teacherInvite = await this.prisma.classInvitationForTeacher.delete({
+      where: { classId_teacherId: { classId: classId, teacherId: teacher.id } },
+    });
+    if (!teacherInvite) {
+      throw new NotFoundException(
+        `Invitation for user with id ${userId} not found`,
+      );
+    }
+    return this.prisma.classTeacher.create({
+      data: { classId: classId, teacherId: userId },
     });
   }
 
@@ -507,7 +555,13 @@ export class ClassesService {
   }
 
   findOne(id: string) {
-    return this.prisma.class.findUnique({ where: { id: id } });
+    return this.prisma.class.findUnique({
+      where: { id: id },
+      include: {
+        classInvitationForStudent: true,
+        classInvitationForTeacher: true,
+      },
+    });
   }
 
   async update(id: string, updateClassDto: UpdateClassDto) {
@@ -601,7 +655,38 @@ export class ClassesService {
     });
   }
 
-  remove(id: string) {
-    return this.prisma.class.delete({ where: { id: id } });
+  async remove(id: string) {
+    const gc = await this.prisma.gradeComposition.findMany({
+      where: { classId: id },
+    });
+
+    const gradeCompositionDeletions = gc.map(async (gc) =>
+      this.gradeCompositionsService.remove(gc.id),
+    );
+
+    await Promise.all(gradeCompositionDeletions);
+
+    await this.prisma.classInvitationForStudent.deleteMany({
+      where: { classId: id },
+    });
+
+    await this.prisma.classInvitationForTeacher.deleteMany({
+      where: { classId: id },
+    });
+
+    await this.prisma.classMember.deleteMany({
+      where: { classId: id },
+    });
+
+    await this.prisma.classTeacher.deleteMany({
+      where: { classId: id },
+    });
+
+    await this.prisma.class.update({
+      where: { id },
+      data: { classOwnerId: null },
+    });
+
+    return await this.prisma.class.delete({ where: { id } });
   }
 }

@@ -1,6 +1,9 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { Route, Routes } from 'react-router-dom';
 import './locale/i18n';
 import ActivateEmailPage from './pages/ActivateEmailPage';
+import ChooseRolePage from './pages/ChooseRolePage';
 import Navbar from './pages/Components/Navbar';
 import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -8,21 +11,19 @@ import RecoverPasswordPage from './pages/RecoverPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
-import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
-import TeacherHomePage from './pages/Teacher/TeacherHomePage';
-import UserProfilePage from './pages/UserProfilePage';
-import StudentHomePage from './pages/Student/StudentHomePage';
-import StudentClassDetailsPage from './pages/Student/StudentClassDetailsPage';
-import { ProtectedRoute } from './routes/ProtectedRoute';
-import UnauthorizedPage from './pages/UnauthorizedPage';
-import ChooseRolePage from './pages/ChooseRolePage';
-import GradeManagementPage from './pages/Teacher/GradeManagementPage';
-import GradeCompositionPage from './pages/Teacher/GradeCompositionPage';
 import SignUpTeacherPage from './pages/SignUpTeacherPage';
 import GradeReviewDetailPage from './pages/Teacher/GradeReviewDetailPage';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import JoinClassByLink from './pages/JoinClassByLink';
+import StudentClassDetailsPage from './pages/Student/StudentClassDetailsPage';
+import StudentHomePage from './pages/Student/StudentHomePage';
+import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
+import GradeCompositionPage from './pages/Teacher/GradeCompositionPage';
+import GradeManagementPage from './pages/Teacher/GradeManagementPage';
+import { GradeReviewDetailProvider } from './pages/Teacher/GradeReviewDetailPage';
+import TeacherHomePage from './pages/Teacher/TeacherHomePage';
+import UnauthorizedPage from './pages/UnauthorizedPage';
+import UserProfilePage from './pages/UserProfilePage';
+import { ProtectedRoute } from './routes/ProtectedRoute';
 
 dayjs.extend(relativeTime);
 
@@ -58,7 +59,7 @@ function App() {
           />
           <Route
             path="class/:id/gradeReview/:gradeReviewId"
-            element={<GradeReviewDetailPage />}
+            element={<GradeReviewDetailProvider />}
           />
           <Route
             path="class/:id/grademanagement/:gradeCompositionId"
