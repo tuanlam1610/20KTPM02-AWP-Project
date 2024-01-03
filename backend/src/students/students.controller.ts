@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
@@ -9,6 +10,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -18,6 +20,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateStudentDto } from './dto/create-students.dto';
@@ -25,7 +28,12 @@ import { StudentEntity } from './entities/student.entity';
 import { PopulateClassDto } from 'src/classes/dto/class-populate.dto';
 import { JoinClassDto, MapUserDto } from './dto/join-class.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
-
+enum GradeReviewStatusFilter {
+  Open = 'Open',
+  Accepted = 'Accepted',
+  Denied = 'Denied',
+  All = 'All',
+}
 @Controller('students')
 @ApiTags('students')
 export class StudentsController {
@@ -39,6 +47,31 @@ export class StudentsController {
   //   const user = req.user;
   //   return this.studentsService.findOne(user['sub']);
   // }
+  @Get(':id/GradeReview')
+  @ApiOkResponse()
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: GradeReviewStatusFilter,
+  })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  getGradeReview(
+    @Param('id') id: string,
+    @Query('status')
+    status?: GradeReviewStatusFilter,
+    @Query('page', new DefaultValuePipe('0')) page?: string,
+    @Query('limit', new DefaultValuePipe('10')) limit?: string,
+  ) {
+    return this.studentsService.getStudentGradeReview(
+      id,
+      +page,
+      +limit,
+      status,
+    );
+  }
+
+  @ApiOkResponse({ type: StudentEntity })
   @Get(':id/getAllClassesOfstudent/')
   @ApiOkResponse({ type: StudentEntity })
   @HttpCode(HttpStatus.OK)

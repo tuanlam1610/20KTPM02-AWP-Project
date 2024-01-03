@@ -1,12 +1,105 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
 import { PopulateClassDto } from 'src/classes/dto/class-populate.dto';
+import { Prisma } from '@prisma/client';
 
+enum GradeReviewStatusFilter {
+  Open = 'Open',
+  Accepted = 'Accepted',
+  Denied = 'Denied',
+  All = 'All',
+}
 @Injectable()
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
+  async getStudentGradeReview(
+    studentId: string,
+    page?: number,
+    limit?: number,
+    status?: GradeReviewStatusFilter,
+  ) {
+    const where: Prisma.GradeReviewWhereInput = {};
+    if (status !== GradeReviewStatusFilter.All) {
+      where.status = status;
+    }
+    // For total count
+    const totalRecord = await this.prisma.gradeReview.count({
+      where: {
+        class: {
+          classMember: {
+            some: {
+              studentId: studentId,
+            },
+          },
+        },
+      },
+    });
+
+    const totalPage = Math.ceil(totalRecord / limit);
+
+    if (page * limit > totalRecord) {
+      throw new BadRequestException(
+        `Page limit out of bound. Total Page: ${totalPage} `,
+      );
+    }
+
+    const studentGradeReviews = await this.prisma.gradeReview.findMany({
+      where: {
+        class: {
+          classMember: {
+            some: {
+              studentId: studentId,
+            },
+          },
+        },
+      },
+      skip: page * limit ?? 0,
+      take: limit ?? 10,
+      orderBy: { updatedAt: 'desc' },
+      select: {
+        id: true,
+        currentGrade: true,
+        expectedGrade: true,
+        finalGrade: true,
+        explanation: true,
+        status: true,
+        studentGrade: {
+          select: {
+            grade: true,
+            gradeComposition: {
+              select: {
+                name: true,
+                percentage: true,
+              },
+            },
+          },
+        },
+        student: {
+          select: {
+            name: true,
+          },
+        },
+        teacher: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return {
+      studentGradeReviews,
+      currentPage: page,
+      totalPage: totalPage,
+      totalRecord: totalRecord,
+    };
+  }
   async joinClassByCode(classCode: string, studentId: string) {
     const classToJoin = await this.prisma.class.findUnique({
       where: { code: classCode },
