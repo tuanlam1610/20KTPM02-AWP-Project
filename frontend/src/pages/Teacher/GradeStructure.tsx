@@ -232,7 +232,7 @@ export default function GradeStructure() {
               </DndContext>
             ) : (
               <>
-                {Object.keys(gradeCompositionMap).map((id) => (
+                {gradeCompositionIds.map((id) => (
                   <GradeItem key={id} id={id} />
                 ))}
               </>

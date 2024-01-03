@@ -18,6 +18,7 @@ import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
 import GradeCompositionPage from './pages/Teacher/GradeCompositionPage';
 import GradeManagementPage from './pages/Teacher/GradeManagementPage';
 import { GradeReviewDetailProvider } from './pages/Teacher/GradeReviewDetailPage';
+import { GradeReviewDetailProvider as StudentGradeReviewDetailProvider } from './pages/Student/GradeReviewDetailPage';
 import TeacherHomePage from './pages/Teacher/TeacherHomePage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import UserProfilePage from './pages/UserProfilePage';
@@ -71,6 +72,10 @@ function App() {
         >
           <Route path="home" element={<StudentHomePage />} />
           <Route path="class/:id" element={<StudentClassDetailsPage />} />
+          <Route
+            path="class/:id/gradeReview/:gradeReviewId"
+            element={<StudentGradeReviewDetailProvider />}
+          />
         </Route>
 
         {/* Error */}
