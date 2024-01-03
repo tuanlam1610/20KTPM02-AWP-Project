@@ -175,7 +175,11 @@ export class GradeReviewsService {
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
+    //delete all comments
+    const deleteComments = await this.prisma.comment.deleteMany({
+      where: { gradeReviewId: id },
+    });
     return this.prisma.gradeReview.delete({ where: { id } });
   }
 }

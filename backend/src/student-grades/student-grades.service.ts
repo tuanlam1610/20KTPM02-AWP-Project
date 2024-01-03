@@ -121,7 +121,17 @@ export class StudentGradesService {
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
+    const sg = await this.prisma.studentGrade.findUnique({
+      where: { id: id },
+      include: { gradeReview: true },
+    });
+    const c = await this.prisma.comment.deleteMany({
+      where: { gradeReviewId: sg.gradeReview.id },
+    });
+    const gr = await this.prisma.gradeReview.delete({
+      where: { id: sg.gradeReview.id },
+    });
     return this.prisma.studentGrade.delete({ where: { id: id } });
   }
 }

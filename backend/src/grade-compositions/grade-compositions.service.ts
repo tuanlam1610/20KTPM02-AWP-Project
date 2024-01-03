@@ -239,7 +239,27 @@ export class GradeCompositionsService {
     }
   }
 
-  remove(id: string) {
+  async remove(id: string) {
+    const gc = await this.prisma.gradeComposition.findUnique({
+      where: { id },
+      include: {
+        studentGrades: {
+          include: { gradeReview: true },
+        },
+      },
+    });
+    await this.prisma.comment.deleteMany({
+      where: {
+        gradeReviewId: { in: gc.studentGrades.map((sg) => sg.gradeReview.id) },
+      },
+    });
+    await this.prisma.gradeReview.deleteMany({
+      where: { studentGradeId: { in: gc.studentGrades.map((sg) => sg.id) } },
+    });
+    await this.prisma.studentGrade.deleteMany({
+      where: { gradeCompositionId: id },
+    });
+
     return this.prisma.gradeComposition.delete({ where: { id } });
   }
 }
