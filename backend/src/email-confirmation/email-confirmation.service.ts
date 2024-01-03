@@ -63,7 +63,7 @@ export class EmailConfirmationService {
     });
   }
 
-  public sendInviteLink(email: string, classId: string) {
+  public async sendInviteLink(email: string, classId: string) {
     const payload: VerificationTokenInvitePayload = {
       email,
       classId: classId,
@@ -77,6 +77,12 @@ export class EmailConfirmationService {
 
     const text = `The class welcome you to join everyone, to keep up to date with your subject. \n
     Click here to join:  ${url}`;
+
+    const user = await this.usersService.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('email for user not found');
+    }
+    this.classesService.inviteUserToClass(classId, user.id);
 
     return this.emailService.sendMail({
       to: email,
@@ -114,7 +120,11 @@ export class EmailConfirmationService {
     if (!user) {
       throw new BadRequestException('Email not found');
     }
-    await this.classesService.addUserToClass(classId, user.id);
+    if (user.roles.includes('student')) {
+      await this.classesService.addStudentToClass(classId, user.id);
+    } else {
+      await this.classesService.addTeacherToClass(classId, user.id);
+    }
 
     return STATUS_CODES.OK;
   }
