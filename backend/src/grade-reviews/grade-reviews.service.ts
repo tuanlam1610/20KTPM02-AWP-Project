@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateGradeReviewDto } from './dto/create-grade-review.dto';
 import { UpdateGradeReviewDto } from './dto/update-grade-review.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -112,10 +116,18 @@ export class GradeReviewsService {
         const notFoundIds = createGradeReviewDto.comment.filter(
           (sgId) => !fetchedComment.some((sg) => sg.id === sgId),
         );
-        throw new Error(
-          `Student grades with IDs ${notFoundIds.join(', ')} not found`,
+        throw new NotFoundException(
+          `comments with IDs ${notFoundIds.join(', ')} not found`,
         );
       }
+
+      const sg = await this.prisma.studentGrade.findUnique({
+        where: { id: createGradeReviewDto.studentGradeId },
+      });
+      if (!sg)
+        throw new BadRequestException(
+          `grade with IDs ${createGradeReviewDto.studentGradeId} not found`,
+        );
 
       const newGradeReview = await this.prisma.gradeReview.create({
         data: {
@@ -134,22 +146,22 @@ export class GradeReviewsService {
         },
       });
 
-      //Send notification to teachers
-      //Todo make this adapt to a list of Teacher
-      const notificationData: CreateNotificationDto = {
-        action: 'GR_CREATED_NOTIFICATION_SEND',
-        object: 'grade review',
-        objectId: newGradeReview.id,
-        objectType: 'gradeReview',
-        content: `New grade review has been created.`,
-        senderId: newGradeReview.studentId,
-        isRead: false,
-        receiverId: newGradeReview.teacherId,
-      };
-      await this.notiService.createAndSendNotifications(
-        [notificationData],
-        newGradeReview.teacherId,
-      );
+      // //Send notification to teachers
+      // //Todo make this adapt to a list of Teacher
+      // const notificationData: CreateNotificationDto = {
+      //   action: 'GR_CREATED_NOTIFICATION_SEND',
+      //   object: 'grade review',
+      //   objectId: newGradeReview.id,
+      //   objectType: 'gradeReview',
+      //   content: `New grade review has been created.`,
+      //   senderId: newGradeReview.studentId,
+      //   isRead: false,
+      //   receiverId: newGradeReview.teacherId,
+      // };
+      // await this.notiService.createAndSendNotifications(
+      //   [notificationData],
+      //   newGradeReview.teacherId,
+      // );
 
       return newGradeReview;
     } catch (error) {

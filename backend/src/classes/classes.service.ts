@@ -24,6 +24,91 @@ export class ClassesService {
     private prisma: PrismaService,
     private gradeCompositionsService: GradeCompositionsService,
   ) {}
+  async joinClassByLink(classId: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+    if (user.roles.includes('student')) {
+      return this.addStudentToClass(classId, user.id);
+    } else {
+      return this.addTeacherToClass(classId, user.id);
+    }
+  }
+  async getFinalizedGradesOfStudent(classId: string, studentId: string) {
+    const classWithGradeCompositions = await this.prisma.class.findUnique({
+      where: { id: classId },
+      include: {
+        gradeCompositions: {
+          select: {
+            id: true,
+            name: true,
+            percentage: true,
+            isFinalized: true,
+            studentGrades: {
+              select: {
+                id: true,
+                grade: true,
+                studentId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const studentGradesByStudent: Record<string, any> = {};
+    if (!classWithGradeCompositions) {
+      throw new NotFoundException(
+        `Class id ${classId} not found`,
+        // `Class id ${classId} has no grade composition`,
+      );
+    }
+
+    for (const gradeComposition of classWithGradeCompositions.gradeCompositions) {
+      for (const studentGrade of gradeComposition.studentGrades) {
+        if (!studentGradesByStudent[studentId]) {
+          const totalGrade = await this.prisma.classMember.findUnique({
+            where: {
+              classId_studentId: { classId: classId, studentId: studentId },
+            },
+            select: {
+              student: {
+                select: {
+                  name: true,
+                },
+              },
+              totalGrade: true,
+            },
+          });
+          if (totalGrade === null) {
+            continue;
+          }
+          studentGradesByStudent[studentId] = {
+            studentId: studentGrade.studentId,
+            name: totalGrade.student.name,
+            totalGrade: totalGrade.totalGrade,
+            gradeEntries: [],
+          };
+        }
+
+        const gradeCompositionX = exclude(gradeComposition, ['studentGrades']);
+        const studentGradeX = exclude(studentGrade, ['studentId']);
+        studentGradesByStudent[studentId].gradeEntries.push({
+          ...gradeCompositionX,
+          ...studentGradeX,
+        });
+      }
+    }
+    const gcList = classWithGradeCompositions.gradeCompositions.map((gc) =>
+      exclude(gc, ['studentGrades']),
+    );
+    return {
+      gradeCompositions: [...gcList],
+      students: Object.values(studentGradesByStudent),
+    };
+  }
   async inviteUserToClass(classId: string, userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
