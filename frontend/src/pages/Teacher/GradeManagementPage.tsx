@@ -20,7 +20,6 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { downloadCSV, downloadXLSX } from '../../utils/helper';
 
 interface Grade {
-  key: React.Key;
   name: string;
   studentId: string;
   gradeEntries: {
@@ -48,190 +47,29 @@ export default function GradeManagementPage() {
     [],
   );
 
-  const data: Grade[] = [];
-  for (let i = 0; i < 20; i++) {
-    data.push(
-      {
-        key: `${i}_1`,
-        name: 'Student 1',
-        studentId: '20127001',
-        gradeEntries: [
-          {
-            id: 'composition1',
-            name: 'Exercise 1',
-            grade: 7,
-            isFinalized: false,
-          },
-          {
-            id: 'composition2',
-            name: 'Exercise 2',
-            grade: 8,
-            isFinalized: false,
-          },
-          {
-            id: 'composition3',
-            name: 'Exercise 3',
-            grade: 9,
-            isFinalized: false,
-          },
-          {
-            id: 'composition4',
-            name: 'Exercise 4',
-            grade: 8.5,
-            isFinalized: false,
-          },
-          {
-            id: 'composition5',
-            name: 'Exercise 5',
-            grade: 9,
-            isFinalized: false,
-          },
-          {
-            id: 'composition6',
-            name: 'Exercise 6',
-            grade: 7.5,
-            isFinalized: false,
-          },
-          {
-            id: 'composition7',
-            name: 'Midterm',
-            grade: 10,
-            isFinalized: true,
-          },
-          {
-            id: 'composition8',
-            name: 'Final',
-            grade: 9.5,
-            isFinalized: false,
-          },
-        ],
-        totalGrade: 8.0,
-      },
-      {
-        key: `${i}_2`,
-        name: 'Student 2',
-        studentId: '20127002',
-        gradeEntries: [
-          {
-            id: 'composition1',
-            name: 'Exercise 1',
-            grade: 7,
-            isFinalized: false,
-          },
-          {
-            id: 'composition2',
-            name: 'Exercise 2',
-            grade: 8,
-            isFinalized: false,
-          },
-          {
-            id: 'composition3',
-            name: 'Exercise 3',
-            grade: 9,
-            isFinalized: false,
-          },
-          {
-            id: 'composition4',
-            name: 'Exercise 4',
-            grade: 8.5,
-            isFinalized: false,
-          },
-          {
-            id: 'composition5',
-            name: 'Exercise 5',
-            grade: 9,
-            isFinalized: false,
-          },
-          {
-            id: 'composition6',
-            name: 'Exercise 6',
-            grade: 7.5,
-            isFinalized: false,
-          },
-          {
-            id: 'composition7',
-            name: 'Midterm',
-            grade: 10,
-            isFinalized: true,
-          },
-          {
-            id: 'composition8',
-            name: 'Final',
-            grade: 9.5,
-            isFinalized: false,
-          },
-        ],
-        totalGrade: 7.5,
-      },
-      {
-        key: `${i}_3`,
-        name: 'Student 3',
-        studentId: '20127003',
-        gradeEntries: [
-          {
-            id: 'composition1',
-            name: 'Exercise 1',
-            grade: 7,
-            isFinalized: false,
-          },
-          {
-            id: 'composition2',
-            name: 'Exercise 2',
-            grade: 8,
-            isFinalized: false,
-          },
-          {
-            id: 'composition3',
-            name: 'Exercise 3',
-            grade: 9,
-            isFinalized: false,
-          },
-          {
-            id: 'composition4',
-            name: 'Exercise 4',
-            grade: 8.5,
-            isFinalized: false,
-          },
-          {
-            id: 'composition5',
-            name: 'Exercise 5',
-            grade: 9,
-            isFinalized: false,
-          },
-          {
-            id: 'composition6',
-            name: 'Exercise 6',
-            grade: 7.5,
-            isFinalized: false,
-          },
-          {
-            id: 'composition7',
-            name: 'Midterm',
-            grade: 10,
-            isFinalized: true,
-          },
-          {
-            id: 'composition8',
-            name: 'Final',
-            grade: 9.5,
-            isFinalized: false,
-          },
-        ],
-        totalGrade: 9.0,
-      },
-    );
-  }
+  const templateData = [
+    {
+      studentId: '',
+      name: '',
+      gradeEntries: [],
+      totalGrade: 0,
+    },
+  ];
 
-  const formatRawDataToTableData = (rawData: any[]) => {
-    return rawData.map((data) => {
+  const data: Grade[] = [];
+
+  const formatRawDataToTableData = (rawData: any) => {
+    const students: any[] = rawData.students || [];
+    const gradeCompositions: any[] = rawData.gradeCompositions || [];
+    const gradeCompositionsMap = keyBy(gradeCompositions, 'name');
+    setGradeCompositionNameMap(gradeCompositionsMap);
+    setGradeCompositionNames(Object.keys(gradeCompositionsMap));
+    return students.map((data) => {
       const gradeCompositionItems = keyBy(data.gradeEntries, 'name');
-      setGradeCompositionNameMap(keyBy(data.gradeEntries, 'name'));
-      console.log(gradeCompositionNameMap);
       Object.keys(gradeCompositionItems).forEach((gradeName) => {
         gradeCompositionItems[gradeName] =
           gradeCompositionItems[gradeName].grade;
       });
-      setGradeCompositionNames(Object.keys(gradeCompositionItems));
       const res = {
         ...data,
         ...gradeCompositionItems,
@@ -326,7 +164,6 @@ export default function GradeManagementPage() {
   const getStudentTemplate = (data: Grade[]) => {
     const res = data.map((dataRow) => {
       return {
-        key: dataRow.key,
         studentId: dataRow.studentId,
         name: dataRow.name,
       };
@@ -335,11 +172,13 @@ export default function GradeManagementPage() {
   };
 
   const downloadStudentListCSV = () => {
+    const data = formattedData.length <= 0 ? templateData : formattedData;
     const studentTemplate = getStudentTemplate(data);
     downloadCSV(studentTemplate, `StudentList_Class${classId}`);
   };
 
   const downloadStudentListXLSX = () => {
+    const data = formattedData.length <= 0 ? templateData : formattedData;
     const studentTemplate = getStudentTemplate(data);
     downloadXLSX(studentTemplate, `StudentList_Class${classId}`);
   };
@@ -364,13 +203,30 @@ export default function GradeManagementPage() {
       key: '1',
       label: 'CSV',
       icon: <FileTextOutlined />,
-      onClick: () => downloadCSV(data, `GradeBoard_Class${classId}`),
+      onClick: () => downloadCSV(formattedData, `GradeBoard_Class${classId}`),
     },
     {
       key: '2',
       label: 'XLSX',
       icon: <FileExcelOutlined />,
-      onClick: () => downloadXLSX(data, `GradeBoard_Class${classId}`),
+      onClick: () => {
+        let templateData = {
+          studentId: '',
+          name: '',
+          totalGrade: '',
+        };
+        gradeCompositionNames.forEach((gradeCompositionName: string) => {
+          templateData = { ...templateData, [gradeCompositionName]: '' };
+        });
+        const exportFormattedData = formattedData.map((row: any) => {
+          delete row['gradeEntries'];
+          return row;
+        });
+        const exportData =
+          formattedData.length <= 0 ? [templateData] : exportFormattedData;
+        console.log(exportData);
+        downloadXLSX(exportData, `GradeBoard_Class${classId}`);
+      },
     },
   ];
 
@@ -454,7 +310,7 @@ export default function GradeManagementPage() {
               fixed="left"
             />
             <ColumnGroup title="Grade Structure">
-              {gradeCompositionNames.map((gradeCompositionName) => {
+              {gradeCompositionNames.map((gradeCompositionName: any) => {
                 console.log(gradeCompositionNames);
                 return (
                   <Column

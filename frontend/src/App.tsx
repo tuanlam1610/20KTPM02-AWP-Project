@@ -12,6 +12,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import SignUpTeacherPage from './pages/SignUpTeacherPage';
+import GradeReviewDetailPage from './pages/Teacher/GradeReviewDetailPage';
+import JoinClassByLink from './pages/JoinClassByLink';
 import StudentClassDetailsPage from './pages/Student/StudentClassDetailsPage';
 import StudentHomePage from './pages/Student/StudentHomePage';
 import ClassDetailsPage from './pages/Teacher/ClassDetailsPage';
@@ -23,6 +25,8 @@ import TeacherHomePage from './pages/Teacher/TeacherHomePage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import UserProfilePage from './pages/UserProfilePage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
+import JoinClassByEmail from './pages/JoinClassByEmail';
+import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
 
 dayjs.extend(relativeTime);
 
@@ -43,6 +47,10 @@ function App() {
         <Route path="/activateEmail" element={<ActivateEmailPage />} />
         <Route path="/chooserole" element={<ChooseRolePage />} />
         <Route path="/profile" element={<UserProfilePage />} />
+        {/* Join Class By Link */}
+        <Route path="/joinClass/:id" element={<JoinClassByLink />} />
+        {/* Join Class By Email */}
+        <Route path="/inviteJoinClass" element={<JoinClassByEmail />} />
 
         {/* Teacher Routes */}
         <Route
@@ -72,6 +80,10 @@ function App() {
         >
           <Route path="home" element={<StudentHomePage />} />
           <Route path="class/:id" element={<StudentClassDetailsPage />} />
+          <Route
+            path="class/:id/gradeboard"
+            element={<StudentGradeBoardPage />}
+          />
           <Route
             path="class/:id/gradeReview/:gradeReviewId"
             element={<StudentGradeReviewDetailProvider />}

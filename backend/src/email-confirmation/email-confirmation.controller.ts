@@ -49,7 +49,7 @@ export class EmailConfirmationController {
     return tokens;
   }
 
-  @Get('confirm') //TODO CHANGE HANDLE
+  @Get('confirm-invite-class') //TODO CHANGE HANDLE
   @HttpCode(HttpStatus.OK)
   async confirmInviteToClassLink(@Query('token') token: string) {
     if (!token) {
@@ -59,6 +59,7 @@ export class EmailConfirmationController {
     const { email, classId } =
       await this.emailConfirmationService.decodeConfirmationToken(token);
     //TODO: This probably insecure AF
+    console.log(email, classId);
     const user = await this.emailConfirmationService.confirmInviteEmail(
       email,
       classId,
