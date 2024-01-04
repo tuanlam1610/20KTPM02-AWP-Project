@@ -3,6 +3,7 @@ import { useForm } from 'antd/es/form/Form';
 import { useEffect, useState } from 'react';
 import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function InviteMemberModal(props: { type: string }) {
   const params = useParams();
@@ -35,12 +36,28 @@ export default function InviteMemberModal(props: { type: string }) {
     const values = await form.validateFields();
     form.resetFields();
     console.log('Submit Values: ', values);
+    let url = '';
+    if (type == 'student') {
+      url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/email-confirmation/sendInviteEmail`;
+    } else {
+      url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/email-confirmation/sendInviteEmailTeacher`;
+    }
+    const res = await axios.post(url, {
+      email: values.email || '',
+      classId: classId,
+    });
+    console.log(res);
     messageApi.open({
       type: 'success',
       content: (
         <span>
           Send invitation to
-          <span className="font-semibold">{values.email}</span> successfully
+          <span className="font-semibold mx-1">{values.email}</span>{' '}
+          successfully
         </span>
       ),
       duration: 1,

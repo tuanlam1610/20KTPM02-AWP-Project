@@ -49,7 +49,7 @@ export class EmailConfirmationController {
     return tokens;
   }
 
-  @Get('confirm') //TODO CHANGE HANDLE
+  @Get('confirm-invite-class') //TODO CHANGE HANDLE
   @HttpCode(HttpStatus.OK)
   async confirmInviteToClassLink(@Query('token') token: string) {
     if (!token) {
