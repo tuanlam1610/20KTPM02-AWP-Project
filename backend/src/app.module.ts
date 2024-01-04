@@ -20,7 +20,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { StudentGradesModule } from './student-grades/student-grades.module';
 import { NotificationsModule } from './notifications/notifications.module';
-import { SocketModule } from './socket/socket.module';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -41,8 +41,9 @@ import { SocketModule } from './socket/socket.module';
     GradeReviewsModule,
     CommentsModule,
     StudentGradesModule,
-    NotificationsModule,
-    SocketModule,
+    // NotificationsModule,
+    // SocketModule,
+    GatewayModule,
   ],
   controllers: [AppController],
   providers: [
