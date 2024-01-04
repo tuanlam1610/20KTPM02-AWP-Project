@@ -59,6 +59,7 @@ export class EmailConfirmationController {
     const { email, classId } =
       await this.emailConfirmationService.decodeConfirmationToken(token);
     //TODO: This probably insecure AF
+    console.log(email, classId);
     const user = await this.emailConfirmationService.confirmInviteEmail(
       email,
       classId,

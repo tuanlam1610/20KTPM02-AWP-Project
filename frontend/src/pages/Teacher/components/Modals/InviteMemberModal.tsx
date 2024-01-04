@@ -36,16 +36,9 @@ export default function InviteMemberModal(props: { type: string }) {
     const values = await form.validateFields();
     form.resetFields();
     console.log('Submit Values: ', values);
-    let url = '';
-    if (type == 'student') {
-      url = `${
-        import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/email-confirmation/sendInviteEmail`;
-    } else {
-      url = `${
-        import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/email-confirmation/sendInviteEmailTeacher`;
-    }
+    const url = `${
+      import.meta.env.VITE_REACT_APP_SERVER_URL
+    }/email-confirmation/sendInviteEmail`;
     const res = await axios.post(url, {
       email: values.email || '',
       classId: classId,
