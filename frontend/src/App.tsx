@@ -25,6 +25,7 @@ import UnauthorizedPage from './pages/UnauthorizedPage';
 import UserProfilePage from './pages/UserProfilePage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import JoinClassByEmail from './pages/JoinClassByEmail';
+import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
 
 dayjs.extend(relativeTime);
 
@@ -78,6 +79,10 @@ function App() {
         >
           <Route path="home" element={<StudentHomePage />} />
           <Route path="class/:id" element={<StudentClassDetailsPage />} />
+          <Route
+            path="class/:id/gradeboard"
+            element={<StudentGradeBoardPage />}
+          />
         </Route>
 
         {/* Error */}

@@ -17,11 +17,11 @@ export default function ClassDetailsTabView() {
       <Col xs={{ order: 2, span: 24 }} md={{ order: 2, span: 16 }}>
         <div className="border-[1px] rounded-md p-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-lg font-semibold">Grade Structure:</h1>
+            <h1 className="text-lg font-semibold">Grade Board:</h1>
             <Button
               className="flex justify-center items-center px-8 py-4 mb-2 bg-indigo-500 text-white"
               onClick={() => {
-                navigate(`grademanagement`);
+                navigate(`gradeboard`);
               }}
             >
               Manage Grade
