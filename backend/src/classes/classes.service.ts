@@ -35,6 +35,7 @@ export class ClassesService {
       const student = await this.prisma.student.findUnique({
         where: { userId: userId },
       });
+      console.log(student);
       return await this.prisma.classInvitationForStudent.create({
         data: {
           classId: classId,
@@ -45,6 +46,7 @@ export class ClassesService {
       const teacher = await this.prisma.teacher.findUnique({
         where: { userId: userId },
       });
+      console.log(teacher);
       return await this.prisma.classInvitationForTeacher.create({
         data: {
           classId: classId,
@@ -58,35 +60,49 @@ export class ClassesService {
     const student = await this.prisma.student.findUnique({
       where: { userId: userId },
     });
-    const studentInvite = await this.prisma.classInvitationForStudent.delete({
-      where: { classId_studentId: { classId: classId, studentId: student.id } },
-    });
-    if (!studentInvite) {
-      throw new NotFoundException(
-        `Invitation for user with id ${userId} not found`,
-      );
+    try {
+      const studentInvite = await this.prisma.classInvitationForStudent.delete({
+        where: {
+          classId_studentId: { classId: classId, studentId: student.id },
+        },
+      });
+    } catch {
+      throw new BadRequestException('No Invite');
     }
-    return this.prisma.classMember.update({
-      where: { classId_studentId: { classId: classId, studentId: userId } },
-      data: {
+
+    return this.prisma.classMember.upsert({
+      where: { classId_studentId: { classId: classId, studentId: student.id } },
+      update: {
+        isJoined: true,
+      },
+      create: {
+        classId: classId,
+        studentId: student.id,
         isJoined: true,
       },
     });
   }
   async addTeacherToClass(classId: string, userId: string) {
-    const teacher = await this.prisma.student.findUnique({
+    const teacher = await this.prisma.teacher.findUnique({
       where: { userId: userId },
     });
-    const teacherInvite = await this.prisma.classInvitationForTeacher.delete({
-      where: { classId_teacherId: { classId: classId, teacherId: teacher.id } },
-    });
-    if (!teacherInvite) {
-      throw new NotFoundException(
-        `Invitation for user with id ${userId} not found`,
-      );
+    try {
+      const teacherInvite = await this.prisma.classInvitationForTeacher.delete({
+        where: {
+          classId_teacherId: { classId: classId, teacherId: teacher.id },
+        },
+      });
+    } catch {
+      throw new BadRequestException('No Invite');
     }
-    return this.prisma.classTeacher.create({
-      data: { classId: classId, teacherId: userId },
+
+    return this.prisma.classTeacher.upsert({
+      where: { classId_teacherId: { classId: classId, teacherId: teacher.id } },
+      update: {},
+      create: {
+        classId: classId,
+        teacherId: teacher.id,
+      },
     });
   }
 

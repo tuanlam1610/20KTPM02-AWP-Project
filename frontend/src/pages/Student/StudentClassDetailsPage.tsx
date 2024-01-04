@@ -1,12 +1,12 @@
 import { CopyOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button, Tabs, TabsProps, message } from 'antd';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../redux/store';
+import { getGradeComposition } from '../../redux/classDetailThunks';
+import { useAppDispatch } from '../../redux/store';
 import ClassDetailsTabView from './components/TabViews/ClassDetailsTabView';
 import ClassMemberTabView from './components/TabViews/ClassMemberTabView';
-import { useEffect, useState } from 'react';
-import { fetchInitData } from '../../redux/classDetailThunks';
-import axios from 'axios';
 
 export default function StudentClassDetailsPage() {
   const dispatch = useAppDispatch();
@@ -59,7 +59,7 @@ export default function StudentClassDetailsPage() {
 
   useEffect(() => {
     fetchClassDetails();
-    dispatch(fetchInitData({ id: classId }));
+    dispatch(getGradeComposition({ id: classId }));
   }, [classId]);
 
   return (

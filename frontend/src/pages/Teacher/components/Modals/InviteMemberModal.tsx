@@ -2,22 +2,20 @@ import { Button, Form, Input, Modal, Space, message } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import { useEffect, useState } from 'react';
 import { CopyOutlined, UserAddOutlined } from '@ant-design/icons';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 export default function InviteMemberModal(props: { type: string }) {
+  const params = useParams();
+  const classId: string = params.id ? params.id : '';
   const type = props.type;
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const [invitationLink, setInvitationLink] = useState(
-    'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
+    `${window.location.protocol}//${window.location.host}/joinClass/${classId}`,
   );
-
-  useEffect(() => {
-    setInvitationLink(
-      'https://20ktpm-awp-hql/class/01/invitationlink-fwienfwef',
-    );
-  }, []);
 
   const showModal = () => {
     setOpen(true);
@@ -38,12 +36,21 @@ export default function InviteMemberModal(props: { type: string }) {
     const values = await form.validateFields();
     form.resetFields();
     console.log('Submit Values: ', values);
+    const url = `${
+      import.meta.env.VITE_REACT_APP_SERVER_URL
+    }/email-confirmation/sendInviteEmail`;
+    const res = await axios.post(url, {
+      email: values.email || '',
+      classId: classId,
+    });
+    console.log(res);
     messageApi.open({
       type: 'success',
       content: (
         <span>
           Send invitation to
-          <span className="font-semibold">{values.email}</span> successfully
+          <span className="font-semibold mx-1">{values.email}</span>{' '}
+          successfully
         </span>
       ),
       duration: 1,

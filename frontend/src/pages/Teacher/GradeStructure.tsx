@@ -16,15 +16,18 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Button, Modal } from 'antd';
+import { Button, Form, Modal } from 'antd';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { EditGradeItem } from '../Components/EditGradeItem';
 import { EditGradeItemSkeleton } from '../Components/EditGradeItemSkeleton';
 import GradeItem from '../Components/GradeItem';
+import axios from 'axios';
+import { getGradeComposition } from '../../redux/classDetailThunks';
+import { debounce } from 'lodash';
 
 export default function GradeStructure() {
   const navigate = useNavigate();
@@ -40,24 +43,40 @@ export default function GradeStructure() {
   const gradeCompositionIds = Object.keys(gradeCompositionMap).sort(
     (a, b) => gradeCompositionMap[a].rank - gradeCompositionMap[b].rank,
   );
-  const { register, control, handleSubmit, reset, watch } = useForm({
+  const form = useForm({
     defaultValues: {
       grade: [
         {
           name: '',
-          gradeId: '',
+          id: '',
           percentage: 0,
           isFinalized: false,
         },
       ],
     },
   });
+  const { register, control, handleSubmit, reset, watch } = form;
   const { fields, append, remove, swap, move } = useFieldArray({
     control,
     name: 'grade',
   });
 
-  const onSubmit = (data) => console.log('data', data);
+  const onSubmit = async (data) => {
+    console.log('data', data);
+    const body = data.grade.map((g, i) => {
+      return { ...g, rank: i };
+    });
+    console.log(body);
+    const result = await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/classes/${classId}/updateGradeCompositionOrder`,
+      body,
+    );
+    dispatch(getGradeComposition({ id: classId }));
+    reset();
+    setIsEditing(false);
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -93,14 +112,17 @@ export default function GradeStructure() {
     setActiveId(null);
   };
 
-  const handleClick = () => {
+  const onFinishFailed = (error: any) => console.log(error);
+
+  const handleClick = debounce(() => {
     if (isEditing) {
+      reset();
       setIsEditing(false);
     } else {
       remove(0);
       for (const grade of Object.values(gradeCompositionMap)) {
         const data = {
-          gradeId: grade.id,
+          id: grade.id,
           name: grade.name,
           percentage: grade.percentage,
           isFinalized: grade.isFinalized,
@@ -109,101 +131,115 @@ export default function GradeStructure() {
       }
       setIsEditing(true);
     }
-  };
+  }, 50);
 
   return (
-    <div>
-      <div className="flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Grade Structure:</h1>
-        <div className="flex gap-2">
-          {isEditing ? (
-            <Button
-              className="w-24"
-              icon={<CloseOutlined />}
-              onClick={handleClick}
-              danger
-            >
-              Cancel
-            </Button>
-          ) : (
-            <Button
-              className="flex justify-center items-center px-8 py-4 mb-2 bg-indigo-500 text-white"
-              onClick={() => {
-                navigate(`grademanagement`);
-              }}
-            >
-              Manage Grade
-            </Button>
-          )}
-          <Button
-            className="w-20 !hover:bg-[#1677FF]"
-            icon={isEditing ? <SaveOutlined /> : <EditOutlined />}
-            onClick={handleClick}
-          >
-            {isEditing ? 'Save' : 'Edit'}
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-4 max-h-[650px] overflow-auto">
-        {isEditing ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="flex flex-col gap-1">
-              <SortableContext
-                items={gradeCompositionIds}
-                strategy={verticalListSortingStrategy}
-              >
-                {fields.map((item, index) => (
-                  <EditGradeItem
-                    className="cursor-grab"
-                    index={index}
-                    key={index}
-                    data={item}
-                    onRemove={() => {
-                      remove(index);
+    <FormProvider {...form}>
+      <Form onFinish={handleSubmit(onSubmit)} onFinishFailed={onFinishFailed}>
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <h1 className="text-lg font-semibold">Grade Structure:</h1>
+            <div className="flex gap-2">
+              {isEditing ? (
+                <>
+                  <Button
+                    className="w-24"
+                    icon={<CloseOutlined />}
+                    onClick={handleClick}
+                    danger
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="w-20 !hover:bg-[#1677FF]"
+                    icon={<SaveOutlined />}
+                    htmlType="submit"
+                  >
+                    Save
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    className="flex justify-center items-center h-8 px-8 bg-indigo-500 text-white"
+                    onClick={() => {
+                      navigate(`grademanagement`);
                     }}
-                  />
-                ))}
-              </SortableContext>
-              {createPortal(
-                <DragOverlay>
-                  {activeId ? (
-                    <EditGradeItemSkeleton data={fields[activeId]} />
-                  ) : null}
-                </DragOverlay>,
-                document.body,
+                  >
+                    Manage Grade
+                  </Button>
+                  <Button
+                    className="w-20 !hover:bg-[#1677FF]"
+                    icon={<EditOutlined />}
+                    onClick={handleClick}
+                  >
+                    Edit
+                  </Button>
+                </>
               )}
-              <Button
-                className="w-1/3"
-                shape="round"
-                icon={<PlusOutlined />}
-                onClick={() => {
-                  append({
-                    name: '',
-                    gradeId: '',
-                    percentage: 0,
-                    isFinalized: false,
-                  });
-                }}
-              >
-                Add New Grade
-              </Button>
             </div>
-          </DndContext>
-        ) : (
-          <>
-            {Object.keys(gradeCompositionMap).map((id) => (
-              <GradeItem key={id} id={id} />
-            ))}
-          </>
-        )}
-      </div>
-    </div>
+          </div>
+
+          <div className="flex flex-col gap-4 max-h-[650px] overflow-auto">
+            {isEditing ? (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="flex flex-col gap-1">
+                  <SortableContext
+                    items={gradeCompositionIds}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {fields.map((item, index) => (
+                      <EditGradeItem
+                        className="cursor-grab"
+                        index={index}
+                        key={item.id}
+                        onRemove={() => {
+                          remove(index);
+                        }}
+                      />
+                    ))}
+                  </SortableContext>
+                  {createPortal(
+                    <DragOverlay>
+                      {activeId ? (
+                        <EditGradeItemSkeleton data={fields[activeId]} />
+                      ) : null}
+                    </DragOverlay>,
+                    document.body,
+                  )}
+                  <Button
+                    className="w-1/3"
+                    shape="round"
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      append({
+                        name: '',
+                        id: '',
+                        percentage: 0,
+                        isFinalized: false,
+                      });
+                    }}
+                  >
+                    Add New Grade
+                  </Button>
+                </div>
+              </DndContext>
+            ) : (
+              <>
+                {gradeCompositionIds.map((id) => (
+                  <GradeItem key={id} id={id} />
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </Form>
+    </FormProvider>
   );
 }

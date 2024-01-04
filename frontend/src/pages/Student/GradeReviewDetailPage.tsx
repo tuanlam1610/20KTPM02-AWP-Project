@@ -114,31 +114,6 @@ export default function GradeReviewDetailPage() {
                 </Tooltip>
               </div>
             </div>
-            <div className="flex gap-2">
-              {userInfo?.roles.includes('teacher') &&
-                data?.status === 'Open' && (
-                  <>
-                    <Button
-                      className="bg-slate-100 w-40"
-                      size="large"
-                      type="text"
-                      icon={<CheckCircleFilled style={{ color: 'green' }} />}
-                      onClick={handleBackButton}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      className="bg-slate-100 w-40"
-                      size="large"
-                      type="text"
-                      icon={<MinusCircleFilled style={{ color: 'red' }} />}
-                      onClick={handleBackButton}
-                    >
-                      Deny
-                    </Button>
-                  </>
-                )}
-            </div>
           </div>
           <div className="my-6">
             {data?.status === 'Denied' ? (
@@ -266,28 +241,6 @@ export default function GradeReviewDetailPage() {
             />
           </div>
         </div>
-
-        {/* <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold">{classDetails?.name}</p>
-          <div className="flex justify-between items-center gap-4">
-            <div className="flex flex-col border-[1px] border-gray-400 rounded-lg overflow-hidden">
-              <div className="py-1 px-6 bg-indigo-500 text-white flex justify-center">
-                <p>Class Code:</p>
-              </div>
-              <div className="flex justify-between items-center py-1 px-4">
-                <p>{classDetails?.code}</p>
-                <Button
-                  icon={<CopyOutlined />}
-                  size="small"
-                  className="text-gray-400"
-                  onClick={() => {
-                    handleCopyClassId();
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );

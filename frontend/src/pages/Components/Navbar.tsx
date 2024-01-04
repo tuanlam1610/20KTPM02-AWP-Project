@@ -74,7 +74,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <div className="flex items-center justify-between h-12 shadow-lg sticky">
+    <div className="flex items-center justify-between h-12 shadow-lg">
       <Link
         to={!userInfo ? '/' : `${userInfo.roles[0]}/home`}
         className="flex h-full items-center gap-2 mx-4"

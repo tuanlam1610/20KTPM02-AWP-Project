@@ -1,7 +1,5 @@
 import { Select, Table, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import { GradeReview } from '../../interface';
-import { useAppDispatch } from '../../redux/store';
 import { ColumnsType } from 'antd/es/table';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
@@ -11,6 +9,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import axios from 'axios';
+import { GradeReview } from '../../interface';
+import { useAppDispatch } from '../../redux/store';
 
 const queryClient = new QueryClient();
 
@@ -28,7 +28,6 @@ export interface GradeReviewItem extends GradeReview {
 
 export default function GradeReviewList() {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
   const [type, setType] = useState('Open');
   const [page, setPage] = useState(0);
   const navigate = useNavigate();
@@ -160,7 +159,7 @@ export default function GradeReviewList() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Grade Reviews:</h1>
+        <h1 className="text-lg font-semibold">My Grade Reviews:</h1>
         <div className="flex gap-2">
           <Select
             style={{ width: '120px' }}

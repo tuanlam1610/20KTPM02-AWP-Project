@@ -133,6 +133,9 @@ export class EmailConfirmationService {
       const payload = await this.jwtService.verify(token, {
         secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
       });
+      if ('classId' in payload) {
+        return payload;
+      }
 
       if (typeof payload === 'object' && 'email' in payload) {
         return payload.email;

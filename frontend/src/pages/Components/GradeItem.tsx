@@ -3,6 +3,10 @@ import { Button, Modal, Select, Tooltip, notification } from 'antd';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
+import {
+  deleteGradeComposition,
+  updateGradeComposition,
+} from '../../redux/classDetailThunks';
 
 export default function GradeItem({ id }: { id: string }) {
   const dispatch = useAppDispatch();
@@ -37,6 +41,17 @@ export default function GradeItem({ id }: { id: string }) {
 
   const handleOk = () => {
     if (selectedValue !== '') {
+      console.log(selectedValue);
+      dispatch(deleteGradeComposition({ gradeId: id }));
+      dispatch(
+        updateGradeComposition({
+          gradeId: selectedValue,
+          body: {
+            percentage:
+              gradeCompositionMap[selectedValue].percentage + grade.percentage,
+          },
+        }),
+      );
       setIsModalOpen(false);
     } else {
       openNotification('You have to select a grade', '');
