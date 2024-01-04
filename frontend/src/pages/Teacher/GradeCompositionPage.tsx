@@ -52,6 +52,14 @@ export default function GradeCompositionPage() {
     );
   }
 
+  const templateData = [
+    {
+      studentId: '',
+      name: '',
+      grade: '',
+    },
+  ];
+
   const handleBackButton = () => {
     navigate(-1);
   };
@@ -99,15 +107,25 @@ export default function GradeCompositionPage() {
       key: '1',
       label: 'CSV',
       icon: <FileTextOutlined />,
-      onClick: () =>
-        downloadCSV(data, `Class${classId}_${gradeCompositionName}`),
+      onClick: () => {
+        const exportData = data.length <= 0 ? templateData : data;
+        delete exportData['id'];
+        downloadCSV(exportData, `Class${classId}_${gradeCompositionName}`);
+      },
     },
     {
       key: '2',
       label: 'XLSX',
       icon: <FileExcelOutlined />,
-      onClick: () =>
-        downloadXLSX(data, `Class${classId}_${gradeCompositionName}`),
+      onClick: () => {
+        const exportData = data.length <= 0 ? templateData : data;
+        exportData.map((row: any) => {
+          delete row['id'];
+          return row;
+        });
+
+        downloadXLSX(exportData, `Class${classId}_${gradeCompositionName}`);
+      },
     },
   ];
 
@@ -221,7 +239,7 @@ export default function GradeCompositionPage() {
             >
               <Button>
                 <Space>
-                  Export Grade Board
+                  Export
                   <DownloadOutlined />
                 </Space>
               </Button>
