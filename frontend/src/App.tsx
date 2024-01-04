@@ -24,6 +24,7 @@ import TeacherHomePage from './pages/Teacher/TeacherHomePage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import UserProfilePage from './pages/UserProfilePage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
+import JoinClassByEmail from './pages/JoinClassByEmail';
 
 dayjs.extend(relativeTime);
 
@@ -44,7 +45,10 @@ function App() {
         <Route path="/activateEmail" element={<ActivateEmailPage />} />
         <Route path="/chooserole" element={<ChooseRolePage />} />
         <Route path="/profile" element={<UserProfilePage />} />
+        {/* Join Class By Link */}
         <Route path="/joinClass/:id" element={<JoinClassByLink />} />
+        {/* Join Class By Email */}
+        <Route path="/inviteJoinClass" element={<JoinClassByEmail />} />
 
         {/* Teacher Routes */}
         <Route
