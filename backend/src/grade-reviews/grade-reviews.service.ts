@@ -31,10 +31,84 @@ export class GradeReviewsService {
       isRead: false,
       receiverId: gr.studentId,
     };
-    await this.notiService.createAndSendNotifications(
-      [notificationData],
-      gr.studentId,
-    );
+    // await this.notiService.createAndSendNotifications(
+    //   [notificationData],
+    //   gr.studentId,
+    // );
+    //REplace with send noti to online student
+  }
+  async createAndNotify(createGradeReviewDto: CreateGradeReviewDto) {
+    try {
+      const fetchedComment = await this.prisma.comment.findMany({
+        where: { id: { in: createGradeReviewDto.comment } },
+      });
+
+      if (fetchedComment.length ?? 0 !== createGradeReviewDto.comment.length) {
+        const notFoundIds = createGradeReviewDto.comment.filter(
+          (sgId) => !fetchedComment.some((sg) => sg.id === sgId),
+        );
+        throw new NotFoundException(
+          `comments with IDs ${notFoundIds.join(', ')} not found`,
+        );
+      }
+
+      const sg = await this.prisma.studentGrade.findUnique({
+        where: { id: createGradeReviewDto.studentGradeId },
+      });
+      if (!sg)
+        throw new BadRequestException(
+          `grade with IDs ${createGradeReviewDto.studentGradeId} not found`,
+        );
+
+      const newGradeReview = await this.prisma.gradeReview.create({
+        data: {
+          currentGrade: createGradeReviewDto.currentGrade,
+          expectedGrade: createGradeReviewDto.expectedGrade,
+          finalGrade: createGradeReviewDto.finalGrade,
+          status: createGradeReviewDto.status,
+          explanation: createGradeReviewDto.explanation,
+          comment: {
+            connect: fetchedComment.map((sg) => ({ id: sg.id })),
+          },
+          studentId: createGradeReviewDto.studentId,
+          teacherId: createGradeReviewDto.teacherId,
+          classId: createGradeReviewDto.classId,
+          studentGradeId: createGradeReviewDto.studentGradeId,
+        },
+      });
+
+      //Send notification to teachers
+      //Todo make this adapt to a list of Teacher
+      const teachers = await this.prisma.classTeacher.findMany({
+        where: { classId: createGradeReviewDto.classId },
+        select: { teacherId: true },
+      });
+      const notifyBaseData = {
+        action: 'GR_CREATED_NOTIFICATION_SEND',
+        object: 'grade review',
+        objectId: newGradeReview.id,
+        objectType: 'gradeReview',
+        content: `New grade review has been created.`,
+        senderId: newGradeReview.studentId,
+        isRead: false,
+      };
+      teachers.forEach(async (teacher) => {
+        const notificationData: CreateNotificationDto = {
+          ...notifyBaseData,
+          receiverId: teacher.teacherId,
+        };
+        // await this.notiService.createAndSendNotifications(
+        //   [notificationData],
+        //   teacher.teacherId,
+        // );
+        //replace with new send command specific to teacher
+      });
+
+      return newGradeReview;
+    } catch (error) {
+      // Custom error handling/logging/reporting
+      throw new Error(`Failed to create grade review: ${error.message}`);
+    }
   }
 
   async getGradeReviewDetails(id: string) {
@@ -145,23 +219,6 @@ export class GradeReviewsService {
           studentGradeId: createGradeReviewDto.studentGradeId,
         },
       });
-
-      // //Send notification to teachers
-      // //Todo make this adapt to a list of Teacher
-      // const notificationData: CreateNotificationDto = {
-      //   action: 'GR_CREATED_NOTIFICATION_SEND',
-      //   object: 'grade review',
-      //   objectId: newGradeReview.id,
-      //   objectType: 'gradeReview',
-      //   content: `New grade review has been created.`,
-      //   senderId: newGradeReview.studentId,
-      //   isRead: false,
-      //   receiverId: newGradeReview.teacherId,
-      // };
-      // await this.notiService.createAndSendNotifications(
-      //   [notificationData],
-      //   newGradeReview.teacherId,
-      // );
 
       return newGradeReview;
     } catch (error) {

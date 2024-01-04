@@ -32,9 +32,37 @@ export class ClassesService {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
     if (user.roles.includes('student')) {
-      return this.addStudentToClass(classId, user.id);
+      const student = await this.prisma.student.findUnique({
+        where: { userId: userId },
+      });
+
+      return this.prisma.classMember.upsert({
+        where: {
+          classId_studentId: { classId: classId, studentId: student.id },
+        },
+        update: {
+          isJoined: true,
+        },
+        create: {
+          classId: classId,
+          studentId: student.id,
+          isJoined: true,
+        },
+      });
     } else {
-      return this.addTeacherToClass(classId, user.id);
+      const teacher = await this.prisma.teacher.findUnique({
+        where: { userId: userId },
+      });
+      return this.prisma.classTeacher.upsert({
+        where: {
+          classId_teacherId: { classId: classId, teacherId: teacher.id },
+        },
+        update: {},
+        create: {
+          classId: classId,
+          teacherId: teacher.id,
+        },
+      });
     }
   }
   async getFinalizedGradesOfStudent(classId: string, studentId: string) {
