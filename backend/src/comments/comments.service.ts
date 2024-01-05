@@ -49,11 +49,11 @@ export class CommentsService {
           receiver: finalReceiverId,
         };
 
-        // await this.notiService.createAndSendNotifications(
-        //   //Todo make anotehr send notifcation function for comment Room
-        //   [notificationData],
-        //   finalReceiverId,
-        // );
+        await this.notiService.handleCommentAndNotification(
+          //Todo make anotehr send notifcation function for comment Room
+          [notificationData],
+          finalReceiverId,
+        );
         //Add a service to send notifcation to room
       }
       //also add live chat room

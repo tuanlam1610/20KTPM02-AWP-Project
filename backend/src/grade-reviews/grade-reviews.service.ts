@@ -16,10 +16,16 @@ export class GradeReviewsService {
     private notiService: NotificationsService,
   ) {}
 
-  async finalizeGradeReview(id: string, finalGrade: number) {
+  async finalizeGradeReview(id: string, teacherId: string, finalGrade: number) {
     const gr = await this.prisma.gradeReview.update({
       where: { id },
-      data: { finalGrade, status: 'Accepted' },
+      data: { finalGrade, status: 'Accepted', teacherId: teacherId },
+    });
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { id: teacherId },
+    });
+    const student = await this.prisma.student.findUnique({
+      where: { id: gr.studentId },
     });
     const notificationData: CreateNotificationDto = {
       action: 'GR_FINALIZED_NOTIFICATION_SEND',
@@ -27,14 +33,15 @@ export class GradeReviewsService {
       objectId: id,
       objectType: 'gradeReview',
       content: `Your grade review has been finalized.`,
-      senderId: gr.teacherId,
+      senderId: teacher.userId,
       isRead: false,
-      receiverId: gr.studentId,
+      receiverId: student.userId,
     };
-    // await this.notiService.createAndSendNotifications(
-    //   [notificationData],
-    //   gr.studentId,
-    // );
+
+    await this.notiService.createAndSendOneNotification(
+      notificationData,
+      student.userId,
+    );
     //REplace with send noti to online student
   }
   async createAndNotify(createGradeReviewDto: CreateGradeReviewDto) {
@@ -84,26 +91,30 @@ export class GradeReviewsService {
       //Todo make this adapt to a list of Teacher
       const teachers = await this.prisma.classTeacher.findMany({
         where: { classId: createGradeReviewDto.classId },
-        select: { teacherId: true },
+        select: { teacher: { select: { userId: true } } },
       });
+      const student = await this.prisma.student.findUnique({
+        where: { id: createGradeReviewDto.studentId },
+      });
+
       const notifyBaseData = {
         action: 'GR_CREATED_NOTIFICATION_SEND',
         object: 'grade review',
         objectId: newGradeReview.id,
         objectType: 'gradeReview',
         content: `New grade review has been created.`,
-        senderId: newGradeReview.studentId,
+        senderId: student.userId,
         isRead: false,
       };
-      teachers.forEach(async (teacher) => {
+      teachers.forEach(async (classT) => {
         const notificationData: CreateNotificationDto = {
           ...notifyBaseData,
-          receiverId: teacher.teacherId,
+          receiverId: classT.teacher.userId,
         };
-        // await this.notiService.createAndSendNotifications(
-        //   [notificationData],
-        //   teacher.teacherId,
-        // );
+        await this.notiService.createAndSendOneNotification(
+          notificationData,
+          notificationData.receiverId,
+        );
         //replace with new send command specific to teacher
       });
 
