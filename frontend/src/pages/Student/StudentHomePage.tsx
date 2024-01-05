@@ -58,38 +58,39 @@ export default function StudentHomePage() {
               />
             </div>
           )}
-          {classes.map((course, index) => {
-            return (
-              <div
-                key={index}
-                className="flex flex-col w-1/5 min-h-[32vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
+          {classes.length > 0 &&
+            classes.map((course, index) => {
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col w-1/5 min-h-[32vh] border-2 border-indigo-200 rounded-xl overflow-hidden 
                 hover:shadow-2xl hover:cursor-pointer active:bg-indigo-200"
-                onClick={() => {
-                  navigate(`/student/class/${classes[index].id}`);
-                }}
-              >
-                <img
-                  src={
-                    'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg'
-                  }
-                  className="h-1/2 object-contain"
-                />
-                <div className="px-4 my-4">
-                  <Title level={4} className="truncate">
-                    {course.name}
-                  </Title>
-                  <p className="italic text-gray-500 text-sm">
-                    {course.description}
-                  </p>
-                </div>
-                {/* <div className="flex flex-1 justify-center items-center">
+                  onClick={() => {
+                    navigate(`/student/class/${classes[index].id}`);
+                  }}
+                >
+                  <img
+                    src={
+                      'https://cdn.create.vista.com/downloads/b1ec016d-2cd8-4c23-ba56-0b4f3bfe19fa_1024.jpeg'
+                    }
+                    className="h-1/2 object-contain"
+                  />
+                  <div className="px-4 my-4">
+                    <Title level={4} className="truncate">
+                      {course.name}
+                    </Title>
+                    <p className="italic text-gray-500 text-sm">
+                      {course.description}
+                    </p>
+                  </div>
+                  {/* <div className="flex flex-1 justify-center items-center">
                   <Button className="flex-1 py-4 mx-4 bg-indigo-500 text-white hover:bg-white rounded-full flex justify-center items-center">
                     Assign Course
                   </Button>
                 </div> */}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>
