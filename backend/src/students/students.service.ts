@@ -18,6 +18,13 @@ enum GradeReviewStatusFilter {
 @Injectable()
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
+
+  getUnmappedStudents() {
+    return this.prisma.student.findMany({
+      where: { userId: null },
+    });
+  }
+
   async getStudentGradeReview(
     studentId: string,
     page?: number,
@@ -140,11 +147,12 @@ export class StudentsService {
     });
   }
 
-  async getAllClassesOfstudent(studentId: string) {
+  async getAllClassesOfStudent(studentId: string) {
     const classesOfStudent = await this.prisma.student.findUnique({
       where: { id: studentId },
       select: {
         classMember: {
+          where: { isJoined: true },
           select: {
             class: {
               select: {

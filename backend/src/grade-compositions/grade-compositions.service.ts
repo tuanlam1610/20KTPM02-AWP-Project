@@ -26,14 +26,16 @@ export class GradeCompositionsService {
       where: { id: gradeCompositionId },
       data: { isFinalized: true },
     });
-
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { id: teacherId },
+    });
     const notificationData: CreateNotificationDto = {
       action: 'GC_FINALIZED_NOTIFICATION_SEND',
       object: 'grade composition finalized',
       objectId: gradeComposition.id,
       objectType: 'gradeComposition',
       content: `Your grade for ${gradeComposition.name} has been finalized.`,
-      senderId: teacherId,
+      senderId: teacher.userId,
       isRead: false,
       receiverId: '',
     };

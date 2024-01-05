@@ -20,3 +20,7 @@ export class CreateGradeCompositionDto {
   @ApiProperty({ type: [String] })
   studentGrades: string[];
 }
+
+export class FinalizeGradeCompositionDto {
+  teacherId: string;
+}

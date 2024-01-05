@@ -11,7 +11,10 @@ import {
 } from '@nestjs/common';
 import { GradeReviewsService } from './grade-reviews.service';
 import { CreateGradeReviewDto } from './dto/create-grade-review.dto';
-import { UpdateGradeReviewDto } from './dto/update-grade-review.dto';
+import {
+  FinalizeGradeReviewDto,
+  UpdateGradeReviewDto,
+} from './dto/update-grade-review.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('grade-reviews')
@@ -22,10 +25,14 @@ export class GradeReviewsController {
   @Patch(':id/finalize')
   @ApiCreatedResponse()
   @HttpCode(HttpStatus.OK)
-  finalizeGradeReview(@Param('id') gradeReviewId: string, @Body() body: any) {
+  finalizeGradeReview(
+    @Param('id') gradeReviewId: string,
+    @Body() body: FinalizeGradeReviewDto,
+  ) {
     return this.gradeReviewsService.finalizeGradeReview(
       gradeReviewId,
       body.teacherId,
+      body.finalGrade,
     );
   }
 
