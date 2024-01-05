@@ -19,6 +19,25 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 export class GradeReviewsController {
   constructor(private readonly gradeReviewsService: GradeReviewsService) {}
 
+  @Patch(':id/finalize')
+  @ApiCreatedResponse()
+  @HttpCode(HttpStatus.OK)
+  finalizeGradeReview(@Param('id') gradeReviewId: string, @Body() body: any) {
+    return this.gradeReviewsService.finalizeGradeReview(
+      gradeReviewId,
+      body.teacherId,
+    );
+  }
+
+  @Post('/notify')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  createAndNotifyGradeReview(
+    @Body() createGradeReviewDto: CreateGradeReviewDto,
+  ) {
+    return this.gradeReviewsService.createAndNotify(createGradeReviewDto);
+  }
+
   @Get(':id/details')
   @ApiOkResponse({ type: CreateGradeReviewDto })
   @HttpCode(HttpStatus.OK)
