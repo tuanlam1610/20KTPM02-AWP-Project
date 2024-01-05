@@ -48,8 +48,10 @@ export default function StudentGradeBoardPage() {
     return students.map((data) => {
       const gradeCompositionItems = keyBy(data.gradeEntries, 'name');
       Object.keys(gradeCompositionItems).forEach((gradeName) => {
-        gradeCompositionItems[gradeName] =
-          gradeCompositionItems[gradeName].grade;
+        gradeCompositionItems[gradeName] = gradeCompositionItems[gradeName]
+          .isFinalized
+          ? gradeCompositionItems[gradeName].grade
+          : null;
       });
       const res = {
         ...data,
@@ -63,17 +65,13 @@ export default function StudentGradeBoardPage() {
 
   const fetchGradeBoardInformation = async () => {
     try {
+      const studentId = userInfo?.studentId.id;
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/classes/${classId}/getAllGradesOfStudent`;
+      }/classes/${classId}/students/${studentId}/finalizedGrade`;
       const res = await axios.get(url);
       console.log(res.data);
-      let formattedData = formatRawDataToTableData(res.data);
-      const studentId = userInfo?.studentId.id;
-      if (studentId)
-        formattedData = formattedData.filter(
-          (row: any) => row.studentId == studentId,
-        );
+      const formattedData = formatRawDataToTableData(res.data);
       setFormattedData(formattedData);
     } catch (err) {
       console.log(err);

@@ -15,10 +15,15 @@ export default function JoinClassByLink() {
 
   const joinClassByLink = async () => {
     try {
+      console.log(
+        `${
+          import.meta.env.VITE_REACT_APP_SERVER_URL
+        }/classes/${classId}/linkJoin/${userInfo?.studentId?.id}`,
+      );
       const res = await axios.patch(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/${
-          userInfo?.studentId?.id
-        }/joinClassByLink/${classId}`,
+        `${
+          import.meta.env.VITE_REACT_APP_SERVER_URL
+        }/classes/${classId}/linkJoin/${userInfo?.id}`,
       );
       console.log(res);
       messageApi.open({
