@@ -39,9 +39,12 @@ export class GradeReviewsService {
   }
   async createAndNotify(createGradeReviewDto: CreateGradeReviewDto) {
     try {
-      const fetchedComment = await this.prisma.comment.findMany({
-        where: { id: { in: createGradeReviewDto.comment } },
-      });
+      let fetchedComment = [];
+      if (createGradeReviewDto.comment) {
+        fetchedComment = await this.prisma.comment.findMany({
+          where: { id: { in: createGradeReviewDto.comment } },
+        });
+      }
 
       if (fetchedComment.length ?? 0 !== createGradeReviewDto.comment.length) {
         const notFoundIds = createGradeReviewDto.comment.filter(
@@ -182,9 +185,12 @@ export class GradeReviewsService {
 
   async create(createGradeReviewDto: CreateGradeReviewDto) {
     try {
-      const fetchedComment = await this.prisma.comment.findMany({
-        where: { id: { in: createGradeReviewDto.comment } },
-      });
+      let fetchedComment = [];
+      if (createGradeReviewDto.comment) {
+        fetchedComment = await this.prisma.comment.findMany({
+          where: { id: { in: createGradeReviewDto.comment } },
+        });
+      }
 
       if (fetchedComment.length ?? 0 !== createGradeReviewDto.comment.length) {
         const notFoundIds = createGradeReviewDto.comment.filter(
@@ -250,9 +256,12 @@ export class GradeReviewsService {
 
   async update(id: string, updateGradeReviewDto: UpdateGradeReviewDto) {
     try {
-      const fetchedComment = await this.prisma.comment.findMany({
-        where: { id: { in: updateGradeReviewDto.comment } },
-      });
+      let fetchedComment = [];
+      if (updateGradeReviewDto.comment) {
+        fetchedComment = await this.prisma.comment.findMany({
+          where: { id: { in: updateGradeReviewDto.comment } },
+        });
+      }
 
       if (fetchedComment.length ?? 0 !== updateGradeReviewDto.comment.length) {
         const notFoundIds = updateGradeReviewDto.comment.filter(
