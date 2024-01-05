@@ -103,16 +103,17 @@ export class UsersService {
           throw new Error(`Admin with ID ${updateUserDto.adminId} not found`);
         }
       }
-
-      const fetchedComment = await this.prisma.comment.findMany({
-        where: { id: { in: updateUserDto.comment } },
-      });
-
+      let fetchedComment = [];
+      if (updateUserDto.comment) {
+        fetchedComment = await this.prisma.comment.findMany({
+          where: { id: { in: updateUserDto.comment } },
+        });
+      }
       if (fetchedComment.length ?? 0 !== updateUserDto.comment.length) {
         const notFoundIds = updateUserDto.comment.filter(
           (cId) => !fetchedComment.some((c) => c.id === cId),
         );
-        throw new Error(`Comment IDs ${notFoundIds.join(', ')} not found`);
+        throw new Error(`Comment IDs ${notFoundIds.join(', ')}User not found`);
       }
 
       const updateData: any = {
@@ -123,23 +124,31 @@ export class UsersService {
       };
 
       if (fetchedStudent) {
-        updateData.student = { connect: { id: fetchedStudent.id } };
-        updateData.role = ['STUDENT'];
+        updateData.roles = ['student'];
       }
 
       if (fetchedTeacher) {
-        updateData.teacher = { connect: { id: fetchedTeacher.id } };
-        updateData.role = ['TEACHER'];
+        updateData.roles = ['teacher'];
       }
 
       if (fetchedAdmin) {
-        updateData.admin = { connect: { id: fetchedAdmin.id } };
-        updateData.role = ['ADMIN'];
+        updateData.roles = ['admin'];
       }
 
       const updatedUser = await this.prisma.user.update({
         where: { id: id },
-        data: updateData,
+        data: {
+          ...updateData,
+          studentId: fetchedStudent
+            ? { connect: { id: fetchedStudent.id } }
+            : undefined,
+          teacherId: fetchedTeacher
+            ? { connect: { id: fetchedTeacher.id } }
+            : undefined,
+          adminId: fetchedAdmin
+            ? { connect: { id: fetchedAdmin.id } }
+            : undefined,
+        },
       });
       return updatedUser;
     } catch (error) {
@@ -186,9 +195,12 @@ export class UsersService {
         throw new Error('No user type provided');
       }
 
-      const fetchedComment = await this.prisma.comment.findMany({
-        where: { id: { in: updateUserDto.comment } },
-      });
+      let fetchedComment = [];
+      if (updateUserDto.comment) {
+        fetchedComment = await this.prisma.comment.findMany({
+          where: { id: { in: updateUserDto.comment } },
+        });
+      }
 
       if (fetchedComment.length ?? 0 !== updateUserDto.comment.length) {
         const notFoundIds = updateUserDto.comment.filter(
@@ -196,31 +208,39 @@ export class UsersService {
         );
         throw new Error(`Comment IDs ${notFoundIds.join(', ')} not found`);
       }
-
       const updateData: any = {
         ...updateUserDto,
         comment: {
-          create: fetchedComment.map((c) => ({
-            userId: { connect: { id: c.id } },
-          })),
+          connect: fetchedComment.map((c) => ({ id: c.id })),
         },
       };
 
       if (fetchedStudent) {
-        updateData.student = { connect: { id: fetchedStudent.id } };
+        updateData.roles = ['student'];
       }
 
       if (fetchedTeacher) {
-        updateData.teacher = { connect: { id: fetchedTeacher.id } };
+        updateData.roles = ['teacher'];
       }
 
       if (fetchedAdmin) {
-        updateData.admin = { connect: { id: fetchedAdmin.id } };
+        updateData.roles = ['admin'];
       }
 
       const updatedUser = await this.prisma.user.update({
         where: { email: email },
-        data: updateData,
+        data: {
+          ...updateData,
+          studentId: fetchedStudent
+            ? { connect: { id: fetchedStudent.id } }
+            : undefined,
+          teacherId: fetchedTeacher
+            ? { connect: { id: fetchedTeacher.id } }
+            : undefined,
+          adminId: fetchedAdmin
+            ? { connect: { id: fetchedAdmin.id } }
+            : undefined,
+        },
       });
       return updatedUser;
     } catch (error) {

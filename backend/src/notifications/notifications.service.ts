@@ -13,11 +13,13 @@ export class NotificationsService {
 
   async createAndSendNotifications(notifications: any[], classId: string) {
     const createdNotifications = await this.saveNotifications(notifications);
+    //This only apply to  finalized GC
     await this.sendNotificationsToOnlineUsers(createdNotifications, classId);
     return createdNotifications;
   }
 
   private async saveNotifications(notifications: any[]) {
+    console.log('saving notifications');
     // Save notifications in the database using Prisma
     const createdNotifications = await Promise.all(
       notifications.map(async (notification) => {
@@ -34,6 +36,7 @@ export class NotificationsService {
     notifications: any[],
     classId: string,
   ) {
+    console.log('sending notifications');
     const roomId = `classRoom-${classId}`; // `classRoom-${classId}
     const onlineUsers = this.appGateway.getOnlineUsers(`classRoom-${classId}`); // Get a list of online users
     for (const notification of notifications) {

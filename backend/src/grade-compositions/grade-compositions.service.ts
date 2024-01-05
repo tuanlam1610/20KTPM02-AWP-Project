@@ -45,11 +45,7 @@ export class GradeCompositionsService {
       ...notificationData,
       receiverId: student.userId,
     }));
-    console.log(
-      notifications[0].senderId,
-      'Bismalaah',
-      notifications[0].receiverId,
-    );
+
     await this.notiService.createAndSendNotifications(
       notifications,
       gradeComposition.classId,

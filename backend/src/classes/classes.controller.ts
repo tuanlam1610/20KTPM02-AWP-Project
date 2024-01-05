@@ -38,6 +38,26 @@ enum GradeReviewStatusFilter {
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 
+  @Patch(':classId/linkJoin/:userId')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  joinClassByLink(
+    @Param('classId') classId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.classesService.joinClassByLink(classId, userId);
+  }
+
+  @Get(':classId/students/:studentId/finalizedGrade')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  getFinalizedGrade(
+    @Param('classId') classId: string,
+    @Param('studentId') studentId: string,
+  ) {
+    return this.classesService.getFinalizedGradesOfStudent(classId, studentId);
+  }
+
   @Patch(':id/updateGradeCompositionOrder')
   @ApiOkResponse()
   @HttpCode(HttpStatus.OK)

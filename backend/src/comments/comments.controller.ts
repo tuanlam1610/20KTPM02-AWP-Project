@@ -6,16 +6,24 @@ import {
   Patch,
   Param,
   Delete,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('comments')
 @ApiTags('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
+  @Post('/notify')
+  @ApiCreatedResponse()
+  @HttpCode(HttpStatus.OK)
+  createAndNotifyComment(@Body() createCommentDto: CreateCommentDto) {
+    return this.commentsService.createAndNotify(createCommentDto);
+  }
 
   @Post()
   create(@Body() createCommentDto: CreateCommentDto) {
