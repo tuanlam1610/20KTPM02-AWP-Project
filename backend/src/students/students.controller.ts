@@ -47,6 +47,13 @@ export class StudentsController {
   //   const user = req.user;
   //   return this.studentsService.findOne(user['sub']);
   // }
+  @Get('unmapped')
+  @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
+  getUnmappedStudents() {
+    return this.studentsService.getUnmappedStudents();
+  }
+
   @Get(':id/GradeReview')
   @ApiOkResponse()
   @ApiQuery({
@@ -75,8 +82,8 @@ export class StudentsController {
   @Get(':id/getAllClassesOfstudent/')
   @ApiOkResponse({ type: StudentEntity })
   @HttpCode(HttpStatus.OK)
-  getAllClassesOfstudent(@Param('id') id: string) {
-    return this.studentsService.getAllClassesOfstudent(id);
+  getAllClassesOfStudent(@Param('id') id: string) {
+    return this.studentsService.getAllClassesOfStudent(id);
   }
 
   @Patch(':id/joinClassByCode')
