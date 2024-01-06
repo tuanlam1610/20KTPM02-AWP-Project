@@ -21,7 +21,7 @@ export class AppGateway implements OnModuleInit {
 
   private readonly socketToUserMapping = new Map<string, string>(); // Map to track users and their socket IDs
   private readonly classRooms = new Map<string, string[]>(); // Map to track users in class rooms
-  private readonly commentRooms = new Map<string, string[]>(); // Map to track users in comment rooms
+  private readonly gradeReviewRooms = new Map<string, string[]>(); // Map to track users in comment rooms
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
@@ -34,6 +34,20 @@ export class AppGateway implements OnModuleInit {
       });
     });
   }
+  private removeFromRoom(
+    socketId: string,
+    room: Map<string, string[]>,
+    roomId: string,
+  ) {
+    const users = room.get(roomId) || [];
+    const index = users.indexOf(this.socketToUserMapping.get(socketId));
+    if (index !== -1) {
+      users.splice(index, 1);
+      room.set(roomId, users);
+    }
+    console.log(room);
+  }
+
   private removeFromAllRooms(socketId: string) {
     console.log(socketId);
     this.classRooms.forEach((users, roomId) => {
@@ -48,11 +62,11 @@ export class AppGateway implements OnModuleInit {
       }
     });
 
-    this.commentRooms.forEach((users, roomId) => {
+    this.gradeReviewRooms.forEach((users, roomId) => {
       const index = users.indexOf(this.socketToUserMapping.get(socketId));
       if (index !== -1) {
         users.splice(index, 1);
-        this.commentRooms.set(roomId, users);
+        this.gradeReviewRooms.set(roomId, users);
       }
     });
     this.socketToUserMapping.delete(socketId);
@@ -69,16 +83,40 @@ export class AppGateway implements OnModuleInit {
     this.addToRoom(this.classRooms, `classRoom-${classId}`, userId, client.id);
   }
 
-  @SubscribeMessage('joinCommentRoom')
-  onCommentRoomJoin(
+  @SubscribeMessage('leaveClassNotifications')
+  onClassNotificationsLeave(
+    @MessageBody() body: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { classId, userId } = body;
+    client.leave(`classRoom-${classId}`); // Leave a specific class room
+    this.removeFromRoom(client.id, this.classRooms, `classRoom-${classId}`);
+  }
+
+  @SubscribeMessage('leaveGradeReviewRoom')
+  onGradeReviewRoomLeave(
     @MessageBody() body: any,
     @ConnectedSocket() client: Socket,
   ) {
     const { gradeReviewId, userId } = body;
-    client.join(`commentRoom-${gradeReviewId}`); // Join a specific comment room
+    client.leave(`gradeReviewRoom-${gradeReviewId}`); // Leave a specific comment room
+    this.removeFromRoom(
+      client.id,
+      this.gradeReviewRooms,
+      `gradeReview-${gradeReviewId}`,
+    );
+  }
+
+  @SubscribeMessage('joinGradeReviewRoom')
+  onGradeReviewRoomJoin(
+    @MessageBody() body: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { gradeReviewId, userId } = body;
+    client.join(`gradeReviewRoom-${gradeReviewId}`); // Join a specific comment room
     this.addToRoom(
-      this.commentRooms,
-      `commentRoom-${gradeReviewId}`,
+      this.gradeReviewRooms,
+      `gradeReview-${gradeReviewId}`,
       userId,
       client.id,
     );
@@ -147,6 +185,7 @@ export class AppGateway implements OnModuleInit {
       this.server.to(socketKey).emit(notification.action, notification);
     }
   }
+  @SubscribeMessage('sendComment')
   emitCommentAndNotificationToRoom(
     gradeReviewId: string,
     notification: any,

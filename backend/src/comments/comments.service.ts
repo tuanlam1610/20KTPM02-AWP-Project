@@ -46,7 +46,7 @@ export class CommentsService {
           content: `New comment on your grade review.`,
           senderId: createCommentDto.userId,
           isRead: false,
-          receiver: finalReceiverId,
+          receiverId: finalReceiverId.userId,
         };
 
         await this.notiService.handleCommentAndNotification(
