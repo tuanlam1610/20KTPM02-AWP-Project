@@ -53,10 +53,10 @@ export class CommentsService {
 
       const notificationData: CreateNotificationDto = {
         action: 'COMMENT_CREATED_NOTIFICATION_SEND',
-        object: 'comment',
+        object: 'comment created',
         objectId: newComment.id,
         objectType: 'comment',
-        content: `New `,
+        content: `New comment for grade review of ${gradeReview.studentId} in class ${userClass.name}`,
         senderId: sender.id,
         isRead: false,
         receiverId: '',
