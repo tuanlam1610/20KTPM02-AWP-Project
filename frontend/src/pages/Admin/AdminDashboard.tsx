@@ -1,7 +1,7 @@
 import { UsergroupAddOutlined } from '@ant-design/icons';
 import { Card, Col, Row, message } from 'antd';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -39,16 +39,24 @@ export default function AdminDashboard() {
           <p className="text-4xl font-semibold mb-4">Dashboard</p>
         </div>
         <Row gutter={16}>
-          <Col xs={{ order: 1, span: 24 }} md={{ order: 1, span: 12 }}>
-            <Card title="User Accounts" extra={<Link to="/">Details</Link>}>
+          <Col xs={{ order: 1, span: 24 }} md={{ order: 1, span: 6 }}>
+            <Card
+              title={<p className="text-xl ">User Accounts</p>}
+              extra={<Link to="/">Details</Link>}
+              className="hover:shadow-xl"
+            >
               <div className="flex justify-between items-center">
-                <p>
-                  Total: <span>{accounts.length}</span>
+                <div className="bg-indigo-500 p-4 rounded-full">
+                  <UsergroupAddOutlined className="text-4xl text-white" />
+                </div>
+                <p className="text-xl">
+                  Total Account:
+                  <span className="font-semibold ms-2">{accounts.length}</span>
                 </p>
               </div>
             </Card>
           </Col>
-          <Col xs={{ order: 2, span: 24 }} md={{ order: 2, span: 12 }}>
+          <Col xs={{ order: 2, span: 24 }} md={{ order: 2, span: 6 }}>
             <Card title="Classes">
               <div className="flex justify-between items-center">
                 <p>
