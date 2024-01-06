@@ -1,8 +1,8 @@
 import { EditOutlined, LeftOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, DatePicker, Form, Input, Spin } from 'antd';
+import { Avatar, Button, DatePicker, Form, Input, Select, Spin } from 'antd';
 import { useForm } from 'antd/es/form/Form';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/store';
 import { User } from '../interface';
 import axios from 'axios';
@@ -27,6 +27,7 @@ export default function UserProfilePage() {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
       values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
+      console.log(values);
       const res = await axios.patch(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/${userInfo?.id}`,
         values,
@@ -112,7 +113,7 @@ export default function UserProfilePage() {
           <Form.Item<Omit<User, 'Id'>>
             label="Date Of Birth"
             name="dob"
-            initialValue={dayjs(userInfo?.dob, 'YYYY-MM-DD')}
+            initialValue={dayjs(userInfo?.dob, 'YYYY-MM-DD') || ''}
             rules={[
               {
                 required: true,
@@ -122,6 +123,29 @@ export default function UserProfilePage() {
             className="ms-0"
           >
             <DatePicker format={'DD/MM/YYYY'} />
+          </Form.Item>
+
+          <Form.Item
+            label="Student ID"
+            initialValue={userInfo?.studentId?.id || null}
+            rules={[
+              {
+                required: true,
+                message: 'Please enter your email!',
+              },
+            ]}
+            name={'studentId'}
+          >
+            <Select
+              style={{ width: 120 }}
+              onChange={(value) => {
+                console.log(value);
+              }}
+              options={[
+                { value: '20127297', label: '20127297' },
+                { value: '20127677', label: '20127677' },
+              ]}
+            />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 9 }}>

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Loading } from '../utils/enum';
 import { User } from '../interface/';
 import Class from '../interface/Class.interface';
+import { Loading } from '../utils/enum';
 
 interface AppState {
   loading: Loading;
@@ -18,7 +18,6 @@ const initialState: AppState = {
   classes: [],
   isEditingGradeComposition: false,
 };
-
 const appSlice = createSlice({
   name: 'app',
   initialState,

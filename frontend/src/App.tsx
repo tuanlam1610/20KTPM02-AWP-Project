@@ -27,10 +27,18 @@ import UserProfilePage from './pages/UserProfilePage';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import JoinClassByEmail from './pages/JoinClassByEmail';
 import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 dayjs.extend(relativeTime);
 
 function App() {
+  const { i18n } = useTranslation();
+  useEffect(() => {
+    const accessToken = localStorage.getItem('language');
+    i18n.changeLanguage(accessToken ?? 'en');
+  }, []);
   return (
     <>
       <Navbar />
@@ -88,6 +96,11 @@ function App() {
             path="class/:id/gradeReview/:gradeReviewId"
             element={<StudentGradeReviewDetailProvider />}
           />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute allowedRole={'admin'} />}>
+          <Route path="home" element={<AdminDashboard />} />
         </Route>
 
         {/* Error */}

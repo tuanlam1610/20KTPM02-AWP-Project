@@ -75,6 +75,7 @@ export class ClassesService {
             name: true,
             percentage: true,
             isFinalized: true,
+            rank: true,
             studentGrades: {
               select: {
                 id: true,
@@ -82,6 +83,9 @@ export class ClassesService {
                 studentId: true,
               },
             },
+          },
+          orderBy: {
+            rank: 'asc',
           },
         },
       },
@@ -350,6 +354,7 @@ export class ClassesService {
             id: true,
             name: true,
             percentage: true,
+            rank: true,
             studentGrades: {
               select: {
                 id: true,
@@ -357,6 +362,9 @@ export class ClassesService {
                 studentId: true,
               },
             },
+          },
+          orderBy: {
+            rank: 'asc',
           },
         },
       },

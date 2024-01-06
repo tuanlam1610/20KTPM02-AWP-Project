@@ -1,18 +1,64 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown, MenuProps } from 'antd';
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  Form,
+  Input,
+  MenuProps,
+  Modal,
+  Select,
+  Space,
+  message,
+} from 'antd';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/imgs/Logo.png';
 import { setUserInfo } from '../../redux/appSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useForm } from 'antd/es/form/Form';
+import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname.replace('/', '');
   const userInfo = useAppSelector((state) => state.app.userInfo);
+  const languageOptions: MenuProps['items'] = [
+    {
+      key: 'en',
+      label: (
+        <div
+          onClick={() => {
+            i18n.changeLanguage('en');
+            localStorage.setItem('language', 'en');
+          }}
+          className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-transparent"
+        >
+          <Avatar className="bg-indigo-500 text-white">EN</Avatar>
+          <p className="text-black text-sm">English</p>
+        </div>
+      ),
+    },
+    {
+      key: 'vn',
+      label: (
+        <div
+          onClick={() => {
+            i18n.changeLanguage('vn');
+            localStorage.setItem('language', 'vn');
+          }}
+          className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-transparent"
+        >
+          <Avatar className="bg-indigo-500 text-white">VN</Avatar>
+          <p className="text-black text-sm">Vietnam</p>
+        </div>
+      ),
+    },
+  ];
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -41,6 +87,10 @@ export default function Navbar() {
       ),
     },
   ];
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [form] = useForm();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const getUserProfile = async () => {
     try {
@@ -54,6 +104,10 @@ export default function Navbar() {
       );
       console.log(res);
       dispatch(setUserInfo(res.data));
+      if (res.data.roles[0] == 'student' && !res.data.studentId) {
+        console.log('Show');
+        showModal();
+      }
       console.log(userInfo);
     } catch (error) {
       console.log(error);
@@ -65,16 +119,72 @@ export default function Navbar() {
   };
 
   useEffect(() => {
+    console.log(
+      'effect',
+      !userInfo?.studentId,
+      userInfo?.roles[0] == 'student',
+    );
     const accessToken = localStorage.getItem('accessToken');
     if (!userInfo) {
       if (accessToken) {
         getUserProfile();
       }
+    } else if (!userInfo.studentId && userInfo.roles[0] == 'student') {
+      if (accessToken) {
+        console.log('Recheck');
+        getUserProfile();
+      }
     }
-  }, []);
+  }, [open]);
+
+  const showModal = () => {
+    console.log('Show');
+    setOpen(true);
+  };
+  const handleCancel = () => {
+    form.resetFields();
+    setOpen(false);
+    messageApi.open({
+      type: 'warning',
+      content: 'Please map your account with your Student ID to continue.',
+      duration: 3,
+    });
+  };
+
+  const handleOk = async () => {
+    setConfirmLoading(true);
+    try {
+      const values = await form.validateFields();
+      form.resetFields();
+      console.log('Submit Values: ', values);
+      const url = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/${
+        values.studentId
+      }/mapStudentToUser`;
+      const res = await axios.patch(url, {
+        userId: userInfo?.id,
+      });
+      console.log(res);
+      messageApi.open({
+        type: 'success',
+        content: 'Student account mapped successfully',
+        duration: 1,
+      });
+      setConfirmLoading(false);
+      setOpen(false);
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: 'Failed to map student account',
+        duration: 1,
+      });
+      setConfirmLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-between h-12 shadow-lg">
+      {contextHolder}
       <Link
         to={!userInfo ? '/' : `${userInfo.roles[0]}/home`}
         className="flex h-full items-center gap-2 mx-4"
@@ -86,26 +196,84 @@ export default function Navbar() {
         />
         <h1 className="uppercase font-semibold text-lg">Edu</h1>
       </Link>
-      {['', 'landing'].includes(pathName) && (
-        <div className="flex gap-2 justify-between mx-4">
-          <Link to={`login`}>
-            <Button type="primary" className="bg-indigo-500 px-8 rounded-full">
-              Sign In
-            </Button>
-          </Link>
-        </div>
-      )}
-      {!['', 'login', 'register', 'landing', '/'].includes(pathName) &&
-        userInfo && (
-          <Dropdown menu={{ items }} placement="bottomRight">
-            <div className="flex gap-2 justify-between h-full">
-              <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
-                <p className="text-black text-sm">{userInfo.name}</p>
-                <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
-              </div>
+      <div className="flex gap-2 items-center h-full">
+        <Dropdown menu={{ items: languageOptions }} placement="bottomCenter">
+          <div className="flex gap-2 justify-between h-full">
+            <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
+              <Avatar className="bg-indigo-500 text-white">
+                {i18n.language.toUpperCase()}
+              </Avatar>
             </div>
-          </Dropdown>
+          </div>
+        </Dropdown>
+        {['', 'landing'].includes(pathName) && (
+          <div className="flex gap-2 justify-between mx-4">
+            <Link to={`login`}>
+              <Button
+                type="primary"
+                className="bg-indigo-500 px-8 rounded-full"
+              >
+                Sign In
+              </Button>
+            </Link>
+          </div>
         )}
+        {!['', 'login', 'register', 'landing', '/'].includes(pathName) &&
+          userInfo && (
+            <Dropdown menu={{ items }} placement="bottomRight">
+              <div className="flex gap-2 justify-between h-full">
+                <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
+                  <p className="text-black text-sm">{userInfo.name}</p>
+                  <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
+                </div>
+              </div>
+            </Dropdown>
+          )}
+      </div>
+      <Modal
+        title={
+          <h1 className="text-2xl text-indigo-500 pb-4 mb-4 border-b-[1px] border-gray-300 uppercase">
+            {`Student Account Mapping:`}
+          </h1>
+        }
+        centered
+        open={open}
+        onOk={handleOk}
+        okText="Confirm"
+        okButtonProps={{ className: 'bg-indigo-500' }}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+        styles={{
+          header: {
+            fontSize: 20,
+          },
+        }}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label={<p className="">{'Student ID:'}</p>}
+            rules={[
+              {
+                required: true,
+                message: 'Please choose student id to map with.',
+              },
+            ]}
+            name={'studentId'}
+            className="w-full mb-4"
+          >
+            <Select
+              style={{ width: 120 }}
+              onChange={(value) => {
+                console.log(value);
+              }}
+              options={[
+                { value: '20127297', label: '20127297' },
+                { value: '20127677', label: '20127677' },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }
