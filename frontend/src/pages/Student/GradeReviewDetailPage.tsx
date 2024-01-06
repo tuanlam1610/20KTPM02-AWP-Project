@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Comment as CommentData, GradeReview } from '../../interface';
 import { useAppSelector } from '../../redux/store';
+import React from 'react';
 
 export interface GradeReviewDetail extends GradeReview {
   comment: CommentData[];

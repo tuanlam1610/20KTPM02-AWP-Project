@@ -11,6 +11,7 @@ export class TeachersService {
       where: { id: teacherId },
       select: {
         classTeacher: {
+          where: { class: { isActive: true } },
           select: {
             class: {
               select: {

@@ -89,6 +89,7 @@ model Class {
   description    String?
   code           String  @unique //Need to be generated
   invitationLink String  @unique
+  isActive       Boolean @default(true)
 
   gradeCompositions GradeComposition[]
 

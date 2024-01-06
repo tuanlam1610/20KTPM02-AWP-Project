@@ -17,6 +17,7 @@ async function main() {
         'Introduce you to the topic of programming and how to use it in real life',
       code: 'ITPJKI',
       invitationLink: '$localhost:3000/invitation/ITPJKI',
+      isActive: true,
     },
   });
   const class2 = await prisma.class.create({
@@ -25,6 +26,7 @@ async function main() {
       description: 'Learn how to use C++ to create real life applications',
       code: 'PICKSL',
       invitationLink: '$localhost:3000/invitation/PICKSL',
+      isActive: true,
     },
   });
   const class3 = await prisma.class.create({
@@ -34,6 +36,7 @@ async function main() {
         'High concept programming and practically development method',
       code: 'APDSQL',
       invitationLink: '$localhost:3000/invitation/APDSQL',
+      isActive: true,
     },
   });
   const hashData = (data: string) => {

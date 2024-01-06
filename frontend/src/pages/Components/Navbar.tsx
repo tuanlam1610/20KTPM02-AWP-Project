@@ -18,13 +18,48 @@ import { useAppDispatch, useAppSelector } from '../../redux/store';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useForm } from 'antd/es/form/Form';
+import { useTranslation } from 'react-i18next';
+import NotificationPopup from './NotificationPopup';
 
 export default function Navbar() {
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const pathName = location.pathname.replace('/', '');
   const userInfo = useAppSelector((state) => state.app.userInfo);
+  const languageOptions: MenuProps['items'] = [
+    {
+      key: 'en',
+      label: (
+        <div
+          onClick={() => {
+            i18n.changeLanguage('en');
+            localStorage.setItem('language', 'en');
+          }}
+          className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-transparent"
+        >
+          <Avatar className="bg-indigo-500 text-white">EN</Avatar>
+          <p className="text-black text-sm">English</p>
+        </div>
+      ),
+    },
+    {
+      key: 'vn',
+      label: (
+        <div
+          onClick={() => {
+            i18n.changeLanguage('vn');
+            localStorage.setItem('language', 'vn');
+          }}
+          className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-transparent"
+        >
+          <Avatar className="bg-indigo-500 text-white">VN</Avatar>
+          <p className="text-black text-sm">Vietnam</p>
+        </div>
+      ),
+    },
+  ];
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -162,26 +197,43 @@ export default function Navbar() {
         />
         <h1 className="uppercase font-semibold text-lg">Edu</h1>
       </Link>
-      {['', 'landing'].includes(pathName) && (
-        <div className="flex gap-2 justify-between mx-4">
-          <Link to={`login`}>
-            <Button type="primary" className="bg-indigo-500 px-8 rounded-full">
-              Sign In
-            </Button>
-          </Link>
-        </div>
-      )}
-      {!['', 'login', 'register', 'landing', '/'].includes(pathName) &&
-        userInfo && (
-          <Dropdown menu={{ items }} placement="bottomRight">
-            <div className="flex gap-2 justify-between h-full">
-              <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
-                <p className="text-black text-sm">{userInfo.name}</p>
-                <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
-              </div>
+      <div className="flex gap-2 items-center h-full">
+        <Dropdown menu={{ items: languageOptions }} placement="bottomCenter">
+          <div className="flex gap-2 justify-between h-full">
+            <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
+              <Avatar className="bg-indigo-500 text-white">
+                {i18n.language.toUpperCase()}
+              </Avatar>
             </div>
-          </Dropdown>
+          </div>
+        </Dropdown>
+        {['', 'landing'].includes(pathName) && (
+          <div className="flex gap-2 justify-between mx-4">
+            <Link to={`login`}>
+              <Button
+                type="primary"
+                className="bg-indigo-500 px-8 rounded-full"
+              >
+                Sign In
+              </Button>
+            </Link>
+          </div>
         )}
+        {!['', 'login', 'register', 'landing', '/'].includes(pathName) &&
+          userInfo && (
+            <>
+              <NotificationPopup />
+              <Dropdown menu={{ items }} placement="bottomRight">
+                <div className="flex gap-2 justify-between h-full">
+                  <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
+                    <p className="text-black text-sm">{userInfo.name}</p>
+                    <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
+                  </div>
+                </div>
+              </Dropdown>
+            </>
+          )}
+      </div>
       <Modal
         title={
           <h1 className="text-2xl text-indigo-500 pb-4 mb-4 border-b-[1px] border-gray-300 uppercase">

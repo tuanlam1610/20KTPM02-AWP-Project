@@ -1,5 +1,5 @@
 import { LeftOutlined } from '@ant-design/icons';
-import { Button, message } from 'antd';
+import { Button, Tooltip, message } from 'antd';
 import Table from 'antd/es/table';
 import Column from 'antd/es/table/Column';
 import ColumnGroup from 'antd/es/table/ColumnGroup';
@@ -8,6 +8,7 @@ import { keyBy } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '../../redux/store';
+import RequestGradeReviewModal from './components/Modals/RequestGradeReviewModal';
 
 interface Grade {
   name: string;
@@ -34,6 +35,7 @@ export default function StudentGradeBoardPage() {
   const [gradeCompositionNameMap, setGradeCompositionNameMap] = useState<any>(
     {},
   );
+  const [studentGradeMap, setStudentGradeMap] = useState<any>({});
   const [gradeCompositionNames, setGradeCompositionNames] = useState<string[]>(
     [],
   );
@@ -43,6 +45,9 @@ export default function StudentGradeBoardPage() {
     const students: any[] = rawData.students || [];
     const gradeCompositions: any[] = rawData.gradeCompositions || [];
     const gradeCompositionsMap = keyBy(gradeCompositions, 'name');
+    const gradeEntries = rawData.students[0].gradeEntries;
+    const newStudentGradeMap = keyBy(gradeEntries, 'name');
+    setStudentGradeMap(newStudentGradeMap);
     setGradeCompositionNameMap(gradeCompositionsMap);
     setGradeCompositionNames(Object.keys(gradeCompositionsMap));
     return students.map((data) => {
@@ -74,7 +79,7 @@ export default function StudentGradeBoardPage() {
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/classes/${classId}/students/${studentId}/finalizedGrade`;
       const res = await axios.get(url);
-      console.log(res.data);
+
       const formattedData = formatRawDataToTableData(res.data);
       setFormattedData(formattedData);
     } catch (err) {
@@ -119,12 +124,28 @@ export default function StudentGradeBoardPage() {
             />
             <ColumnGroup title="Grade Structure">
               {gradeCompositionNames.map((gradeCompositionName: any) => {
-                console.log(gradeCompositionNames);
                 return (
                   <Column
                     key={gradeCompositionName}
                     dataIndex={gradeCompositionName}
-                    title={gradeCompositionName}
+                    title={
+                      <div className="flex justify-between items-center">
+                        {gradeCompositionName}
+                        <Tooltip title="Request a review">
+                          <RequestGradeReviewModal
+                            currentGrade={
+                              formattedData[0][gradeCompositionName]
+                            }
+                            gradeCompositionId={
+                              gradeCompositionNameMap[gradeCompositionName].id
+                            }
+                            studentGradeId={
+                              studentGradeMap[gradeCompositionName].id
+                            }
+                          />
+                        </Tooltip>
+                      </div>
+                    }
                   />
                 );
               })}

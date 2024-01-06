@@ -29,12 +29,22 @@ import JoinClassByEmail from './pages/JoinClassByEmail';
 import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import ClassesManagementPage from './pages/Admin/ClassesManagementPage';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 dayjs.extend(relativeTime);
 
+export const queryClient = new QueryClient();
+
 function App() {
+  const { i18n } = useTranslation();
+  useEffect(() => {
+    const accessToken = localStorage.getItem('language');
+    i18n.changeLanguage(accessToken ?? 'en');
+  }, []);
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -106,7 +116,7 @@ function App() {
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </>
+    </QueryClientProvider>
   );
 }
 

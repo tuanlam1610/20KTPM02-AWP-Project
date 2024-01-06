@@ -3,6 +3,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import { CreateNotificationDto } from 'src/notifications/dto/create-notification.dto';
 
 @Injectable()
 export class CommentsService {
@@ -19,44 +20,59 @@ export class CommentsService {
           gradeReviewId: createCommentDto.gradeReviewId,
         },
       });
-      const user = await this.prisma.user.findUnique({
+      const sender = await this.prisma.user.findUnique({
         where: { id: createCommentDto.userId },
       });
 
-      const isStudent = user.roles.includes('student');
-      const receiverField = isStudent ? 'teacherId' : 'studentId';
-      const receiverId = await this.prisma.gradeReview
-        .findUnique({
-          where: { id: createCommentDto.gradeReviewId },
-          select: { [receiverField]: true },
-        })
-        .then((res) => res && res[receiverField]);
+      const gradeReview = await this.prisma.gradeReview.findUnique({
+        where: { id: createCommentDto.gradeReviewId },
+      });
 
-      // Ensure receiverId is a string, otherwise, handle the case where it's an array of objects
-      const finalReceiverId = Array.isArray(receiverId)
-        ? receiverId[0]?.[receiverField]
-        : receiverId;
+      const userClass = await this.prisma.class.findUnique({
+        where: { id: gradeReview.classId },
+      });
 
-      if (finalReceiverId) {
-        const notificationData = {
-          action: 'COMMENT_CREATED_NOTIFICATION_SEND',
-          object: 'comment',
-          objectId: newComment.id,
-          objectType: 'comment',
-          content: `New comment on your grade review.`,
-          senderId: createCommentDto.userId,
-          isRead: false,
-          receiver: finalReceiverId,
-        };
+      const studentOfGradeReview = await this.prisma.student.findUnique({
+        where: { id: gradeReview.studentId },
+      });
 
-        await this.notiService.handleCommentAndNotification(
-          //Todo make anotehr send notifcation function for comment Room
-          [notificationData],
-          finalReceiverId,
-        );
-        //Add a service to send notifcation to room
-      }
-      //also add live chat room
+      const teacherOfGradeReview = await this.prisma.classTeacher.findMany({
+        where: { classId: gradeReview.classId },
+        include: {
+          teacher: true,
+        },
+      });
+
+      const userIdsOfClassParticipant = [
+        ...teacherOfGradeReview.map((t) => t.teacher.userId),
+        studentOfGradeReview.userId,
+      ];
+      const userIdsExcludeSender = userIdsOfClassParticipant.filter(
+        (id) => id !== sender.id,
+      );
+
+      const notificationData: CreateNotificationDto = {
+        action: 'COMMENT_CREATED_NOTIFICATION_SEND',
+        object: 'comment',
+        objectId: newComment.id,
+        objectType: 'comment',
+        content: `New `,
+        senderId: sender.id,
+        isRead: false,
+        receiverId: '',
+      };
+      const notifications = userIdsExcludeSender.map((userId) => ({
+        ...notificationData,
+        receiverId: userId,
+      }));
+      await this.notiService.handleCommentAndNotification(
+        //Todo make anotehr send notifcation function for comment Room
+        notifications,
+        newComment,
+      );
+      //Add a service to send notifcation to room
+
+      // //also add live chat room
 
       return newComment;
     } catch (error) {

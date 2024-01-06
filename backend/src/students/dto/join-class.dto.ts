@@ -9,3 +9,10 @@ export class MapUserDto {
   @ApiProperty()
   userId: string;
 }
+
+export class BulkMappingDto {
+  users: {
+    userId: string;
+    studentId: string;
+  }[];
+}

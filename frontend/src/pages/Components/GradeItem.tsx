@@ -19,11 +19,6 @@ export default function GradeItem({ id }: { id: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState('');
 
-  const showModal = () => {
-    setIsModalOpen(true);
-    setSelectedValue('');
-  };
-
   const handleChange = (value: string) => {
     setSelectedValue(value);
   };

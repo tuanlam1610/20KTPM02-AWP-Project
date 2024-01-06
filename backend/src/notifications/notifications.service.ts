@@ -12,6 +12,35 @@ export class NotificationsService {
     private appGateway: AppGateway,
   ) {}
 
+  getUserNotifications(userId: string) {
+    return this.prisma.notification.findMany({
+      where: {
+        receiverId: userId,
+      },
+    });
+  }
+
+  findUnreadNotifications(userId: string) {
+    return this.prisma.notification.findMany({
+      where: {
+        receiverId: userId,
+        isRead: false,
+      },
+    });
+  }
+
+  markUnreadNotificationsAsRead(userId: string) {
+    return this.prisma.notification.updateMany({
+      where: {
+        receiverId: userId,
+        isRead: false,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+  }
+
   async createAndSendNotifications(notifications: any[], classId: string) {
     const createdNotifications = await this.saveNotifications(notifications);
     //This only apply to  finalized GC
@@ -26,14 +55,19 @@ export class NotificationsService {
     return createdNotifications;
   }
 
-  async handleCommentAndNotification(notifcation: any, comment: CommentEntity) {
-    const createdNotifications = await this.saveNotifications([notifcation]);
+  async handleCommentAndNotification(
+    notifications: any,
+    comment: CommentEntity,
+  ) {
+    const createdNotifications = await this.saveNotifications(notifications);
     //This only apply to  finalized GC
-    await this.emitCommentAndNotificationToRoom(
-      notifcation,
-      comment.gradeReviewId,
-      comment,
-    );
+    await this.appGateway.emitCommentToRoom(comment.gradeReviewId, comment);
+    notifications.forEach(async (notification) => {
+      await this.appGateway.sendNotificationToUser(
+        notification.receiverId,
+        notification,
+      );
+    });
     return createdNotifications;
   }
 
@@ -50,23 +84,23 @@ export class NotificationsService {
 
     return createdNotifications;
   }
-  private async sendNotificationsToGRRoom(
-    notifications: any[],
-    gradeReviewId: string,
-  ) {
-    console.log('sending notifications');
-    const roomId = `commentRoom-${gradeReviewId}`; // `classRoom-${classId}
-    const onlineUsers = this.appGateway.getOnlineUsers(
-      `commentRoom-${gradeReviewId}`,
-    ); // Get a list of online users
-    for (const notification of notifications) {
-      if (onlineUsers.includes(notification.receiverId)) {
-        // If the receiver is online, emit the notification
-        console.log('emitting notification');
-        await this.appGateway.emitNotification(roomId, notification);
-      }
-    }
-  }
+  // private async sendNotificationsTo(
+  //   notifications: any[],
+  //   gradeReviewId: string,
+  // ) {
+  //   console.log('sending notifications');
+  //   const roomId = `commentRoom-${gradeReviewId}`; // `classRoom-${classId}
+  //   const onlineUsers = this.appGateway.getOnlineUsers(
+  //     `commentRoom-${gradeReviewId}`,
+  //   ); // Get a list of online users
+  //   for (const notification of notifications) {
+  //     if (onlineUsers.includes(notification.receiverId)) {
+  //       // If the receiver is online, emit the notification
+  //       console.log('emitting notification');
+  //       await this.appGateway.emitNotification(roomId, notification);
+  //     }
+  //   }
+  // }
 
   private async sendNotificationsToClassMembers(
     notifications: any[],
@@ -88,18 +122,6 @@ export class NotificationsService {
   }
   private async sendNotificationToUser(notification: any, userId: string) {
     this.appGateway.sendNotificationToUser(userId, notification);
-  }
-
-  private async emitCommentAndNotificationToRoom(
-    notification: any,
-    gradeReviewId: string,
-    comment: CommentEntity,
-  ) {
-    this.appGateway.emitCommentAndNotificationToRoom(
-      gradeReviewId,
-      notification,
-      comment,
-    );
   }
 
   create(createNotificationDto: CreateNotificationDto) {
