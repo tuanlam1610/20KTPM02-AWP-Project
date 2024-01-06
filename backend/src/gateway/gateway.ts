@@ -103,7 +103,7 @@ export class AppGateway implements OnModuleInit {
     this.removeFromRoom(
       client.id,
       this.gradeReviewRooms,
-      `gradeReview-${gradeReviewId}`,
+      `gradeReviewRoom-${gradeReviewId}`,
     );
   }
 
@@ -116,7 +116,7 @@ export class AppGateway implements OnModuleInit {
     client.join(`gradeReviewRoom-${gradeReviewId}`); // Join a specific comment room
     this.addToRoom(
       this.gradeReviewRooms,
-      `gradeReview-${gradeReviewId}`,
+      `gradeReviewRoom-${gradeReviewId}`,
       userId,
       client.id,
     );
@@ -186,15 +186,10 @@ export class AppGateway implements OnModuleInit {
     }
   }
   @SubscribeMessage('sendComment')
-  emitCommentAndNotificationToRoom(
-    gradeReviewId: string,
-    notification: any,
-    comment: CommentEntity,
-  ) {
-    console.log(gradeReviewId, notification.action);
+  emitCommentToRoom(gradeReviewId: string, comment: CommentEntity) {
     this.server
-      .to(`commentRoom-${gradeReviewId}`)
-      .emit(notification.action, { notification, comment });
+      .to(`gradeReviewRoom-${gradeReviewId}`)
+      .emit('INCOMING_COMMENT', comment);
   }
 
   findKeyByValue(map, value) {
