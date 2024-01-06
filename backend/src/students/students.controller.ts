@@ -26,7 +26,7 @@ import {
 import { CreateStudentDto } from './dto/create-students.dto';
 import { StudentEntity } from './entities/student.entity';
 import { PopulateClassDto } from 'src/classes/dto/class-populate.dto';
-import { JoinClassDto, MapUserDto } from './dto/join-class.dto';
+import { BulkMappingDto, JoinClassDto, MapUserDto } from './dto/join-class.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
 enum GradeReviewStatusFilter {
   Open = 'Open',
@@ -99,6 +99,14 @@ export class StudentsController {
   mapStudentToUser(@Param('id') id: string, @Body() body: MapUserDto) {
     return this.studentsService.mapStudentToUser(id, body.userId);
   }
+
+  @Patch('mapMultipleStudentToUser')
+  @ApiOkResponse({ type: StudentEntity })
+  @HttpCode(HttpStatus.OK)
+  mapMultipleStudentToUser(@Body() body: BulkMappingDto) {
+    return this.studentsService.mapMultipleStudentToUser(body);
+  }
+
   @Post('populateStudents')
   @ApiCreatedResponse({ type: StudentEntity })
   @HttpCode(HttpStatus.OK)

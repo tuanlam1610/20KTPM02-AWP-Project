@@ -11,6 +11,9 @@ export class CreateClassDto {
   code: string;
 
   @ApiProperty({ required: false })
+  isActive?: boolean;
+
+  @ApiProperty({ required: false })
   invitationLink: string;
 
   @ApiProperty({ required: false, type: [String] })

@@ -8,6 +8,7 @@ import { CreateStudentDto } from './dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
 import { PopulateClassDto } from 'src/classes/dto/class-populate.dto';
 import { Prisma } from '@prisma/client';
+import { BulkMappingDto } from './dto/join-class.dto';
 
 enum GradeReviewStatusFilter {
   Open = 'Open',
@@ -152,7 +153,7 @@ export class StudentsService {
       where: { id: studentId },
       select: {
         classMember: {
-          where: { isJoined: true },
+          where: { isJoined: true, class: { isActive: true } },
           select: {
             class: {
               select: {
@@ -160,6 +161,7 @@ export class StudentsService {
                 name: true,
                 description: true,
                 code: true,
+                isActive: false,
               },
             },
           },
@@ -201,6 +203,29 @@ export class StudentsService {
     } catch (e) {
       console.log(e, 'User is already mapped');
     }
+  }
+
+  async mapMultipleStudentToUser(body: BulkMappingDto) {
+    const { users } = body;
+    const studentMapping = new Map<string, string>();
+    const successfulMappings: string[] = [];
+    const failedMappings: { studentId: string; userId: string }[] = [];
+
+    for (const user of users) {
+      try {
+        const updatedStudent = await this.prisma.student.update({
+          where: { id: user.studentId },
+          data: { userId: user.userId },
+        });
+
+        successfulMappings.push(updatedStudent.id);
+        studentMapping.set(updatedStudent.id, user.userId);
+      } catch (error) {
+        failedMappings.push({ studentId: user.studentId, userId: user.userId });
+      }
+    }
+
+    return { successful: successfulMappings, failed: failedMappings };
   }
 
   //CRUD

@@ -225,7 +225,7 @@ export class ClassesService {
 
   async getClassStudentsTeachers(classId: string) {
     const fetchedStudentsTeachers = await this.prisma.class.findUnique({
-      where: { id: classId },
+      where: { id: classId, isActive: true },
       select: {
         classMember: {
           select: {
@@ -657,6 +657,7 @@ export class ClassesService {
         },
         classOwnerId: createClassDto.classOwnerId,
         //TODO rework all tehse connection.
+        isActive: createClassDto.isActive,
         classTeacher: {
           create: fetchedClassTeachers.map((ct) => ({
             teacher: { connect: { id: ct.id } },
@@ -762,6 +763,7 @@ export class ClassesService {
         code: updateClassDto.code,
         invitationLink: updateClassDto.invitationLink,
         classOwnerId: updateClassDto.classOwnerId,
+        isActive: updateClassDto.isActive,
         gradeCompositions: {
           connect: fetchedGradeCompositions.map((gc) => ({ id: gc.id })),
         },

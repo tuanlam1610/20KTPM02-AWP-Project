@@ -127,6 +127,12 @@ export class AuthService {
     if (!user.isEmailConfirm) {
       throw new UnauthorizedException('Email not confirmed');
     }
+    if (user.isBanned) {
+      throw new UnauthorizedException('User is banned');
+    }
+    if (user.isLocked) {
+      throw new UnauthorizedException('User is locked');
+    }
     const tokens = await this.getTokens(user);
     await this.updateRtHash(user.id, tokens.refreshToken);
     return tokens;
@@ -140,11 +146,12 @@ export class AuthService {
     });
     if (!user) {
       const googleEmail = decodedToken.email;
+      const hash = await this.hashData('123456');
       if (googleEmail) {
         user = await this.prisma.user.create({
           data: {
             email: googleEmail,
-            hash: 'google',
+            hash: hash,
             name: decodedToken.name,
             isEmailConfirm: true,
             roles: ['student'], //TODO CHANGE LATER
@@ -154,6 +161,12 @@ export class AuthService {
       } else {
         throw new ForbiddenException('token does not have email');
       }
+    }
+    if (user.isBanned) {
+      throw new UnauthorizedException('User is banned');
+    }
+    if (user.isLocked) {
+      throw new UnauthorizedException('User is locked');
     }
 
     const tokens = await this.getTokens(user);
