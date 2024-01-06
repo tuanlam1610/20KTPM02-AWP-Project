@@ -19,16 +19,11 @@ import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @Post()
-  @ApiCreatedResponse()
-  create(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationsService.create(createNotificationDto);
-  }
-
-  @Get()
+  @Get('/user/:userId')
+  @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: CreateNotificationDto })
-  findAll() {
-    return this.notificationsService.findAll();
+  getUserNotifications(@Param('userId') userId: string) {
+    return this.notificationsService.getUserNotifications(userId);
   }
 
   @Get('unread/user/:userId')
@@ -43,6 +38,18 @@ export class NotificationsController {
   @ApiOkResponse({ type: CreateNotificationDto })
   markUnreadNotifications(@Param('userId') userId: string) {
     return this.notificationsService.markUnreadNotificationsAsRead(userId);
+  }
+
+  @Post()
+  @ApiCreatedResponse()
+  create(@Body() createNotificationDto: CreateNotificationDto) {
+    return this.notificationsService.create(createNotificationDto);
+  }
+
+  @Get()
+  @ApiOkResponse({ type: CreateNotificationDto })
+  findAll() {
+    return this.notificationsService.findAll();
   }
 
   @Get(':id')
