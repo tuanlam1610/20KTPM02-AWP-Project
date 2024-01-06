@@ -149,6 +149,11 @@ export class UsersService {
             ? { connect: { id: fetchedAdmin.id } }
             : undefined,
         },
+        include: {
+          studentId: true,
+          teacherId: true,
+          adminId: true,
+        },
       });
       return updatedUser;
     } catch (error) {
@@ -241,7 +246,13 @@ export class UsersService {
             ? { connect: { id: fetchedAdmin.id } }
             : undefined,
         },
+        include: {
+          studentId: true,
+          teacherId: true,
+          adminId: true,
+        },
       });
+
       return updatedUser;
     } catch (error) {
       // Custom error handling/logging/reporting

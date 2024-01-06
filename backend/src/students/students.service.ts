@@ -310,8 +310,23 @@ export class StudentsService {
     return this.prisma.student.findUnique({ where: { userId: userId } });
   }
 
-  findAll() {
-    return this.prisma.student.findMany();
+  async findAll() {
+    const students = await this.prisma.student.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+    const modifiedStudents = students.map(({ user, ...rest }) => ({
+      ...rest,
+      userId: user.id,
+      userName: user.name,
+    }));
+    return modifiedStudents;
   }
 
   // findAllRegistered() {
