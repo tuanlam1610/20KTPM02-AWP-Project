@@ -18,6 +18,9 @@ export class ClassEntity implements Class {
   description: string;
 
   @ApiProperty()
+  isActive: boolean;
+
+  @ApiProperty()
   code: string;
 
   @ApiProperty()
