@@ -21,7 +21,8 @@ export default function LandingPage() {
   useEffect(() => {
     if (userInfo) {
       if (userInfo.roles[0] == 'teacher') navigate('teacher/home');
-      else navigate('student/home');
+      if (userInfo.roles[0] == 'student') navigate('student/home');
+      if (userInfo.roles[0] == 'admin') navigate('admin/home');
     }
   }, [userInfo]);
   const listContent = [
