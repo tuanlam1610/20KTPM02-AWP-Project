@@ -13,8 +13,8 @@ import {
   setPersistence,
   signInWithPopup,
 } from 'firebase/auth';
-import { t } from 'i18next';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, fbAuthProvider, googleAuthProvider } from '../../firebase';
 import loginImg from '../assets/imgs/Login-amico.png';
@@ -29,6 +29,7 @@ type FieldType = {
 };
 
 export default function SignInPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [form] = useForm();

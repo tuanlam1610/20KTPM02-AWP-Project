@@ -1,16 +1,17 @@
-import { Select, Table, Tag } from 'antd';
-import { useEffect, useState } from 'react';
-import { ColumnsType } from 'antd/es/table';
-import { useNavigate, useParams } from 'react-router-dom';
+import { PlusCircleFilled } from '@ant-design/icons';
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { Button, Modal, Select, Table, Tag } from 'antd';
+import { ColumnsType } from 'antd/es/table';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { GradeReview } from '../../interface';
-import { useAppDispatch } from '../../redux/store';
+import { useAppSelector } from '../../redux/store';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,9 @@ export default function GradeReviewList() {
   const navigate = useNavigate();
   const params = useParams();
   const classId: string = params.id ? params.id : '';
+  const user = useAppSelector((state) => state.app.userInfo);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const columns: ColumnsType<GradeReviewItem> = [
     {
@@ -156,47 +160,70 @@ export default function GradeReviewList() {
     setPage(0);
   }, [type]);
 
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <h1 className="text-lg font-semibold">My Grade Reviews:</h1>
-        <div className="flex gap-2">
-          <Select
-            style={{ width: '120px' }}
-            value={type}
-            onChange={handleChange}
-            options={[
-              { value: 'Open', label: 'Open' },
-              { value: 'Accepted', label: 'Accepted' },
-              { value: 'Denied', label: 'Denied' },
-              { value: 'All', label: 'All' },
-            ]}
+    <>
+      <Modal
+        title={'Add Grade Review'}
+        open={isModalOpen}
+        centered
+        onCancel={handleCancel}
+        footer={
+          <div>
+            <Button key="back">Back</Button>
+          </div>
+        }
+      ></Modal>
+      <div className="flex flex-col gap-2">
+        <div className="flex justify-between items-center">
+          <h1 className="text-lg font-semibold">My Grade Reviews:</h1>
+          <div className="flex gap-2 items-center">
+            <Button
+              icon={<PlusCircleFilled />}
+              onClick={() => setIsModalOpen(true)}
+            >
+              Add Grade Review
+            </Button>
+            <Select
+              style={{ width: '120px' }}
+              value={type}
+              onChange={handleChange}
+              options={[
+                { value: 'Open', label: 'Open' },
+                { value: 'Accepted', label: 'Accepted' },
+                { value: 'Denied', label: 'Denied' },
+                { value: 'All', label: 'All' },
+              ]}
+            />
+          </div>
+        </div>
+        <div>
+          <Table
+            rowClassName="cursor-pointer"
+            onRow={(record, rowIndex) => {
+              return {
+                onClick: (event) => {
+                  navigate(`gradeReview/${record.id}`);
+                }, // click row
+              };
+            }}
+            dataSource={isLoading ? [] : data?.gradeReviews}
+            columns={columns}
+            scroll={{ y: 480, x: 1000 }}
+            pagination={{
+              onChange: (page, pageSize) => {
+                setPage(page - 1);
+              },
+              current: page + 1,
+              defaultPageSize: 1,
+              total: data?.totalReviews,
+            }}
           />
         </div>
       </div>
-      <div>
-        <Table
-          rowClassName="cursor-pointer"
-          onRow={(record, rowIndex) => {
-            return {
-              onClick: (event) => {
-                navigate(`gradeReview/${record.id}`);
-              }, // click row
-            };
-          }}
-          dataSource={isLoading ? [] : data?.gradeReviews}
-          columns={columns}
-          scroll={{ y: 480, x: 1000 }}
-          pagination={{
-            onChange: (page, pageSize) => {
-              setPage(page - 1);
-            },
-            current: page + 1,
-            defaultPageSize: 1,
-            total: data?.totalReviews,
-          }}
-        />
-      </div>
-    </div>
+    </>
   );
 }
