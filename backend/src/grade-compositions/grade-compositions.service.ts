@@ -132,6 +132,9 @@ export class GradeCompositionsService {
             },
             grade: true,
           },
+          orderBy: {
+            studentId: 'asc',
+          },
         },
       },
     });
