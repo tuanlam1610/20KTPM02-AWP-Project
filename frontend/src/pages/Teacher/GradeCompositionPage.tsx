@@ -270,7 +270,6 @@ export default function GradeCompositionPage() {
             <Column
               key="id"
               dataIndex="id"
-              title="Edit"
               render={(value, record, index) => {
                 // console.log(value, record, index);
                 return (

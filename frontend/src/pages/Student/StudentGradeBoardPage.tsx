@@ -47,7 +47,10 @@ export default function StudentGradeBoardPage() {
     setGradeCompositionNames(Object.keys(gradeCompositionsMap));
     return students.map((data) => {
       const gradeCompositionItems = keyBy(data.gradeEntries, 'name');
+      let isAllFinalize = true;
       Object.keys(gradeCompositionItems).forEach((gradeName) => {
+        if (!gradeCompositionItems[gradeName].isFinalized)
+          isAllFinalize = false;
         gradeCompositionItems[gradeName] = gradeCompositionItems[gradeName]
           .isFinalized
           ? gradeCompositionItems[gradeName].grade
@@ -56,6 +59,7 @@ export default function StudentGradeBoardPage() {
       const res = {
         ...data,
         ...gradeCompositionItems,
+        ['totalGrade']: isAllFinalize ? data['totalGrade'] : null,
       };
       return res;
     });

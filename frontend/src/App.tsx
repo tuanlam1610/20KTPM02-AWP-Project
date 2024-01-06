@@ -28,6 +28,7 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import JoinClassByEmail from './pages/JoinClassByEmail';
 import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import ClassesManagementPage from './pages/Admin/ClassesManagementPage';
 
 dayjs.extend(relativeTime);
 
@@ -94,6 +95,11 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<ProtectedRoute allowedRole={'admin'} />}>
           <Route path="home" element={<AdminDashboard />} />
+          {/* Accounts Management */}
+          <Route path="accounts" element={<AdminDashboard />} />
+
+          {/* Classes Management */}
+          <Route path="classes" element={<ClassesManagementPage />} />
         </Route>
 
         {/* Error */}

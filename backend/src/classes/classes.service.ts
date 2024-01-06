@@ -688,7 +688,11 @@ export class ClassesService {
     });
   }
   findAll() {
-    return this.prisma.class.findMany();
+    return this.prisma.class.findMany({
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
   }
 
   findOne(id: string) {

@@ -124,29 +124,30 @@ export default function UserProfilePage() {
           >
             <DatePicker format={'DD/MM/YYYY'} />
           </Form.Item>
-
-          <Form.Item
-            label="Student ID"
-            initialValue={userInfo?.studentId?.id || null}
-            rules={[
-              {
-                required: true,
-                message: 'Please enter your email!',
-              },
-            ]}
-            name={'studentId'}
-          >
-            <Select
-              style={{ width: 120 }}
-              onChange={(value) => {
-                console.log(value);
-              }}
-              options={[
-                { value: '20127297', label: '20127297' },
-                { value: '20127677', label: '20127677' },
+          {userInfo?.roles[0] == 'student' && (
+            <Form.Item
+              label="Student ID"
+              initialValue={userInfo?.studentId?.id || null}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your email!',
+                },
               ]}
-            />
-          </Form.Item>
+              name={'studentId'}
+            >
+              <Select
+                style={{ width: 120 }}
+                onChange={(value) => {
+                  console.log(value);
+                }}
+                options={[
+                  { value: '20127297', label: '20127297' },
+                  { value: '20127677', label: '20127677' },
+                ]}
+              />
+            </Form.Item>
+          )}
 
           <Form.Item wrapperCol={{ offset: 9 }}>
             <div className="flex gap-4">
