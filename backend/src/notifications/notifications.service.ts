@@ -12,6 +12,27 @@ export class NotificationsService {
     private appGateway: AppGateway,
   ) {}
 
+  findUnreadNotifications(userId: string) {
+    return this.prisma.notification.findMany({
+      where: {
+        receiverId: userId,
+        isRead: false,
+      },
+    });
+  }
+
+  markUnreadNotificationsAsRead(userId: string) {
+    return this.prisma.notification.updateMany({
+      where: {
+        receiverId: userId,
+        isRead: false,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+  }
+
   async createAndSendNotifications(notifications: any[], classId: string) {
     const createdNotifications = await this.saveNotifications(notifications);
     //This only apply to  finalized GC
