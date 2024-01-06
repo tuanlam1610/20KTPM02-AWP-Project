@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useForm } from 'antd/es/form/Form';
 import { useTranslation } from 'react-i18next';
+import NotificationPopup from './NotificationPopup';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
@@ -220,14 +221,17 @@ export default function Navbar() {
         )}
         {!['', 'login', 'register', 'landing', '/'].includes(pathName) &&
           userInfo && (
-            <Dropdown menu={{ items }} placement="bottomRight">
-              <div className="flex gap-2 justify-between h-full">
-                <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
-                  <p className="text-black text-sm">{userInfo.name}</p>
-                  <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
+            <>
+              <NotificationPopup />
+              <Dropdown menu={{ items }} placement="bottomRight">
+                <div className="flex gap-2 justify-between h-full">
+                  <div className="flex gap-3 items-center px-4 duration-300 cursor-pointer border-b-2 border-transparent hover:border-indigo-500">
+                    <p className="text-black text-sm">{userInfo.name}</p>
+                    <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
+                  </div>
                 </div>
-              </div>
-            </Dropdown>
+              </Dropdown>
+            </>
           )}
       </div>
       <Modal
