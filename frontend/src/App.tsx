@@ -30,8 +30,11 @@ import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 dayjs.extend(relativeTime);
+
+export const queryClient = new QueryClient();
 
 function App() {
   const { i18n } = useTranslation();
@@ -40,7 +43,7 @@ function App() {
     i18n.changeLanguage(accessToken ?? 'en');
   }, []);
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Navbar />
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -107,7 +110,7 @@ function App() {
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </>
+    </QueryClientProvider>
   );
 }
 
