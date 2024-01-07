@@ -19,6 +19,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Comment as CommentData, GradeReview } from '../../interface';
 import { useAppSelector } from '../../redux/store';
 import React from 'react';
+import { queryClient } from '../../App';
 
 export interface GradeReviewDetail extends GradeReview {
   comment: CommentData[];
@@ -59,10 +60,23 @@ export default function StudentGradeReviewDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [value, setValue] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!value) return;
-
     setSubmitting(true);
+    await axios.post(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/comments/notify`,
+      {
+        userId: userInfo?.id,
+        gradeReviewId: data?.id,
+        content: value,
+      },
+    );
+    await queryClient.refetchQueries({
+      queryKey: ['gradeReviews', gradeReviewId],
+      type: 'active',
+    });
+    setSubmitting(false);
+    setValue('');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -75,7 +89,7 @@ export default function StudentGradeReviewDetailPage() {
         <Spin />
       </div>
     );
-  console.log(data);
+
   return (
     <div className="overflow-auto">
       {/* Content */}
@@ -189,47 +203,62 @@ export default function StudentGradeReviewDetailPage() {
           </Row>
           <div className="text-xl font-semibold mb-2">Explanation</div>
           <p className="mb-4 indent-8">{data?.explanation}</p>
-          <div className="text-xl font-semibold mb-2">Comment</div>
+          <div id="comment" className="text-xl font-semibold mb-2">
+            Comment
+          </div>
           <div className="flex flex-col gap-2 mb-12">
-            {data?.comment.map((c) => {
-              return (
-                <Comment
-                  className="border-b rounded p-4 drop-shadow"
-                  // actions={actions}
-                  author={
-                    <div className="font-semibold text-base">{c.user.name}</div>
-                  }
-                  avatar={
-                    <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
-                  }
-                  content={<p>{c.content}</p>}
-                  datetime={
-                    <Tooltip
-                      title={dayjs(c.createdAt).format('YYYY-MM-DD HH:mm')}
-                      mouseEnterDelay={0.5}
-                    >
-                      <span className="cursor-default">
-                        {dayjs(c.createdAt).fromNow()}
-                      </span>
-                    </Tooltip>
-                  }
-                />
-              );
-            })}
-            <Comment
-              className="border-b rounded p-4 drop-shadow"
-              avatar={
-                <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
-              }
-              content={
-                <Editor
-                  onChange={handleChange}
-                  onSubmit={handleSubmit}
-                  submitting={submitting}
-                  value={value}
-                />
-              }
-            />
+            {data && data.comment.length > 0 ? (
+              data?.comment.map((c) => {
+                return (
+                  <Comment
+                    className="border-b rounded p-4 drop-shadow"
+                    // actions={actions}
+                    author={
+                      <div className="font-semibold text-base">
+                        {c.user.name}
+                      </div>
+                    }
+                    avatar={
+                      <Avatar
+                        className="bg-indigo-500"
+                        icon={<UserOutlined />}
+                      />
+                    }
+                    content={<p>{c.content}</p>}
+                    datetime={
+                      <Tooltip
+                        title={dayjs(c.createdAt).format('YYYY-MM-DD HH:mm')}
+                        mouseEnterDelay={0.5}
+                      >
+                        <span className="cursor-default">
+                          {dayjs(c.createdAt).fromNow()}
+                        </span>
+                      </Tooltip>
+                    }
+                  />
+                );
+              })
+            ) : (
+              <div className="flex justify-center italic text-sm text-slate-500">
+                There is no comment on this grade review
+              </div>
+            )}
+            {data?.status === 'Open' && (
+              <Comment
+                className="border-b rounded p-4 drop-shadow"
+                avatar={
+                  <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
+                }
+                content={
+                  <Editor
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    submitting={submitting}
+                    value={value}
+                  />
+                }
+              />
+            )}
           </div>
         </div>
       </div>

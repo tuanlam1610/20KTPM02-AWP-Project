@@ -77,7 +77,7 @@ function App() {
             element={<GradeManagementPage />}
           />
           <Route
-            path="class/:id/gradeReview/:gradeReviewId"
+            path="gradeReview/:gradeReviewId"
             element={<GradeReviewDetailPage />}
           />
           <Route
@@ -98,7 +98,7 @@ function App() {
             element={<StudentGradeBoardPage />}
           />
           <Route
-            path="class/:id/gradeReview/:gradeReviewId"
+            path="gradeReview/:gradeReviewId"
             element={<StudentGradeReviewDetailPage />}
           />
         </Route>

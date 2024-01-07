@@ -70,10 +70,23 @@ export default function GradeReviewDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [value, setValue] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!value) return;
-
     setSubmitting(true);
+    await axios.post(
+      `${import.meta.env.VITE_REACT_APP_SERVER_URL}/comments/notify`,
+      {
+        userId: userInfo?.id,
+        gradeReviewId: data?.id,
+        content: value,
+      },
+    );
+    await queryClient.refetchQueries({
+      queryKey: ['gradeReviews', gradeReviewId],
+      type: 'active',
+    });
+    setSubmitting(false);
+    setValue('');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -320,71 +333,64 @@ export default function GradeReviewDetailPage() {
           </Row>
           <div className="text-xl font-semibold mb-2">Explanation</div>
           <p className="mb-4 indent-8">{data?.explanation}</p>
-          <div className="text-xl font-semibold mb-2">Comment</div>
+          <div id="comment" className="text-xl font-semibold mb-2">
+            Comment
+          </div>
           <div className="flex flex-col gap-2 mb-12">
-            {data?.comment.map((c) => {
-              return (
-                <Comment
-                  className="border-b rounded p-4 drop-shadow"
-                  // actions={actions}
-                  author={
-                    <div className="font-semibold text-base">{c.user.name}</div>
-                  }
-                  avatar={
-                    <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
-                  }
-                  content={<p>{c.content}</p>}
-                  datetime={
-                    <Tooltip
-                      title={dayjs(c.createdAt).format('YYYY-MM-DD HH:mm')}
-                      mouseEnterDelay={0.5}
-                    >
-                      <span className="cursor-default">
-                        {dayjs(c.createdAt).fromNow()}
-                      </span>
-                    </Tooltip>
-                  }
-                />
-              );
-            })}
-            <Comment
-              className="border-b rounded p-4 drop-shadow"
-              avatar={
-                <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
-              }
-              content={
-                <Editor
-                  onChange={handleChange}
-                  onSubmit={handleSubmit}
-                  submitting={submitting}
-                  value={value}
-                />
-              }
-            />
+            {data && data.comment.length > 0 ? (
+              data?.comment.map((c) => {
+                return (
+                  <Comment
+                    className="border-b rounded p-4 drop-shadow"
+                    // actions={actions}
+                    author={
+                      <div className="font-semibold text-base">
+                        {c.user.name}
+                      </div>
+                    }
+                    avatar={
+                      <Avatar
+                        className="bg-indigo-500"
+                        icon={<UserOutlined />}
+                      />
+                    }
+                    content={<p>{c.content}</p>}
+                    datetime={
+                      <Tooltip
+                        title={dayjs(c.createdAt).format('YYYY-MM-DD HH:mm')}
+                        mouseEnterDelay={0.5}
+                      >
+                        <span className="cursor-default">
+                          {dayjs(c.createdAt).fromNow()}
+                        </span>
+                      </Tooltip>
+                    }
+                  />
+                );
+              })
+            ) : (
+              <div className="flex justify-center italic text-sm text-slate-500">
+                There is no comment on this grade review
+              </div>
+            )}
+            {data?.status === 'Open' && (
+              <Comment
+                className="border-b rounded p-4 drop-shadow"
+                avatar={
+                  <Avatar className="bg-indigo-500" icon={<UserOutlined />} />
+                }
+                content={
+                  <Editor
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    submitting={submitting}
+                    value={value}
+                  />
+                }
+              />
+            )}
           </div>
         </div>
-
-        {/* <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold">{classDetails?.name}</p>
-          <div className="flex justify-between items-center gap-4">
-            <div className="flex flex-col border-[1px] border-gray-400 rounded-lg overflow-hidden">
-              <div className="py-1 px-6 bg-indigo-500 text-white flex justify-center">
-                <p>Class Code:</p>
-              </div>
-              <div className="flex justify-between items-center py-1 px-4">
-                <p>{classDetails?.code}</p>
-                <Button
-                  icon={<CopyOutlined />}
-                  size="small"
-                  className="text-gray-400"
-                  onClick={() => {
-                    handleCopyClassId();
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );
