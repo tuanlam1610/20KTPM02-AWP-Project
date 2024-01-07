@@ -109,7 +109,10 @@ export default function GradeCompositionPage() {
       icon: <FileTextOutlined />,
       onClick: () => {
         const exportData = data.length <= 0 ? templateData : data;
-        delete exportData['id'];
+        exportData.map((row: any) => {
+          delete row['id'];
+          return row;
+        });
         downloadCSV(exportData, `Class${classId}_${gradeCompositionName}`);
       },
     },
@@ -123,7 +126,6 @@ export default function GradeCompositionPage() {
           delete row['id'];
           return row;
         });
-
         downloadXLSX(exportData, `Class${classId}_${gradeCompositionName}`);
       },
     },
@@ -270,7 +272,6 @@ export default function GradeCompositionPage() {
             <Column
               key="id"
               dataIndex="id"
-              title="Edit"
               render={(value, record, index) => {
                 // console.log(value, record, index);
                 return (

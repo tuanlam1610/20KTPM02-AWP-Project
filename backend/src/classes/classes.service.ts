@@ -691,6 +691,9 @@ export class ClassesService {
   async findAll() {
     const classes = await this.prisma.class.findMany({
       include: { classOwner: true },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
     const modifiedClass = classes.map(({ classOwner, ...rest }) => {
       if (!classOwner) return { ...rest, classOwnerName: null };
