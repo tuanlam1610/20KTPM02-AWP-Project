@@ -2,15 +2,19 @@ import {
   DownloadOutlined,
   FileExcelOutlined,
   FileTextOutlined,
+  PlusOutlined,
   SearchOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
 import {
   Button,
   Dropdown,
+  Form,
   Input,
   InputRef,
   MenuProps,
+  Modal,
+  Select,
   Space,
   Table,
   message,
@@ -23,18 +27,92 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { downloadCSV, downloadXLSX } from '../../utils/helper';
+import { useForm } from 'antd/es/form/Form';
 
 export default function StudentsManagementPage() {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [students, setStudents] = useState([]);
+  const [form] = useForm();
+  const [open, setOpen] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [unmappedAccounts, setUnmappedAccount] = useState([]);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+    null,
+  );
 
-  const templateData = [
+  const fetchUnmappedAccounts = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users`,
+      );
+      let result = res?.data.filter((account: any) => {
+        return account?.roles[0] == 'student' && !account?.studentId?.id;
+      });
+      result = result.map((account: any) => {
+        return { value: account.id, label: account.id };
+      });
+      setUnmappedAccount(result || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const showModal = (studentId: string) => {
+    setSelectedStudentId(studentId);
+    fetchUnmappedAccounts();
+    setOpen(true);
+  };
+  const handleCancel = () => {
+    form.resetFields();
+    setOpen(false);
+    setSelectedStudentId(null);
+  };
+  const handleOk = async () => {
+    setConfirmLoading(true);
+    try {
+      const values = await form.validateFields();
+      form.resetFields();
+      console.log('Submit Values: ', values, selectedStudentId);
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/students/${selectedStudentId}/mapStudentToUser`;
+      const res = await axios.patch(url, {
+        userId: values.userId,
+      });
+      console.log(res);
+      fetchStudents();
+      messageApi.open({
+        type: 'success',
+        content: 'Student account mapped successfully',
+        duration: 1,
+      });
+      setConfirmLoading(false);
+      setOpen(false);
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: 'Failed to map student account',
+        duration: 1,
+      });
+      setConfirmLoading(false);
+    }
+  };
+
+  const templateMappingData = [
     {
       studentId: '',
       studentName: '',
       userId: '',
       userName: '',
+    },
+  ];
+
+  const templateStudentData = [
+    {
+      studentId: '',
+      name: '',
     },
   ];
 
@@ -125,7 +203,7 @@ export default function StudentsManagementPage() {
     ),
     onFilter: (value, record: any) =>
       record[dataIndex]
-        .toString()
+        ?.toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
@@ -135,56 +213,83 @@ export default function StudentsManagementPage() {
     },
   });
 
-  const exportStudentListOptions: MenuProps['items'] = [
-    {
-      key: '1',
-      label: 'CSV',
-      icon: <FileTextOutlined />,
-      onClick: () => {
-        const exportData = students.length <= 0 ? templateData : students;
-        delete exportData['id'];
-        downloadCSV(exportData, `StudentList`);
-      },
-    },
-    {
-      key: '2',
-      label: 'XLSX',
-      icon: <FileExcelOutlined />,
-      onClick: () => {
-        const exportData = students.length <= 0 ? templateData : students;
-        exportData.map((row: any) => {
-          delete row['id'];
-          return row;
-        });
-
-        downloadXLSX(exportData, `StudentList`);
-      },
-    },
-  ];
-
-  const doUploadStudentList = async (data: any) => {
+  const doUploadMappingList = async (data: any) => {
     // Upload List Student
     try {
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/grade-compositions//updateAllStudentGrades/`;
+      }/students/mapMultipleStudentToUser`;
       const result = await axios.patch(url, {
-        studentGrades: data,
+        users: data,
       });
       console.log(result);
-      //   fetchGradeComposition();
+      fetchStudents();
       messageApi.open({
         type: 'success',
-        content: 'Upload grade composition successfully',
+        content: 'Upload student mapping successfully',
         duration: 1,
       });
     } catch (error) {
       console.log(error);
       messageApi.open({
         type: 'error',
-        content: `Something wrong when upload grade composition`,
+        content: `Something wrong when update student mapping`,
         duration: 1,
       });
+    }
+  };
+
+  const doUploadStudentList = async (data: any) => {
+    // Upload List Student
+    try {
+      console.log(data);
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/students/populateStudents`;
+      const result = await axios.post(url, {
+        students: data,
+      });
+      console.log(result);
+      fetchStudents();
+      messageApi.open({
+        type: 'success',
+        content: 'Upload student list successfully',
+        duration: 1,
+      });
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Something wrong when update student list`,
+        duration: 1,
+      });
+    }
+  };
+
+  const handleUploadMappingList = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const fileData: File = e.target.files[0];
+      console.log(fileData);
+      if (fileData.type == 'text/csv') {
+        console.log('Parse CSV File');
+        Papa.parse(fileData, {
+          header: true,
+          complete: function (results: any) {
+            const data = results.data;
+            console.log(data);
+            doUploadMappingList(data);
+          },
+        });
+      } else {
+        console.log('Parse XLSX File');
+        const data = await fileData.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const wsName = workbook.SheetNames[0];
+        console.log(XLSX.utils.sheet_to_json(workbook.Sheets[wsName]));
+        const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[wsName]);
+        console.log(worksheet);
+        doUploadMappingList(worksheet);
+      }
     }
   };
 
@@ -197,9 +302,7 @@ export default function StudentsManagementPage() {
         Papa.parse(fileData, {
           header: true,
           complete: function (results: any) {
-            const data = results.data.map((row: any) => {
-              return { ...row, grade: Number(row?.grade) };
-            });
+            const data = results.data;
             console.log(data);
             doUploadStudentList(data);
           },
@@ -209,12 +312,13 @@ export default function StudentsManagementPage() {
         const data = await fileData.arrayBuffer();
         const workbook = XLSX.read(data);
         const wsName = workbook.SheetNames[0];
+        console.log(XLSX.utils.sheet_to_json(workbook.Sheets[wsName]));
         const worksheet = XLSX.utils
           .sheet_to_json(workbook.Sheets[wsName])
           .map((row: any) => {
             return {
               ...row,
-              studentId: `${row.studentId}`,
+              studentId: row?.studentId ? `${row?.studentId}` : null,
             };
           });
         console.log(worksheet);
@@ -222,6 +326,163 @@ export default function StudentsManagementPage() {
       }
     }
   };
+
+  const handleUnmapStudent = async (studentId: string) => {
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/students/${studentId}`;
+      const result = await axios.patch(url, {
+        userId: null,
+      });
+      console.log(result);
+      fetchStudents();
+      messageApi.open({
+        type: 'success',
+        content: 'Unmap student successfully',
+        duration: 1,
+      });
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Something wrong when unmap student`,
+        duration: 1,
+      });
+    }
+  };
+
+  const exportOptions: MenuProps['items'] = [
+    {
+      key: '1',
+      label: 'Mapping List',
+      children: [
+        {
+          key: '1.1',
+          label: 'CSV',
+          icon: <FileTextOutlined />,
+          onClick: () => {
+            let exportData =
+              students.length <= 0 ? templateMappingData : [...students];
+            exportData = exportData.map((row: any) => {
+              return {
+                studentId: row.id,
+                studentName: row.name,
+                userId: row.userId,
+                userName: row.userName,
+              };
+            });
+            downloadCSV(exportData, `MappingList`);
+          },
+        },
+        {
+          key: '1.2',
+          label: 'XLSX',
+          icon: <FileExcelOutlined />,
+          onClick: () => {
+            let exportData =
+              students.length <= 0 ? templateMappingData : [...students];
+            exportData = exportData.map((row: any) => {
+              return {
+                studentId: row.id,
+                studentName: row.name,
+                userId: row.userId,
+                userName: row.userName,
+              };
+            });
+            console.log(exportData);
+            downloadXLSX(exportData, `MappingList`);
+          },
+        },
+      ],
+    },
+    {
+      key: '2',
+      label: 'Student List',
+      children: [
+        {
+          key: '2.1',
+          label: 'CSV',
+          icon: <FileTextOutlined />,
+          onClick: () => {
+            let exportData =
+              students.length <= 0 ? templateStudentData : [...students];
+            exportData = exportData.map((row: any) => {
+              return {
+                studentId: row.id,
+                name: row.name,
+              };
+            });
+            downloadCSV(exportData, `StudentList`);
+          },
+        },
+        {
+          key: '2.2',
+          label: 'XLSX',
+          icon: <FileExcelOutlined />,
+          onClick: () => {
+            let exportData =
+              students.length <= 0 ? templateStudentData : [...students];
+            exportData = exportData.map((row: any) => {
+              return {
+                studentId: row.id,
+                name: row.name,
+              };
+            });
+            console.log(exportData);
+            downloadXLSX(exportData, `StudentList`);
+          },
+        },
+      ],
+    },
+  ];
+
+  const uploadOptions: MenuProps['items'] = [
+    {
+      key: '1_uploadMapping',
+      label: (
+        <label className="cursor-pointer" htmlFor="uploadMapping">
+          Mapping List
+          <input
+            type="file"
+            accept=".xlsx, .csv"
+            onClick={(e) => {
+              const element = e.target as HTMLInputElement;
+              element.value = '';
+            }}
+            onChange={handleUploadMappingList}
+            id="uploadMapping"
+            className="hidden"
+          />
+        </label>
+      ),
+      onClick: () => {
+        console.log('Mapping');
+      },
+    },
+    {
+      key: '2_uploadStudent',
+      label: (
+        <label className="cursor-pointer" htmlFor="uploadStudent">
+          Student List
+          <input
+            type="file"
+            accept=".xlsx, .csv"
+            onClick={(e) => {
+              const element = e.target as HTMLInputElement;
+              element.value = '';
+            }}
+            onChange={handleUploadStudentList}
+            id="uploadStudent"
+            className="hidden"
+          />
+        </label>
+      ),
+      onClick: () => {
+        console.log('Student');
+      },
+    },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -233,38 +494,22 @@ export default function StudentsManagementPage() {
         </div>
         <div className="flex justify-between items-center px-4 mt-4">
           <div className="flex gap-2 justify-start items-center">
-            <div className="w-fit">
-              <input
-                type="file"
-                accept=".xlsx, .csv"
-                onClick={(e) => {
-                  const element = e.target as HTMLInputElement;
-                  element.value = '';
-                }}
-                onChange={handleUploadStudentList}
-                id="buttonFile"
-                className="hidden"
-              />
-              <Button className="p-0">
-                <label
-                  htmlFor="buttonFile"
-                  className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
-                >
-                  <span className=" w-full h-full text-center flex justify-center items-center">
-                    Upload
-                  </span>
+            <Dropdown menu={{ items: uploadOptions }}>
+              <Button>
+                <Space>
+                  Upload
                   <UploadOutlined />
-                </label>
+                </Space>
               </Button>
-            </div>
+            </Dropdown>
             <Dropdown
               menu={{
-                items: exportStudentListOptions,
+                items: exportOptions,
               }}
             >
               <Button>
                 <Space>
-                  Export
+                  Download
                   <DownloadOutlined />
                 </Space>
               </Button>
@@ -300,7 +545,7 @@ export default function StudentsManagementPage() {
           <Column
             key="name"
             dataIndex="name"
-            title="Student ID"
+            title="Student Name"
             width={120}
             sortDirections={['ascend', 'descend']}
             sorter={(a: any, b: any) => {
@@ -331,8 +576,82 @@ export default function StudentsManagementPage() {
             }}
             {...getColumnSearchProps('userId')}
           />
+          <Column
+            key="userName"
+            dataIndex="userName"
+            title="Username"
+            width={120}
+            sortDirections={['ascend', 'descend']}
+            sorter={(a: any, b: any) => {
+              if (a.id < b.id) {
+                return -1;
+              }
+              if (a.id > b.id) {
+                return 1;
+              }
+              return 0;
+            }}
+            {...getColumnSearchProps('userName')}
+          />
+          <Column
+            title="Mapping Account"
+            width={100}
+            render={(value: any, record: any, index: number) => {
+              return record?.userId ? (
+                <Button
+                  onClick={() => {
+                    handleUnmapStudent(record.id);
+                  }}
+                >
+                  Unmap
+                </Button>
+              ) : (
+                <Button onClick={() => showModal(record.id)}>Map</Button>
+              );
+            }}
+          />
         </Table>
       </div>
+      <Modal
+        title={
+          <h1 className="text-2xl text-indigo-500 pb-4 mb-4 border-b-[1px] border-gray-300 uppercase">
+            {`Student Account Mapping:`}
+          </h1>
+        }
+        centered
+        open={open}
+        onOk={handleOk}
+        okText="Confirm"
+        okButtonProps={{ className: 'bg-indigo-500' }}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+        styles={{
+          header: {
+            fontSize: 20,
+          },
+        }}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label={<p className="">{'User ID:'}</p>}
+            rules={[
+              {
+                required: true,
+                message: 'Please choose user id to map with',
+              },
+            ]}
+            name={'userId'}
+            className="w-full mb-4"
+          >
+            <Select
+              onChange={(value) => {
+                console.log(value);
+              }}
+              options={unmappedAccounts}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

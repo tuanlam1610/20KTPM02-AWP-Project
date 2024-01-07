@@ -1,5 +1,14 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, InputRef, Space, Table, Tooltip, message } from 'antd';
+import {
+  Button,
+  Input,
+  InputRef,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+  message,
+} from 'antd';
 import Column from 'antd/es/table/Column';
 import { ColumnType, FilterConfirmProps } from 'antd/es/table/interface';
 import axios from 'axios';
@@ -93,7 +102,7 @@ export default function ClassesManagementPage() {
     ),
     onFilter: (value, record: any) =>
       record[dataIndex]
-        .toString()
+        ?.toString()
         .toLowerCase()
         .includes((value as string).toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
@@ -102,6 +111,32 @@ export default function ClassesManagementPage() {
       }
     },
   });
+
+  const handleUpdateActiveState = async (classId: string, value: boolean) => {
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/classes/${classId}`;
+      const res = await axios.patch(url, {
+        isActive: value,
+      });
+      console.log('New Active State: ', res.data.isActive);
+      messageApi.open({
+        type: 'success',
+        content: `${value ? 'Active' : 'Inactive'} class successfully`,
+        duration: 1,
+      });
+      fetchClasses();
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Cannot ${value ? 'active' : 'inactive'} selected class`,
+        duration: 1,
+      });
+      fetchClasses();
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -194,8 +229,8 @@ export default function ClassesManagementPage() {
             )}
           />
           <Column
-            key="classOwnerId"
-            dataIndex="classOwnerId"
+            key="classOwnerName"
+            dataIndex="classOwnerName"
             title="Class Owner"
             sortDirections={['ascend', 'descend']}
             sorter={(a: any, b: any) => {
@@ -207,42 +242,20 @@ export default function ClassesManagementPage() {
               }
               return 0;
             }}
-            {...getColumnSearchProps('classOwnerId')}
+            {...getColumnSearchProps('classOwnerName')}
           />
           <Column
-            title="Actions"
-            render={(value, record: any, index) => {
+            key="isActive"
+            dataIndex="isActive"
+            title="Active State"
+            render={(value: boolean, record: any, index) => {
               return (
-                <Button
-                  onClick={() => {
-                    console.log(record);
-                    try {
-                      const url = `${
-                        import.meta.env.VITE_REACT_APP_SERVER_URL
-                      }/classes/${record.id}`;
-                      const res = axios.patch(url, {
-                        ...record,
-                        isActive: !record?.isActive,
-                      });
-                      console.log(res);
-                      fetchClasses();
-                      messageApi.open({
-                        type: 'success',
-                        content: `Change class state successfully`,
-                        duration: 1,
-                      });
-                    } catch (error) {
-                      console.log(error);
-                      messageApi.open({
-                        type: 'error',
-                        content: `Failed to change state of class`,
-                        duration: 1,
-                      });
-                    }
+                <Switch
+                  checked={Boolean(value)}
+                  onChange={(value) => {
+                    handleUpdateActiveState(record?.id, value);
                   }}
-                >
-                  {record?.isActive ? 'Active' : 'Inactive'}
-                </Button>
+                />
               );
             }}
           />

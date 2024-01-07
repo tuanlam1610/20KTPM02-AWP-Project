@@ -1,5 +1,14 @@
 import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, InputRef, Space, Table, Tooltip, message } from 'antd';
+import {
+  Button,
+  Input,
+  InputRef,
+  Space,
+  Switch,
+  Table,
+  Tooltip,
+  message,
+} from 'antd';
 import Column from 'antd/es/table/Column';
 import { ColumnType, FilterConfirmProps } from 'antd/es/table/interface';
 import axios from 'axios';
@@ -8,7 +17,7 @@ import { useEffect, useRef, useState } from 'react';
 export default function AccountsManagementPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const [accounts, setAccounts] = useState([]);
-  const fetchClasses = async () => {
+  const fetchAccounts = async () => {
     try {
       const accountUrl = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users`;
       const resAccounts = await axios.get(accountUrl);
@@ -24,7 +33,7 @@ export default function AccountsManagementPage() {
     }
   };
   useEffect(() => {
-    fetchClasses();
+    fetchAccounts();
   }, []);
 
   const [searchText, setSearchText] = useState('');
@@ -103,6 +112,58 @@ export default function AccountsManagementPage() {
     },
   });
 
+  const handleUpdateBanAccount = async (userId: string, value: boolean) => {
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/users/${userId}`;
+      const res = await axios.patch(url, {
+        isBanned: value,
+      });
+      console.log('New Ban Status: ', res.data.isBanned);
+      messageApi.open({
+        type: 'success',
+        content: `${value ? 'Ban' : 'Unban'} account successfully`,
+        duration: 1,
+      });
+      fetchAccounts();
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Cannot ${value ? 'ban' : 'unban'} selected account`,
+        duration: 1,
+      });
+      fetchAccounts();
+    }
+  };
+
+  const handleUpdateLockAccount = async (userId: string, value: boolean) => {
+    try {
+      const url = `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/users/${userId}`;
+      const res = await axios.patch(url, {
+        isLocked: value,
+      });
+      console.log('New Lock Status: ', res.data.isBanned);
+      messageApi.open({
+        type: 'success',
+        content: `${value ? 'Lock' : 'Unlock'} account successfully`,
+        duration: 1,
+      });
+      fetchAccounts();
+    } catch (error) {
+      console.log(error);
+      messageApi.open({
+        type: 'error',
+        content: `Cannot ${value ? 'lock' : 'unlock'} selected account`,
+        duration: 1,
+      });
+      fetchAccounts();
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {contextHolder}
@@ -123,8 +184,8 @@ export default function AccountsManagementPage() {
           <Column
             key="id"
             dataIndex="id"
-            title="Class ID"
-            width={120}
+            title="User ID"
+            width={200}
             sortDirections={['ascend', 'descend']}
             sorter={(a: any, b: any) => {
               if (a.id < b.id) {
@@ -152,12 +213,12 @@ export default function AccountsManagementPage() {
               }
               return 0;
             }}
-            {...getColumnSearchProps('code')}
+            {...getColumnSearchProps('email')}
           />
           <Column
             key="name"
             dataIndex="name"
-            title="Class Name"
+            title="Username"
             width={200}
             sortDirections={['ascend', 'descend']}
             sorter={(a: any, b: any) => {
@@ -172,77 +233,50 @@ export default function AccountsManagementPage() {
             {...getColumnSearchProps('name')}
           />
           <Column
-            key="description"
-            dataIndex="description"
-            title="Description"
-            width={240}
+            key="roles"
+            dataIndex="roles"
+            title="Role"
+            width={200}
+            render={(value) => <div>{value[0]}</div>}
             sortDirections={['ascend', 'descend']}
             sorter={(a: any, b: any) => {
-              if (a.description < b.description) {
+              if (a.name < b.name) {
                 return -1;
               }
-              if (a.description > b.description) {
+              if (a.name > b.name) {
                 return 1;
               }
               return 0;
             }}
-            {...getColumnSearchProps('description')}
-            render={(value) => (
-              <Tooltip title={value}>
-                <p className="truncate w-[240px]">{value}</p>
-              </Tooltip>
-            )}
+            {...getColumnSearchProps('roles')}
           />
           <Column
-            key="classOwnerId"
-            dataIndex="classOwnerId"
-            title="Class Owner"
-            sortDirections={['ascend', 'descend']}
-            sorter={(a: any, b: any) => {
-              if (a.classOwnerId < b.nameOwnerId) {
-                return -1;
-              }
-              if (a.classOwnerId > b.classOwnerId) {
-                return 1;
-              }
-              return 0;
-            }}
-            {...getColumnSearchProps('classOwnerId')}
-          />
-          <Column
-            title="Actions"
-            render={(value, record: any, index) => {
+            key="isBanned"
+            dataIndex="isBanned"
+            title="Ban Account"
+            render={(value: boolean, record: any, index) => {
               return (
-                <Button
-                  onClick={() => {
-                    console.log(record);
-                    try {
-                      const url = `${
-                        import.meta.env.VITE_REACT_APP_SERVER_URL
-                      }/classes/${record.id}`;
-                      const res = axios.patch(url, {
-                        ...record,
-                        isActive: !record?.isActive,
-                      });
-                      console.log(res);
-                      fetchClasses();
-                      messageApi.open({
-                        type: 'success',
-                        content: `Change class state successfully`,
-                        duration: 1,
-                      });
-                    } catch (error) {
-                      console.log(error);
-                      messageApi.open({
-                        type: 'error',
-                        content: `Failed to change state of class`,
-                        duration: 1,
-                      });
-                    }
+                <Switch
+                  checked={Boolean(value)}
+                  onChange={(value) => {
+                    handleUpdateBanAccount(record?.id, value);
                   }}
-                >
-                  {record?.isActive ? 'Active' : 'Inactive'}
-                </Button>
+                />
+              );
+            }}
+          />
+          <Column
+            key="isLocked"
+            dataIndex="isLocked"
+            title="Lock Account"
+            render={(value: string, record: any, index) => {
+              return (
+                <Switch
+                  checked={Boolean(value)}
+                  onChange={(value) => {
+                    handleUpdateLockAccount(record?.id, value);
+                  }}
+                />
               );
             }}
           />

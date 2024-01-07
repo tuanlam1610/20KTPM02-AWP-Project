@@ -42,7 +42,16 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      include: {
+        studentId: { select: { id: true } },
+        teacherId: { select: { id: true } },
+        adminId: { select: { id: true } },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
   }
 
   // findAllRegistered() {
