@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAppSelector } from '../../redux/store';
 import { queryClient } from '../../App';
 import dayjs from 'dayjs';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function NotificationPopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,27 +37,33 @@ export default function NotificationPopup() {
   return (
     <Popover
       placement="bottom"
+      title={
+        <div className="flex justify-between items-center">
+          Notifications
+          {data && data.notificationList.length > 0 && (
+            <div className="flex justify-end font-normal italic text-xs">
+              <span
+                onClick={async () => {
+                  await axios.patch(
+                    `${
+                      import.meta.env.VITE_REACT_APP_SERVER_URL
+                    }/notifications/unread/user/${userInfo?.id}`,
+                  );
+                  refetch();
+                }}
+                className="hover:text-indigo-500 hover:underline cursor-pointer"
+              >
+                Mark all as read
+              </span>
+            </div>
+          )}
+        </div>
+      }
       content={
         data ? (
           <div className="flex flex-col gap-2 max-h-[400px] overflow-auto">
-            {data.notificationList.length <= 0 ? (
+            {data.notificationList.length <= 0 && (
               <div className="text-center">There is no notifications</div>
-            ) : (
-              <div className="flex justify-end">
-                <span
-                  onClick={async () => {
-                    const res = await axios.patch(
-                      `${
-                        import.meta.env.VITE_REACT_APP_SERVER_URL
-                      }/notifications/unread/user/${userInfo?.id}`,
-                    );
-                    refetch();
-                  }}
-                  className="hover:text-indigo-500 hover:underline cursor-pointer"
-                >
-                  Mark all as read
-                </span>
-              </div>
             )}
             {data.notificationList.map((notification) => {
               return <NotificationItem notification={notification} />;
@@ -92,6 +99,10 @@ export default function NotificationPopup() {
 }
 
 const NotificationItem = ({ notification }: { notification: any }) => {
+  const navigate = useNavigate();
+  const userInfo = useAppSelector((state) => state.app.userInfo);
+  const location = useLocation();
+
   return (
     <div
       onClick={async () => {
@@ -106,6 +117,26 @@ const NotificationItem = ({ notification }: { notification: any }) => {
             queryKey: ['notification'],
             type: 'active',
           });
+        }
+        switch (notification.objectType) {
+          case 'gradeReview': {
+            const url = `/${
+              userInfo?.roles.includes('teacher')
+                ? `teacher/gradeReview/${notification.objectId}`
+                : `student/gradeReview/${notification.objectId}`
+            }`;
+            url !== location.pathname && navigate(url);
+            return;
+          }
+          case 'class': {
+            const url = `/${
+              userInfo?.roles.includes('teacher')
+                ? `teacher/class/${notification.objectId}/gradeboard`
+                : `student/class/${notification.objectId}/gradeboard`
+            }`;
+            url !== location.pathname && navigate(url);
+            return;
+          }
         }
       }}
       className="flex gap-4 items-center cursor-pointer hover:bg-slate-100 p-2 rounded"

@@ -98,12 +98,11 @@ function App() {
               path="class/:id/gradeboard"
               element={<StudentGradeBoardPage />}
             />
-            <Route
-              path="class/:id/gradeReview/:gradeReviewId"
-              element={<StudentGradeReviewDetailPage />}
-            />
           </Route>
-
+          <Route
+            path="gradeReview/:gradeReviewId"
+            element={<GradeReviewDetailPage />}
+          />
           {/* Admin Routes */}
           <Route
             path="/admin"

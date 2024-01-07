@@ -181,7 +181,7 @@ export default function GradeReviewList() {
           onRow={(record, rowIndex) => {
             return {
               onClick: (event) => {
-                navigate(`gradeReview/${record.id}`);
+                navigate(`/teacher/gradeReview/${record.id}`);
               }, // click row
             };
           }}
