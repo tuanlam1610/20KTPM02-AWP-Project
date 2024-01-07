@@ -99,7 +99,7 @@ export class GradeReviewsService {
 
       const notifyBaseData = {
         action: 'GR_CREATED_NOTIFICATION_SEND',
-        object: 'grade review',
+        object: 'grade review created',
         objectId: newGradeReview.id,
         objectType: 'gradeReview',
         content: `New grade review has been created.`,
