@@ -109,6 +109,7 @@ export class AuthService {
           email: dto.email,
           hash: hash,
           name: dto.name,
+          roles: dto.roles,
           dob: dto.dob,
           comment: undefined,
         },
@@ -235,7 +236,6 @@ export class AuthService {
     if (!user.isEmailConfirm) {
       throw new UnauthorizedException('Email not confirmed');
     }
-    //console.log(typeof resetPasswordDto.newPassword.toString());
     const hash = await this.hashData(resetPasswordDto.newPassword.toString());
     user = await this.prisma.user.update({
       where: { email: resetPasswordDto.email },
@@ -243,7 +243,6 @@ export class AuthService {
         hash: hash,
       },
     });
-    console.log(hash);
     //Probably not return tokens
     // const tokens = await this.getTokens(user);
     // await this.updateRtHash(user.id, tokens.refreshToken);

@@ -42,7 +42,6 @@ export class GradeCompositionsService {
     const students = await this.prisma.student.findMany({
       where: { classMember: { some: { classId: gradeComposition.classId } } },
     });
-    console.log(students);
     const notifications = students.map((student) => ({
       ...notificationData,
       receiverId: student.userId,
@@ -138,7 +137,6 @@ export class GradeCompositionsService {
         },
       },
     });
-    console.log(gradeComposition);
     const grade = gradeComposition.studentGrades.map((sg) => {
       return {
         id: sg.id,
@@ -189,7 +187,6 @@ export class GradeCompositionsService {
       where: { id: gradeCompositionId },
       data: { studentGrades: { create: studentGradesToCreate } },
     });
-    console.log(result);
   }
 
   async create(createGradeCompositionDto: CreateGradeCompositionDto) {

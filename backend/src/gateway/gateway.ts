@@ -45,17 +45,12 @@ export class AppGateway implements OnModuleInit {
       users.splice(index, 1);
       room.set(roomId, users);
     }
-    console.log(room);
   }
 
   private removeFromAllRooms(socketId: string) {
-    console.log(socketId);
     this.classRooms.forEach((users, roomId) => {
-      console.log(roomId, socketId);
       //delete from usersSocketMapping
       const index = users.indexOf(this.socketToUserMapping.get(socketId));
-      console.log(index);
-      console.log(users);
       if (index !== -1) {
         users.splice(index, 1);
         this.classRooms.set(roomId, users);

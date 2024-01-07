@@ -152,7 +152,6 @@ export class ClassesService {
       const student = await this.prisma.student.findUnique({
         where: { userId: userId },
       });
-      console.log(student);
       return await this.prisma.classInvitationForStudent.create({
         data: {
           classId: classId,
@@ -163,7 +162,6 @@ export class ClassesService {
       const teacher = await this.prisma.teacher.findUnique({
         where: { userId: userId },
       });
-      console.log(teacher);
       return await this.prisma.classInvitationForTeacher.create({
         data: {
           classId: classId,
@@ -522,7 +520,6 @@ export class ClassesService {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         const nonExistentStudents = [];
-        console.log(students);
         const classMembers = await Promise.all(
           students.map(async (student) => {
             // Check if the student exists
@@ -766,8 +763,6 @@ export class ClassesService {
       fetchedClassInvitationForStudents,
     ] = batchedFetch;
 
-    console.log(updateClassDto.classTeachers, id);
-    console.log(fetchedClassTeachers);
     return this.prisma.class.update({
       where: { id: id },
       data: {
