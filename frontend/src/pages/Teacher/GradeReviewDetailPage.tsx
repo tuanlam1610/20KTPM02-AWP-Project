@@ -5,32 +5,31 @@ import {
   MinusCircleFilled,
   UserOutlined,
 } from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
 import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from '@tanstack/react-query';
-import { Avatar, Button, Card, Col, Form, Row, Spin, Tooltip } from 'antd';
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Form,
+  InputNumber,
+  Modal,
+  Row,
+  Spin,
+  Tooltip,
+} from 'antd';
+import { useForm } from 'antd/es/form/Form';
 import TextArea from 'antd/es/input/TextArea';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { queryClient } from '../../App';
 import { Comment as CommentData, GradeReview } from '../../interface';
 import { useAppSelector } from '../../redux/store';
 
 export interface GradeReviewDetail extends GradeReview {
   comment: CommentData[];
-}
-
-const queryClient = new QueryClient();
-
-export function GradeReviewDetailProvider() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <GradeReviewDetailPage />
-    </QueryClientProvider>
-  );
 }
 
 export default function GradeReviewDetailPage() {
@@ -39,6 +38,9 @@ export default function GradeReviewDetailPage() {
   const gradeReviewId: string = params.gradeReviewId
     ? params.gradeReviewId
     : '';
+
+  const [isAcceptedModalOpen, setIsAcceptedModalOpen] = useState(false);
+  const [isDeniedModalOpen, setIsDeniedModalOpen] = useState(false);
 
   const fetchGradeReviewDetail = async () => {
     const res = await axios.get(
@@ -78,13 +80,56 @@ export default function GradeReviewDetailPage() {
     setValue(e.target.value);
   };
 
+  const [form] = useForm();
+
+  const handleOk = async () => {
+    const values = await form.validateFields();
+    await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-reviews/${gradeReviewId}/finalize`,
+      {
+        teacherId: userInfo?.teacherId.id,
+        finalGrade: values.finalGrade,
+        status: 'Accepted',
+      },
+    );
+    await queryClient.refetchQueries({
+      queryKey: ['gradeReviews', gradeReviewId],
+      type: 'active',
+    });
+  };
+
+  const handleDenyButton = async () => {
+    await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-reviews/${gradeReviewId}/finalize`,
+      {
+        teacherId: userInfo?.teacherId.id,
+        finalGrade: null,
+        status: 'Denied',
+      },
+    );
+    await queryClient.refetchQueries({
+      queryKey: ['gradeReviews', gradeReviewId],
+      type: 'active',
+    });
+  };
+
+  const handleCancel = () => {
+    setIsAcceptedModalOpen(false);
+    setIsDeniedModalOpen(false);
+    form.resetFields();
+  };
+
   if (isLoading)
     return (
       <div className="h-screen w-screen flex justify-center items-center">
         <Spin />
       </div>
     );
-  console.log(data);
+
   return (
     <div className="overflow-auto">
       {/* Content */}
@@ -123,19 +168,71 @@ export default function GradeReviewDetailPage() {
                       size="large"
                       type="text"
                       icon={<CheckCircleFilled style={{ color: 'green' }} />}
-                      onClick={handleBackButton}
+                      onClick={() => setIsAcceptedModalOpen(true)}
                     >
-                      Accept
+                      Resolve
                     </Button>
+                    <Modal
+                      title={'Resolve Grade Review'}
+                      open={isAcceptedModalOpen}
+                      centered
+                      onCancel={handleCancel}
+                      footer={
+                        <div>
+                          <Button key="back" onClick={handleCancel}>
+                            Cancel
+                          </Button>
+                          <Button key="submit" onClick={handleOk}>
+                            Resolve
+                          </Button>
+                        </div>
+                      }
+                    >
+                      <Form form={form} layout="vertical">
+                        <Form.Item
+                          label={<p className="">{'Final Grade:'}</p>}
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Please input the final grade.',
+                            },
+                          ]}
+                          name={'finalGrade'}
+                          className="w-full mb-4"
+                        >
+                          <InputNumber placeholder="10" min={1} max={10} />
+                        </Form.Item>
+                      </Form>
+                    </Modal>
                     <Button
                       className="bg-slate-100 w-40"
                       size="large"
                       type="text"
                       icon={<MinusCircleFilled style={{ color: 'red' }} />}
-                      onClick={handleBackButton}
+                      onClick={() => setIsDeniedModalOpen(true)}
                     >
                       Deny
                     </Button>
+                    <Modal
+                      title={'Denied Grade Review'}
+                      open={isDeniedModalOpen}
+                      centered
+                      onCancel={handleCancel}
+                      footer={
+                        <div>
+                          <Button key="back" onClick={handleCancel}>
+                            Cancel
+                          </Button>
+                          <Button
+                            key="submit"
+                            onClick={handleDenyButton}
+                            danger
+                          >
+                            Confirm
+                          </Button>
+                        </div>
+                      }
+                    ></Modal>
                   </>
                 )}
             </div>

@@ -8,6 +8,7 @@ import { UpdateGradeReviewDto } from './dto/update-grade-review.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { CreateNotificationDto } from 'src/notifications/dto/create-notification.dto';
+import { GradeReviewStatus } from '@prisma/client';
 
 @Injectable()
 export class GradeReviewsService {
@@ -16,10 +17,15 @@ export class GradeReviewsService {
     private notiService: NotificationsService,
   ) {}
 
-  async finalizeGradeReview(id: string, teacherId: string, finalGrade: number) {
+  async finalizeGradeReview(
+    id: string,
+    teacherId: string,
+    finalGrade: number,
+    status: GradeReviewStatus,
+  ) {
     const gr = await this.prisma.gradeReview.update({
       where: { id },
-      data: { finalGrade, status: 'Accepted', teacherId: teacherId },
+      data: { finalGrade, status, teacherId: teacherId },
     });
     const teacher = await this.prisma.teacher.findUnique({
       where: { id: teacherId },
@@ -27,12 +33,20 @@ export class GradeReviewsService {
     const student = await this.prisma.student.findUnique({
       where: { id: gr.studentId },
     });
+    if (status === 'Accepted') {
+      const grade = await this.prisma.studentGrade.update({
+        where: { id: gr.studentGradeId },
+        data: {
+          grade: finalGrade,
+        },
+      });
+    }
     const notificationData: CreateNotificationDto = {
       action: 'GR_FINALIZED_NOTIFICATION_SEND',
       object: 'grade review finalized',
       objectId: id,
       objectType: 'gradeReview',
-      content: `Your grade review has been finalized.`,
+      content: `Your grade review has been ${status}.`,
       senderId: teacher.userId,
       isRead: false,
       receiverId: student.userId,

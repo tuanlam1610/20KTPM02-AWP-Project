@@ -38,7 +38,7 @@ export default function NotificationPopup() {
       placement="bottom"
       content={
         data ? (
-          <div className="flex flex-col gap-2 max-h-[400px]">
+          <div className="flex flex-col gap-2 max-h-[400px] overflow-auto">
             {data.notificationList.length <= 0 ? (
               <div className="text-center">There is no notifications</div>
             ) : (
