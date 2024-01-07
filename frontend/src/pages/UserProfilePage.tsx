@@ -27,9 +27,7 @@ export default function UserProfilePage() {
         return { value: student.id, label: student.id };
       });
       setUnmappedStudent(result || []);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -59,15 +57,12 @@ export default function UserProfilePage() {
       setIsEditing(false);
       document.body.style.cursor = 'default';
     } catch (err) {
-      console.log(err);
       setIsSubmitting(false);
       setIsEditing(false);
       document.body.style.cursor = 'default';
     }
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+  const onFinishFailed = (errorInfo) => {};
   return (
     <div className="flex justify-center h-[80vh] mt-8">
       <Button

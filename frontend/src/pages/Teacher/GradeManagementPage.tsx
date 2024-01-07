@@ -88,9 +88,7 @@ export default function GradeManagementPage() {
       const res = await axios.get(url);
       const formattedData = formatRawDataToTableData(res.data);
       setFormattedData(formattedData);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const doUploadStudentList = async (data: any) => {
@@ -109,7 +107,6 @@ export default function GradeManagementPage() {
         duration: 1,
       });
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `${error}`,

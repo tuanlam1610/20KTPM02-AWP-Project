@@ -53,9 +53,7 @@ export default function StudentsManagementPage() {
         return { value: account.id, label: account.id };
       });
       setUnmappedAccount(result || []);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const showModal = (studentId: string) => {
@@ -88,7 +86,6 @@ export default function StudentsManagementPage() {
       setConfirmLoading(false);
       setOpen(false);
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: 'Failed to map student account',
@@ -122,7 +119,6 @@ export default function StudentsManagementPage() {
       const resStudents = await axios.get(studentsUrl);
       if (resStudents.data) setStudents(resStudents.data);
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot fetch data`,
@@ -226,7 +222,6 @@ export default function StudentsManagementPage() {
         duration: 1,
       });
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Something wrong when update student mapping`,
@@ -251,7 +246,6 @@ export default function StudentsManagementPage() {
         duration: 1,
       });
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Something wrong when update student list`,
@@ -324,7 +318,6 @@ export default function StudentsManagementPage() {
         duration: 1,
       });
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Something wrong when unmap student`,

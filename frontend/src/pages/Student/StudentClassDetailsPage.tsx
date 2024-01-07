@@ -39,9 +39,7 @@ export default function StudentClassDetailsPage() {
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${classId}`,
       );
       setClassDetails(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const tabItems: TabsProps['items'] = [

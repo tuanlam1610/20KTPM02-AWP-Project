@@ -53,7 +53,6 @@ export default function RequestGradeReviewModal({
       setOpen(false);
       setConfirmLoading(false);
     } catch (err) {
-      console.log(err);
       messageApi.open({
         type: 'error',
         content: `Request a grade review failed`,

@@ -24,9 +24,7 @@ export default function TeacherHomePage() {
         }/teachers/${teacherId}/getAllClasses`,
       );
       dispatch(setClasses(res.data));
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {

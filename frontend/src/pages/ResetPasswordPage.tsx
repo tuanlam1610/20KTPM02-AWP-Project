@@ -38,19 +38,15 @@ export default function RecoverPasswordPage() {
         form.resetFields();
         navigate('/login');
       } else {
-        console.log('Not match');
       }
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     } catch (err) {
-      console.log(err);
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     }
   };
-  const onFinishPasswordFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-  };
+  const onFinishPasswordFailed = (errorInfo: any) => {};
 
   return (
     <div className="h-screen w-screen flex justify-center items-center fixed">

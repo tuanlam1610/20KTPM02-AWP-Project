@@ -31,7 +31,6 @@ export default function JoinClassByLink() {
         duration: 1,
       });
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
       if (userInfo?.teacherId?.id || userInfo?.adminId?.id)
         messageApi.open({

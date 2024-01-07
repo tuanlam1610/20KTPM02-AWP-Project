@@ -44,9 +44,7 @@ export default function SignInPage() {
         }/email-confirmation/resendVerification`,
         values,
       );
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const getUserProfile = async () => {
@@ -67,7 +65,6 @@ export default function SignInPage() {
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     } catch (error) {
-      console.log(error);
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
       localStorage.removeItem('accessToken');
@@ -105,9 +102,7 @@ export default function SignInPage() {
     }
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-  };
+  const onFinishFailed = (errorInfo: any) => {};
   const [api, contextHolder] = notification.useNotification({
     stack: { threshold: 3 },
   });

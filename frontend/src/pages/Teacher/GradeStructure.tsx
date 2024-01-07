@@ -121,7 +121,7 @@ export default function GradeStructure() {
     setActiveId(null);
   };
 
-  const onFinishFailed = (error: any) => console.log(error);
+  const onFinishFailed = (error: any) => 
 
   const handleClick = debounce(() => {
     if (isEditing) {

@@ -196,9 +196,7 @@ export class StudentsService {
         where: { id: studentId },
         data: { userId: userId },
       });
-    } catch (e) {
-      console.log(e, 'User is already mapped');
-    }
+    } catch (e) {}
   }
 
   async mapMultipleStudentToUser(body: BulkMappingDto) {
@@ -217,7 +215,6 @@ export class StudentsService {
         successfulMappings.push(updatedStudent.id);
         studentMapping.set(updatedStudent.id, user.userId);
       } catch (error) {
-        console.log(error);
         failedMappings.push({ studentId: user.studentId, userId: user.userId });
       }
     }
