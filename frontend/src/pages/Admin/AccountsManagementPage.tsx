@@ -5,15 +5,15 @@ import { ColumnType, FilterConfirmProps } from 'antd/es/table/interface';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
-export default function ClassesManagementPage() {
+export default function AccountsManagementPage() {
   const [messageApi, contextHolder] = message.useMessage();
-  const [classes, setClasses] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const fetchClasses = async () => {
     try {
-      const classesUrl = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes`;
-      const resClasses = await axios.get(classesUrl);
-      console.log(resClasses.data);
-      if (resClasses.data) setClasses(resClasses.data);
+      const accountUrl = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users`;
+      const resAccounts = await axios.get(accountUrl);
+      console.log(resAccounts.data);
+      if (resAccounts.data) setAccounts(resAccounts.data);
     } catch (error) {
       console.log(error);
       messageApi.open({
@@ -109,10 +109,10 @@ export default function ClassesManagementPage() {
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="flex justify-between items-center">
-          <p className="text-4xl font-semibold mb-4">Classes Management</p>
+          <p className="text-4xl font-semibold mb-4">Accounts Management</p>
         </div>
         <Table
-          dataSource={classes}
+          dataSource={accounts}
           pagination={{
             defaultPageSize: 5,
             showSizeChanger: true,
@@ -138,9 +138,9 @@ export default function ClassesManagementPage() {
             {...getColumnSearchProps('id')}
           />
           <Column
-            key="code"
-            dataIndex="code"
-            title="Code"
+            key="email"
+            dataIndex="email"
+            title="Email"
             width={120}
             sortDirections={['ascend', 'descend']}
             sorter={(a: any, b: any) => {
