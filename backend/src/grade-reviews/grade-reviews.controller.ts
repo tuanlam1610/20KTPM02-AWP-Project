@@ -33,6 +33,7 @@ export class GradeReviewsController {
       gradeReviewId,
       body.teacherId,
       body.finalGrade,
+      body.status,
     );
   }
 
