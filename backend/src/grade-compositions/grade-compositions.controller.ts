@@ -1,24 +1,23 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  HttpStatus,
+  Get,
   HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
-import { GradeCompositionsService } from './grade-compositions.service';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateGradeCompositionDto,
   FinalizeGradeCompositionDto,
 } from './dto/create-grade-composition.dto';
-import { UpdateGradeCompositionDto } from './dto/update-grade-composition.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GradeCompositionEntity } from './entities/grade-composition.entity';
 import { UpdateAllStudentGradeDto } from './dto/update-all-student-grade.dto';
-import { FinalizeGradeReviewDto } from 'src/grade-reviews/dto/update-grade-review.dto';
+import { UpdateGradeCompositionDto } from './dto/update-grade-composition.dto';
+import { GradeCompositionEntity } from './entities/grade-composition.entity';
+import { GradeCompositionsService } from './grade-compositions.service';
 
 @Controller('grade-compositions')
 @ApiTags('grade-compositions')

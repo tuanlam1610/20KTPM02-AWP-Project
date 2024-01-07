@@ -39,7 +39,8 @@ export default function GradeReviewDetailPage() {
     ? params.gradeReviewId
     : '';
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAcceptedModalOpen, setIsAcceptedModalOpen] = useState(false);
+  const [isDeniedModalOpen, setIsDeniedModalOpen] = useState(false);
 
   const fetchGradeReviewDetail = async () => {
     const res = await axios.get(
@@ -87,7 +88,28 @@ export default function GradeReviewDetailPage() {
       `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/grade-reviews/${gradeReviewId}/finalize`,
-      { teacherId: userInfo?.teacherId.id, finalGrade: values.finalGrade },
+      {
+        teacherId: userInfo?.teacherId.id,
+        finalGrade: values.finalGrade,
+        status: 'Accepted',
+      },
+    );
+    await queryClient.refetchQueries({
+      queryKey: ['gradeReviews', gradeReviewId],
+      type: 'active',
+    });
+  };
+
+  const handleDenyButton = async () => {
+    await axios.patch(
+      `${
+        import.meta.env.VITE_REACT_APP_SERVER_URL
+      }/grade-reviews/${gradeReviewId}/finalize`,
+      {
+        teacherId: userInfo?.teacherId.id,
+        finalGrade: null,
+        status: 'Denied',
+      },
     );
     await queryClient.refetchQueries({
       queryKey: ['gradeReviews', gradeReviewId],
@@ -96,7 +118,8 @@ export default function GradeReviewDetailPage() {
   };
 
   const handleCancel = () => {
-    setIsModalOpen(false);
+    setIsAcceptedModalOpen(false);
+    setIsDeniedModalOpen(false);
     form.resetFields();
   };
 
@@ -145,13 +168,13 @@ export default function GradeReviewDetailPage() {
                       size="large"
                       type="text"
                       icon={<CheckCircleFilled style={{ color: 'green' }} />}
-                      onClick={() => setIsModalOpen(true)}
+                      onClick={() => setIsAcceptedModalOpen(true)}
                     >
                       Resolve
                     </Button>
                     <Modal
                       title={'Resolve Grade Review'}
-                      open={isModalOpen}
+                      open={isAcceptedModalOpen}
                       centered
                       onCancel={handleCancel}
                       footer={
@@ -186,10 +209,30 @@ export default function GradeReviewDetailPage() {
                       size="large"
                       type="text"
                       icon={<MinusCircleFilled style={{ color: 'red' }} />}
-                      onClick={handleBackButton}
+                      onClick={() => setIsDeniedModalOpen(true)}
                     >
                       Deny
                     </Button>
+                    <Modal
+                      title={'Denied Grade Review'}
+                      open={isDeniedModalOpen}
+                      centered
+                      onCancel={handleCancel}
+                      footer={
+                        <div>
+                          <Button key="back" onClick={handleCancel}>
+                            Cancel
+                          </Button>
+                          <Button
+                            key="submit"
+                            onClick={handleDenyButton}
+                            danger
+                          >
+                            Confirm
+                          </Button>
+                        </div>
+                      }
+                    ></Modal>
                   </>
                 )}
             </div>
