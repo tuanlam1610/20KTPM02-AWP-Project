@@ -46,7 +46,7 @@ export default function RequestGradeReviewModal({
       };
       console.log(body);
       const res = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/grade-reviews`,
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/grade-reviews/notify`,
         body,
       );
       messageApi.open({
