@@ -32,9 +32,9 @@ export class GradeCompositionsService {
     const notificationData: CreateNotificationDto = {
       action: 'GC_FINALIZED_NOTIFICATION_SEND',
       object: 'grade composition finalized',
-      objectId: gradeComposition.id,
-      objectType: 'gradeComposition',
-      content: `Your grade for ${gradeComposition.name} has been finalized.`,
+      objectId: gradeComposition.classId,
+      objectType: 'class',
+      content: `Your grade for ${gradeComposition.name} has been finalized. Now you can view it`,
       senderId: teacher.userId,
       isRead: false,
       receiverId: '',
@@ -138,6 +138,7 @@ export class GradeCompositionsService {
         },
       },
     });
+    console.log(gradeComposition);
     const grade = gradeComposition.studentGrades.map((sg) => {
       return {
         id: sg.id,
@@ -147,7 +148,14 @@ export class GradeCompositionsService {
       };
     });
 
-    return { name: gradeComposition.name, studentGrades: grade };
+    return {
+      gradeComposition: {
+        id: gradeComposition.id,
+        name: gradeComposition.name,
+        isFinalized: gradeComposition.isFinalized,
+      },
+      studentGrades: grade,
+    };
   }
 
   async populateStudentGrade(gradeCompositionId: string) {

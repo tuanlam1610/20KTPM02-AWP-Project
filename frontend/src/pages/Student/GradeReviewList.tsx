@@ -10,6 +10,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GradeReview } from '../../interface';
+import { useAppSelector } from '../../redux/store';
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,8 @@ export default function GradeReviewList() {
   const navigate = useNavigate();
   const params = useParams();
   const classId: string = params.id ? params.id : '';
+
+  const userInfo = useAppSelector((state) => state.app.userInfo);
 
   const columns: ColumnsType<GradeReviewItem> = [
     {
@@ -180,7 +183,7 @@ export default function GradeReviewList() {
             onRow={(record, rowIndex) => {
               return {
                 onClick: (event) => {
-                  navigate(`gradeReview/${record.id}`);
+                  navigate(`/student/gradeReview/${record.id}`);
                 }, // click row
               };
             }}

@@ -5,7 +5,15 @@ import {
   LeftOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import { Button, Dropdown, MenuProps, Space, Table, message } from 'antd';
+import {
+  Button,
+  Dropdown,
+  MenuProps,
+  Modal,
+  Space,
+  Table,
+  message,
+} from 'antd';
 import Search from 'antd/es/input/Search';
 import Column from 'antd/es/table/Column';
 import axios from 'axios';
@@ -22,11 +30,13 @@ export default function GradeCompositionPage() {
   const navigate = useNavigate();
   const classId: string = params.id ? params.id : '';
   const gradeCompositionId = params?.gradeCompositionId;
+  const userInfo = useAppSelector((state) => state.app.userInfo);
 
   const [messageApi, contextHolder] = message.useMessage();
   const [data, setData] = useState<any>([]);
-  const [gradeCompositionName, setGradeCompositionName] = useState<string>('');
+  const [gradeComposition, setGradeComposition] = useState<any>({});
   const { isEditingGradeComposition } = useAppSelector((state) => state.app);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const sampleGradeCompositionData: any = [];
   for (let i = 0; i < 20; i++) {
@@ -68,12 +78,17 @@ export default function GradeCompositionPage() {
     try {
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
-      }/grade-compositions/${gradeCompositionId}`;
+      }/grade-compositions/${gradeCompositionId}/finalize`;
       const values = {
-        isFinalized: true,
+        teacherId: userInfo?.teacherId.id,
       };
-      const result = await axios.patch(url, values);
-      console.log(result);
+      await axios.patch(url, values);
+      setGradeComposition({
+        id: gradeComposition.id,
+        name: gradeComposition.name,
+        isFinalized: true,
+      });
+      setIsModalOpen(false);
     } catch (error) {
       console.log(error);
     }
@@ -90,7 +105,7 @@ export default function GradeCompositionPage() {
       let resultData = res.data?.studentGrades || [];
       console.log(resultData);
       setData(resultData);
-      setGradeCompositionName(res.data?.name || '');
+      setGradeComposition(res.data?.gradeComposition || {});
     } catch (err) {
       setData([...sampleGradeCompositionData]);
       console.log(err);
@@ -110,7 +125,7 @@ export default function GradeCompositionPage() {
       onClick: () => {
         const exportData = data.length <= 0 ? templateData : data;
         delete exportData['id'];
-        downloadCSV(exportData, `Class${classId}_${gradeCompositionName}`);
+        downloadCSV(exportData, `Class${classId}_${gradeComposition.name}`);
       },
     },
     {
@@ -124,7 +139,7 @@ export default function GradeCompositionPage() {
           return row;
         });
 
-        downloadXLSX(exportData, `Class${classId}_${gradeCompositionName}`);
+        downloadXLSX(exportData, `Class${classId}_${gradeComposition.name}`);
       },
     },
   ];
@@ -202,36 +217,38 @@ export default function GradeCompositionPage() {
         </div>
         <div className="flex justify-between items-center">
           <p className="text-4xl font-semibold">
-            {`Grade Composition - ${gradeCompositionName}`}
+            {`Grade Composition - ${gradeComposition.name}`}
           </p>
         </div>
         <div className="flex justify-between items-center px-4 mt-4">
           <Search placeholder="Search student ID" className="w-1/2" />
           <div className="flex gap-2 justify-start items-center">
-            <div className="w-fit">
-              <input
-                type="file"
-                accept=".xlsx, .csv"
-                onClick={(e) => {
-                  const element = e.target as HTMLInputElement;
-                  element.value = '';
-                }}
-                onChange={handleUploadStudentList}
-                id="buttonFile"
-                className="hidden"
-              />
-              <Button className="p-0">
-                <label
-                  htmlFor="buttonFile"
-                  className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
-                >
-                  <span className=" w-full h-full text-center flex justify-center items-center">
-                    Upload
-                  </span>
-                  <UploadOutlined />
-                </label>
-              </Button>
-            </div>
+            {!gradeComposition.isFinalized && (
+              <div className="w-fit">
+                <input
+                  type="file"
+                  accept=".xlsx, .csv"
+                  onClick={(e) => {
+                    const element = e.target as HTMLInputElement;
+                    element.value = '';
+                  }}
+                  onChange={handleUploadStudentList}
+                  id="buttonFile"
+                  className="hidden"
+                />
+                <Button className="p-0">
+                  <label
+                    htmlFor="buttonFile"
+                    className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
+                  >
+                    <span className=" w-full h-full text-center flex justify-center items-center">
+                      Upload
+                    </span>
+                    <UploadOutlined />
+                  </label>
+                </Button>
+              </div>
+            )}
             <Dropdown
               menu={{
                 items: exportGradeCompositionOptions,
@@ -244,7 +261,28 @@ export default function GradeCompositionPage() {
                 </Space>
               </Button>
             </Dropdown>
-            <Button onClick={handleFinalize}>Finalize</Button>
+            {!gradeComposition.isFinalized && (
+              <>
+                <Button onClick={() => setIsModalOpen(true)}>Finalize</Button>
+
+                <Modal
+                  title={'Finalize This Grade'}
+                  open={isModalOpen}
+                  centered
+                  onCancel={() => setIsModalOpen(false)}
+                  footer={
+                    <div>
+                      <Button key="back" onClick={() => setIsModalOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleFinalize} danger>
+                        Confirm
+                      </Button>
+                    </div>
+                  }
+                ></Modal>
+              </>
+            )}
           </div>
         </div>
         <div className="px-4 mt-4">
@@ -265,22 +303,23 @@ export default function GradeCompositionPage() {
             <Column
               key="grade"
               dataIndex="grade"
-              title={`${gradeCompositionName}`}
+              title={`${gradeComposition.name}`}
             />
-            <Column
-              key="id"
-              dataIndex="id"
-              title="Edit"
-              render={(value, record, index) => {
-                // console.log(value, record, index);
-                return (
-                  <EditGradeCompositionModal
-                    record={data[index]}
-                    classId={classId}
-                  />
-                );
-              }}
-            />
+            {!gradeComposition.isFinalized && (
+              <Column
+                key="id"
+                dataIndex="id"
+                render={(value, record, index) => {
+                  // console.log(value, record, index);
+                  return (
+                    <EditGradeCompositionModal
+                      record={data[index]}
+                      classId={classId}
+                    />
+                  );
+                }}
+              />
+            )}
           </Table>
         </div>
       </div>
