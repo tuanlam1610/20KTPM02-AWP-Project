@@ -1,17 +1,15 @@
-import { PlusCircleFilled } from '@ant-design/icons';
 import {
   QueryClient,
   QueryClientProvider,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { Button, Modal, Select, Table, Tag } from 'antd';
+import { Select, Table, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GradeReview } from '../../interface';
-import { useAppSelector } from '../../redux/store';
 
 const queryClient = new QueryClient();
 
@@ -34,9 +32,6 @@ export default function GradeReviewList() {
   const navigate = useNavigate();
   const params = useParams();
   const classId: string = params.id ? params.id : '';
-  const user = useAppSelector((state) => state.app.userInfo);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const columns: ColumnsType<GradeReviewItem> = [
     {
@@ -160,33 +155,12 @@ export default function GradeReviewList() {
     setPage(0);
   }, [type]);
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <>
-      <Modal
-        title={'Add Grade Review'}
-        open={isModalOpen}
-        centered
-        onCancel={handleCancel}
-        footer={
-          <div>
-            <Button key="back">Back</Button>
-          </div>
-        }
-      ></Modal>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold">My Grade Reviews:</h1>
           <div className="flex gap-2 items-center">
-            <Button
-              icon={<PlusCircleFilled />}
-              onClick={() => setIsModalOpen(true)}
-            >
-              Add Grade Review
-            </Button>
             <Select
               style={{ width: '120px' }}
               value={type}

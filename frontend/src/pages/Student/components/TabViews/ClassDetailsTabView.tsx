@@ -22,7 +22,7 @@ export default function ClassDetailsTabView() {
                 navigate(`gradeboard`);
               }}
             >
-              Manage Grade
+              View Grade
             </Button>
           </div>
           <GradeStructure />

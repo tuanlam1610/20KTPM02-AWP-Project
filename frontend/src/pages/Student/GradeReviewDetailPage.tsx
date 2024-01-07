@@ -24,17 +24,7 @@ export interface GradeReviewDetail extends GradeReview {
   comment: CommentData[];
 }
 
-const queryClient = new QueryClient();
-
-export function GradeReviewDetailProvider() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <GradeReviewDetailPage />
-    </QueryClientProvider>
-  );
-}
-
-export default function GradeReviewDetailPage() {
+export default function StudentGradeReviewDetailPage() {
   const userInfo = useAppSelector((state) => state.app.userInfo);
   const params = useParams();
   const gradeReviewId: string = params.gradeReviewId

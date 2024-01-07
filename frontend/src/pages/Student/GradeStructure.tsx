@@ -12,10 +12,6 @@ export default function GradeStructure() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-2">
-        <h1 className="text-lg font-semibold">Grade Structure:</h1>
-      </div>
-
       <div className="flex flex-col gap-4 max-h-[650px] overflow-auto">
         {gradeCompositionIds.map((id) => (
           <GradeItem key={id} id={id} />
