@@ -75,7 +75,6 @@ export class NotificationsService {
   }
 
   private async saveNotifications(notifications: any[]) {
-    console.log('saving notifications');
     // Save notifications in the database using Prisma
     const createdNotifications = await Promise.all(
       notifications.map(async (notification) => {
@@ -87,35 +86,16 @@ export class NotificationsService {
 
     return createdNotifications;
   }
-  // private async sendNotificationsTo(
-  //   notifications: any[],
-  //   gradeReviewId: string,
-  // ) {
-  //   console.log('sending notifications');
-  //   const roomId = `commentRoom-${gradeReviewId}`; // `classRoom-${classId}
-  //   const onlineUsers = this.appGateway.getOnlineUsers(
-  //     `commentRoom-${gradeReviewId}`,
-  //   ); // Get a list of online users
-  //   for (const notification of notifications) {
-  //     if (onlineUsers.includes(notification.receiverId)) {
-  //       // If the receiver is online, emit the notification
-  //       console.log('emitting notification');
-  //       await this.appGateway.emitNotification(roomId, notification);
-  //     }
-  //   }
-  // }
 
   private async sendNotificationsToClassMembers(
     notifications: any[],
     classId: string,
   ) {
-    console.log('sending notifications');
     const roomId = `classRoom-${classId}`; // `classRoom-${classId}
     const onlineUsers = this.appGateway.getOnlineUsers(`classRoom-${classId}`); // Get a list of online users
     for (const notification of notifications) {
       if (onlineUsers.includes(notification.receiverId)) {
         // If the receiver is online, emit the notification
-        console.log('emitting notification');
         await this.appGateway.sendNotificationToUser(
           notification.receiverId,
           notification,

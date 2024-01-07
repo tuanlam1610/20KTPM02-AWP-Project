@@ -24,7 +24,6 @@ export class FirebaseService {
   async decodeToken(token: string): Promise<admin.auth.DecodedIdToken> {
     try {
       const decodedToken = await this.firebaseAdmin.auth().verifyIdToken(token);
-      console.log('decodedToken', decodedToken);
       return decodedToken;
     } catch (error) {
       throw new Error('Unable to decode token');
