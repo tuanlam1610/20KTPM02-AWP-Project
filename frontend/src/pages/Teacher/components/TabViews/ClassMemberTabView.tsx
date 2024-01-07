@@ -22,14 +22,12 @@ export default function ClassMemberTabView() {
 
   const fetchClassMembers = async () => {
     try {
-      console.log('FETHCED');
       const res = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/classes/${classId}/getStudentsTeachers`,
       );
       const resultData = res.data;
-      console.log(resultData);
       setMembers({
         students: resultData.userStudents,
         teachers: resultData.userTeachers,
@@ -70,7 +68,6 @@ export default function ClassMemberTabView() {
   };
 
   useEffect(() => {
-    console.log('Fetch class members');
     fetchClassMembers();
   }, []);
 

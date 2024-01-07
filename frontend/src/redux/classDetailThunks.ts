@@ -40,7 +40,6 @@ export const updateGradeComposition = createAsyncThunk(
     { rejectWithValue, dispatch },
   ) => {
     try {
-      console.log(body);
       await axios.patch(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL

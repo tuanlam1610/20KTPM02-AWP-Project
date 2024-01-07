@@ -26,7 +26,6 @@ export default function CreateClassModal() {
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/teachers/${teacherId}/getAllClasses`,
       );
-      console.log(res.data);
       dispatch(setClasses(res.data));
     } catch (err) {
       console.log(err);
@@ -37,7 +36,6 @@ export default function CreateClassModal() {
     setConfirmLoading(true);
     const values = await form.validateFields();
     form.resetFields();
-    console.log('Submit Values: ', values);
     try {
       const teacherId = userInfo?.teacherId?.id;
       const classDetails = {

@@ -17,13 +17,11 @@ export default function StudentHomePage() {
   const fetchClassList = async () => {
     try {
       const studentId = userInfo?.studentId.id;
-      console.log(studentId);
       const res = await axios.get(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/students/${studentId}/getAllClassesOfstudent`,
       );
-      console.log(res.data);
       dispatch(setClasses(res.data));
     } catch (err) {
       console.log(err);
@@ -31,7 +29,6 @@ export default function StudentHomePage() {
   };
 
   useEffect(() => {
-    console.log('Fetch class list');
     fetchClassList();
   }, [userInfo]);
 

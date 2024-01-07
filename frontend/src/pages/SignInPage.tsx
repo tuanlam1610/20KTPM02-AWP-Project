@@ -91,7 +91,6 @@ export default function SignInPage() {
       document.body.style.cursor = 'default';
     } catch (err: any) {
       const errMsg = err.response.data.message;
-      console.log(err.response.data.message);
       if (
         err.response.data.statusCode == 401 &&
         errMsg == 'Email not confirmed'
@@ -148,7 +147,6 @@ export default function SignInPage() {
     );
     localStorage.setItem('refreshToken', signInResult.data.refreshToken);
     localStorage.setItem('accessToken', signInResult.data.accessToken);
-    console.log(signInResult.data);
     navigate('/home');
     setIsSubmitting(false);
     document.body.style.cursor = 'default';

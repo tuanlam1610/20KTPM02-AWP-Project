@@ -21,7 +21,6 @@ export default function AccountsManagementPage() {
     try {
       const accountUrl = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users`;
       const resAccounts = await axios.get(accountUrl);
-      console.log(resAccounts.data);
       if (resAccounts.data) setAccounts(resAccounts.data);
     } catch (error) {
       console.log(error);
@@ -120,7 +119,6 @@ export default function AccountsManagementPage() {
       const res = await axios.patch(url, {
         isBanned: value,
       });
-      console.log('New Ban Status: ', res.data.isBanned);
       messageApi.open({
         type: 'success',
         content: `${value ? 'Ban' : 'Unban'} account successfully`,
@@ -146,7 +144,6 @@ export default function AccountsManagementPage() {
       const res = await axios.patch(url, {
         isLocked: value,
       });
-      console.log('New Lock Status: ', res.data.isBanned);
       messageApi.open({
         type: 'success',
         content: `${value ? 'Lock' : 'Unlock'} account successfully`,

@@ -73,7 +73,6 @@ export default function GradeCompositionPage() {
         isFinalized: true,
       };
       const result = await axios.patch(url, values);
-      console.log(result);
     } catch (error) {
       console.log(error);
     }
@@ -84,11 +83,8 @@ export default function GradeCompositionPage() {
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/grade-compositions/${gradeCompositionId}/getStudentsGrade`;
-      console.log(url);
       const res = await axios.get(url);
-      console.log(res.data);
       let resultData = res.data?.studentGrades || [];
-      console.log(resultData);
       setData(resultData);
       setGradeCompositionName(res.data?.name || '');
     } catch (err) {
@@ -99,7 +95,6 @@ export default function GradeCompositionPage() {
 
   useEffect(() => {
     fetchGradeComposition();
-    console.log('Fetch Grade Composition');
   }, [isEditingGradeComposition]);
 
   const exportGradeCompositionOptions: MenuProps['items'] = [
@@ -140,7 +135,6 @@ export default function GradeCompositionPage() {
       const result = await axios.patch(url, {
         studentGrades: data,
       });
-      console.log(result);
       fetchGradeComposition();
       messageApi.open({
         type: 'success',
@@ -160,21 +154,19 @@ export default function GradeCompositionPage() {
   const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileData: File = e.target.files[0];
-      console.log(fileData);
+
       if (fileData.type == 'text/csv') {
-        console.log('Parse CSV File');
         Papa.parse(fileData, {
           header: true,
           complete: function (results: any) {
             const data = results.data.map((row: any) => {
               return { ...row, grade: Number(row?.grade) };
             });
-            console.log(data);
+
             doUploadStudentList(data);
           },
         });
       } else {
-        console.log('Parse XLSX File');
         const data = await fileData.arrayBuffer();
         const workbook = XLSX.read(data);
         const wsName = workbook.SheetNames[0];
@@ -186,7 +178,6 @@ export default function GradeCompositionPage() {
               studentId: `${row.studentId}`,
             };
           });
-        console.log(worksheet);
         doUploadStudentList(worksheet);
       }
     }
@@ -273,7 +264,6 @@ export default function GradeCompositionPage() {
               key="id"
               dataIndex="id"
               render={(value, record, index) => {
-                // console.log(value, record, index);
                 return (
                   <EditGradeCompositionModal
                     record={data[index]}

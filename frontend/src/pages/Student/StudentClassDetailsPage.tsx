@@ -97,13 +97,7 @@ export default function StudentClassDetailsPage() {
         </div>
         <p className="text-gray-500 italic mb-4">{classDetails?.description}</p>
 
-        <Tabs
-          defaultActiveKey="1"
-          items={tabItems}
-          onChange={(value) => {
-            console.log(value);
-          }}
-        />
+        <Tabs defaultActiveKey="1" items={tabItems} />
       </div>
     </div>
   );

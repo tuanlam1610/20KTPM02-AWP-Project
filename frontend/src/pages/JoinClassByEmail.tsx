@@ -11,7 +11,6 @@ export default function JoinClassByEmail() {
   const params = useParams();
   const [queries] = useSearchParams();
   const token = queries.get('token');
-  console.log(token);
   const [messageApi, contextHolder] = message.useMessage();
   const [isLoading, setIsLoading] = useState(true);
   const [isSuccess, setIsSuccess] = useState(true);
@@ -29,7 +28,6 @@ export default function JoinClassByEmail() {
           },
         },
       );
-      console.log(res, 'Success');
       setIsSuccess(true);
       setIsLoading(false);
       messageApi.open({

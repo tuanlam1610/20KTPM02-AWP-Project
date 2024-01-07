@@ -9,7 +9,6 @@ export default function RecoverPasswordPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const token = params.get('token');
-  console.log(token);
 
   const activateEmail = async () => {
     const res = await axios.get(
@@ -20,7 +19,6 @@ export default function RecoverPasswordPage() {
         },
       },
     );
-    console.log(res);
   };
 
   useEffect(() => {

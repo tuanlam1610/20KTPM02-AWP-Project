@@ -36,7 +36,6 @@ export default function GradeItem({ id }: { id: string }) {
 
   const handleOk = () => {
     if (selectedValue !== '') {
-      console.log(selectedValue);
       dispatch(deleteGradeComposition({ gradeId: id }));
       dispatch(
         updateGradeComposition({

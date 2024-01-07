@@ -23,13 +23,10 @@ export default function AdminDashboard() {
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/students`;
       const resAccounts = await axios.get(accountUrl);
-      console.log(resAccounts.data);
       if (resAccounts.data) setAccounts(resAccounts.data);
       const resClasses = await axios.get(classesUrl);
-      console.log(resClasses.data);
       if (resClasses.data) setClasses(resClasses.data);
       const resStudents = await axios.get(studentsUrl);
-      console.log(resStudents.data);
       if (resStudents.data) setStudents(resStudents.data);
     } catch (error) {
       console.log(error);

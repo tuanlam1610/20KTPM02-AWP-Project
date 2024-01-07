@@ -53,7 +53,6 @@ export default function EditGradeCompositionModal(props: any) {
     setConfirmLoading(true);
     const values = await form.validateFields();
     form.resetFields();
-    console.log(values, studentGrade);
     try {
       const newGrade = {
         grade: values?.grade,
@@ -64,7 +63,6 @@ export default function EditGradeCompositionModal(props: any) {
         }/updateOneStudentGrade/${classId}`,
         newGrade,
       );
-      console.log(result);
       messageApi.open({
         type: 'success',
         content: 'Update student grade successfully',
@@ -133,12 +131,7 @@ export default function EditGradeCompositionModal(props: any) {
             name={'grade'}
             className="w-full mb-4"
           >
-            <InputNumber
-              min={0}
-              max={10}
-              className="w-full"
-              onChange={(value) => console.log(value)}
-            />
+            <InputNumber min={0} max={10} className="w-full" />
           </Form.Item>
         </Form>
       </Modal>

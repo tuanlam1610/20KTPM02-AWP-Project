@@ -35,7 +35,6 @@ export default function InviteMemberModal(props: { type: string }) {
 
     const values = await form.validateFields();
     form.resetFields();
-    console.log('Submit Values: ', values);
     const url = `${
       import.meta.env.VITE_REACT_APP_SERVER_URL
     }/email-confirmation/sendInviteEmail`;
@@ -43,7 +42,6 @@ export default function InviteMemberModal(props: { type: string }) {
       email: values.email || '',
       classId: classId,
     });
-    console.log(res);
     messageApi.open({
       type: 'success',
       content: (

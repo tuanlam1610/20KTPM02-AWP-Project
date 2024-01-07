@@ -56,8 +56,6 @@ export default function GradeManagementPage() {
     name: 'grade',
   });
 
-  const onSubmit = (data) => console.log('data', data);
-
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -70,13 +68,11 @@ export default function GradeManagementPage() {
 
   const handleDragStart = (event: any) => {
     const { active } = event;
-    console.log(active.id);
     setActiveId(active.id);
   };
 
   const handleDragOver = (event: any) => {
     const { active, over } = event;
-    console.log({ active, over });
     if (!active || !over) return;
     if (active && over) {
       if (active.id !== over.id) {
@@ -87,7 +83,6 @@ export default function GradeManagementPage() {
   const handleDragEnd = (event: any) => {
     // update db
     const { active, over } = event;
-    console.log({ active, over });
     move(active.id, over.id);
     setActiveId(null);
   };
@@ -96,7 +91,6 @@ export default function GradeManagementPage() {
     if (isEditing) {
       // save record
       setIsEditing(false);
-      console.log(fields);
     } else {
       remove(0);
       for (const grade of Object.values(gradeCompositionMap)) {

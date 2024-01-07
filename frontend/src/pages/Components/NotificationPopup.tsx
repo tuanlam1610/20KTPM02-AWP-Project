@@ -92,7 +92,6 @@ export default function NotificationPopup() {
 }
 
 const NotificationItem = ({ notification }: { notification: any }) => {
-  console.log(notification);
   return (
     <div
       onClick={async () => {

@@ -86,9 +86,7 @@ export default function GradeManagementPage() {
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/classes/${classId}/getAllGradesOfStudent`;
       const res = await axios.get(url);
-      console.log(res.data);
       const formattedData = formatRawDataToTableData(res.data);
-      console.log(formattedData);
       setFormattedData(formattedData);
     } catch (err) {
       console.log(err);
@@ -104,7 +102,6 @@ export default function GradeManagementPage() {
       const result = await axios.post(url, {
         students: data,
       });
-      console.log(result);
       fetchGradeBoardInformation();
       messageApi.open({
         type: 'success',
@@ -124,18 +121,14 @@ export default function GradeManagementPage() {
   const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileData: File = e.target.files[0];
-      console.log(fileData);
       if (fileData?.type == 'text/csv') {
-        console.log('Parse CSV File');
         Papa.parse(fileData, {
           header: true,
           complete: function (results) {
-            console.log(results.data);
             doUploadStudentList(results.data);
           },
         });
       } else {
-        console.log('Parse XLSX File');
         const data = await fileData.arrayBuffer();
         const workbook = XLSX.read(data);
         const wsName = workbook.SheetNames[0];
@@ -147,7 +140,6 @@ export default function GradeManagementPage() {
               studentId: `${row.studentId}`,
             };
           });
-        console.log(worksheet);
         doUploadStudentList(worksheet);
       }
     }
@@ -224,7 +216,6 @@ export default function GradeManagementPage() {
         });
         const exportData =
           formattedData.length <= 0 ? [templateData] : exportFormattedData;
-        console.log(exportData);
         downloadXLSX(exportData, `GradeBoard_Class${classId}`);
       },
     },
@@ -312,7 +303,6 @@ export default function GradeManagementPage() {
             />
             <ColumnGroup title="Grade Structure">
               {gradeCompositionNames.map((gradeCompositionName: any) => {
-                console.log(gradeCompositionNames);
                 return (
                   <Column
                     key={gradeCompositionName}

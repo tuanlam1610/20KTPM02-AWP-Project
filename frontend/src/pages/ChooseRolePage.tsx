@@ -6,9 +6,6 @@ import { useState } from 'react';
 export default function ChooseRolePage() {
   const [role, setRole] = useState('student');
 
-  const handleConfirm = () => {
-    console.log(role);
-  };
   return (
     <div className="h-screen w-screen flex justify-center items-center fixed">
       {/* Content */}
@@ -39,10 +36,7 @@ export default function ChooseRolePage() {
               />
             </div>
             <div className="flex justify-center">
-              <Button
-                className="flex justify-center items-center px-8 py-4 mb-2 bg-indigo-500 rounded-full w-full text-white"
-                onClick={handleConfirm}
-              >
+              <Button className="flex justify-center items-center px-8 py-4 mb-2 bg-indigo-500 rounded-full w-full text-white">
                 Confirm
               </Button>
             </div>

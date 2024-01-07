@@ -34,7 +34,6 @@ export default function RecoverPasswordPage() {
     try {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
-      console.log(values);
       await axios.post(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/auth/local/resetPassword`,
         values,

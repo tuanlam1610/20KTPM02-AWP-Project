@@ -10,29 +10,6 @@ export const ProtectedRoute = ({ allowedRole }) => {
   const location = useLocation();
   const accessToken = localStorage.getItem('accessToken');
 
-  // const getUserProfile = async () => {
-  //   try {
-  //     const res = await axios.get(
-  //       `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/getUserProfile`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-  //         },
-  //       },
-  //     );
-  //     console.log(res);
-  //     dispatch(setUserInfo(res.data));
-  //     console.log(userInfo);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   if (!userInfo) {
-  //     getUserProfile();
-  //   }
-  // }, []);
-
   if (userInfo == undefined) {
     if (!accessToken)
       return <Navigate to={'/landing'} state={{ from: location }} replace />;

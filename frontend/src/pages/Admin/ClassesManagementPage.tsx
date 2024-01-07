@@ -21,7 +21,6 @@ export default function ClassesManagementPage() {
     try {
       const classesUrl = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes`;
       const resClasses = await axios.get(classesUrl);
-      console.log(resClasses.data);
       if (resClasses.data) setClasses(resClasses.data);
     } catch (error) {
       console.log(error);
@@ -120,7 +119,6 @@ export default function ClassesManagementPage() {
       const res = await axios.patch(url, {
         isActive: value,
       });
-      console.log('New Active State: ', res.data.isActive);
       messageApi.open({
         type: 'success',
         content: `${value ? 'Active' : 'Inactive'} class successfully`,
