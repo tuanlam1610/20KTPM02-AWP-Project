@@ -27,12 +27,18 @@ export class GradeReviewsService {
     const student = await this.prisma.student.findUnique({
       where: { id: gr.studentId },
     });
+    const grade = await this.prisma.studentGrade.update({
+      where: { id: gr.studentGradeId },
+      data: {
+        grade: finalGrade,
+      },
+    });
     const notificationData: CreateNotificationDto = {
       action: 'GR_FINALIZED_NOTIFICATION_SEND',
       object: 'grade review finalized',
       objectId: id,
       objectType: 'gradeReview',
-      content: `Your grade review has been finalized.`,
+      content: `Your grade review has been resolved.`,
       senderId: teacher.userId,
       isRead: false,
       receiverId: student.userId,
