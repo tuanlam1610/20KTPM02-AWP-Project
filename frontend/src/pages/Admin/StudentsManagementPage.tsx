@@ -73,14 +73,12 @@ export default function StudentsManagementPage() {
     try {
       const values = await form.validateFields();
       form.resetFields();
-      console.log('Submit Values: ', values, selectedStudentId);
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/students/${selectedStudentId}/mapStudentToUser`;
       const res = await axios.patch(url, {
         userId: values.userId,
       });
-      console.log(res);
       fetchStudents();
       messageApi.open({
         type: 'success',
@@ -122,7 +120,6 @@ export default function StudentsManagementPage() {
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/students`;
       const resStudents = await axios.get(studentsUrl);
-      console.log(resStudents.data);
       if (resStudents.data) setStudents(resStudents.data);
     } catch (error) {
       console.log(error);
@@ -222,7 +219,6 @@ export default function StudentsManagementPage() {
       const result = await axios.patch(url, {
         users: data,
       });
-      console.log(result);
       fetchStudents();
       messageApi.open({
         type: 'success',
@@ -242,14 +238,12 @@ export default function StudentsManagementPage() {
   const doUploadStudentList = async (data: any) => {
     // Upload List Student
     try {
-      console.log(data);
       const url = `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/students/populateStudents`;
       const result = await axios.post(url, {
         students: data,
       });
-      console.log(result);
       fetchStudents();
       messageApi.open({
         type: 'success',
@@ -269,25 +263,19 @@ export default function StudentsManagementPage() {
   const handleUploadMappingList = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileData: File = e.target.files[0];
-      console.log(fileData);
       if (fileData.type == 'text/csv') {
-        console.log('Parse CSV File');
         Papa.parse(fileData, {
           header: true,
           complete: function (results: any) {
             const data = results.data;
-            console.log(data);
             doUploadMappingList(data);
           },
         });
       } else {
-        console.log('Parse XLSX File');
         const data = await fileData.arrayBuffer();
         const workbook = XLSX.read(data);
         const wsName = workbook.SheetNames[0];
-        console.log(XLSX.utils.sheet_to_json(workbook.Sheets[wsName]));
         const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[wsName]);
-        console.log(worksheet);
         doUploadMappingList(worksheet);
       }
     }
@@ -296,23 +284,18 @@ export default function StudentsManagementPage() {
   const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileData: File = e.target.files[0];
-      console.log(fileData);
       if (fileData.type == 'text/csv') {
-        console.log('Parse CSV File');
         Papa.parse(fileData, {
           header: true,
           complete: function (results: any) {
             const data = results.data;
-            console.log(data);
             doUploadStudentList(data);
           },
         });
       } else {
-        console.log('Parse XLSX File');
         const data = await fileData.arrayBuffer();
         const workbook = XLSX.read(data);
         const wsName = workbook.SheetNames[0];
-        console.log(XLSX.utils.sheet_to_json(workbook.Sheets[wsName]));
         const worksheet = XLSX.utils
           .sheet_to_json(workbook.Sheets[wsName])
           .map((row: any) => {
@@ -321,7 +304,6 @@ export default function StudentsManagementPage() {
               studentId: row?.studentId ? `${row?.studentId}` : null,
             };
           });
-        console.log(worksheet);
         doUploadStudentList(worksheet);
       }
     }
@@ -335,7 +317,6 @@ export default function StudentsManagementPage() {
       const result = await axios.patch(url, {
         userId: null,
       });
-      console.log(result);
       fetchStudents();
       messageApi.open({
         type: 'success',
@@ -390,7 +371,6 @@ export default function StudentsManagementPage() {
                 userName: row.userName,
               };
             });
-            console.log(exportData);
             downloadXLSX(exportData, `MappingList`);
           },
         },
@@ -429,7 +409,6 @@ export default function StudentsManagementPage() {
                 name: row.name,
               };
             });
-            console.log(exportData);
             downloadXLSX(exportData, `StudentList`);
           },
         },
@@ -456,9 +435,6 @@ export default function StudentsManagementPage() {
           />
         </label>
       ),
-      onClick: () => {
-        console.log('Mapping');
-      },
     },
     {
       key: '2_uploadStudent',
@@ -478,14 +454,11 @@ export default function StudentsManagementPage() {
           />
         </label>
       ),
-      onClick: () => {
-        console.log('Student');
-      },
     },
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
@@ -643,12 +616,7 @@ export default function StudentsManagementPage() {
             name={'userId'}
             className="w-full mb-4"
           >
-            <Select
-              onChange={(value) => {
-                console.log(value);
-              }}
-              options={unmappedAccounts}
-            />
+            <Select options={unmappedAccounts} />
           </Form.Item>
         </Form>
       </Modal>

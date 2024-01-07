@@ -15,17 +15,11 @@ export default function JoinClassByLink() {
 
   const joinClassByLink = async () => {
     try {
-      console.log(
-        `${
-          import.meta.env.VITE_REACT_APP_SERVER_URL
-        }/classes/${classId}/linkJoin/${userInfo?.studentId?.id}`,
-      );
       const res = await axios.patch(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/classes/${classId}/linkJoin/${userInfo?.id}`,
       );
-      console.log(res);
       messageApi.open({
         type: 'success',
         content: 'Join class successfully',

@@ -89,7 +89,6 @@ export default function StudentGradeReviewDetailPage() {
         <Spin />
       </div>
     );
-
   return (
     <div className="overflow-auto">
       {/* Content */}

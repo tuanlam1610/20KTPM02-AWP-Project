@@ -62,11 +62,9 @@ export default function GradeStructure() {
   });
 
   const onSubmit = async (data) => {
-    console.log('data', data);
     const body = data.grade.map((g, i) => {
       return { ...g, rank: i };
     });
-    console.log(body);
     const result = await axios.patch(
       `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
@@ -90,13 +88,13 @@ export default function GradeStructure() {
 
   const handleDragStart = (event: any) => {
     const { active } = event;
-    console.log(active.id);
+
     setActiveId(active.id);
   };
 
   const handleDragOver = (event: any) => {
     const { active, over } = event;
-    console.log({ active, over });
+
     if (!active || !over) return;
     if (active && over) {
       if (active.id !== over.id) {
@@ -107,7 +105,7 @@ export default function GradeStructure() {
   const handleDragEnd = (event: any) => {
     // update db
     const { active, over } = event;
-    console.log({ active, over });
+
     move(active.id, over.id);
     setActiveId(null);
   };

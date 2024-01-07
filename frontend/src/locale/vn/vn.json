@@ -22,6 +22,10 @@
     "sendEmailTo": "Mail đã được gửi đến",
     "activateAccountContent": "Vui lòng nhấp vào liên kết trong email để kích hoạt tài khoản của bạn.\n Liên kết trong thư sẽ hết hạn sau 5 phút.\n Đừng quên kiểm tra phần thư rác!",
     "notReceiveMail": "Không nhận được mail?",
-    "resend": "Gửi lại"
+    "resend": "Gửi lại",
+    "bannedNotificationTitle": "Tài Khoản Đã Bị Ban",
+    "lockedNotificationTitle": "Tài Khoản Đã Bị Khoá",
+    "bannedNotificationDescription": "Tài khoản của bạn đã bị ban vì một vài lý do. Vui lòng liên lạc quản trị viên để khôi phục tài khoản.",
+    "lockedNotificationDescription": "Tài khoản của bạn đã bị khoá vì một vài lý do. Vui lòng liên lạc quản trị viên để khôi phục tài khoản."
   }
 }

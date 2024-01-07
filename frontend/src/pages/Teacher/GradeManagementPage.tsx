@@ -86,9 +86,7 @@ export default function GradeManagementPage() {
         import.meta.env.VITE_REACT_APP_SERVER_URL
       }/classes/${classId}/getAllGradesOfStudent`;
       const res = await axios.get(url);
-      console.log(res.data);
       const formattedData = formatRawDataToTableData(res.data);
-      console.log(formattedData);
       setFormattedData(formattedData);
     } catch (err) {
       console.log(err);
@@ -104,7 +102,6 @@ export default function GradeManagementPage() {
       const result = await axios.post(url, {
         students: data,
       });
-      console.log(result);
       fetchGradeBoardInformation();
       messageApi.open({
         type: 'success',
@@ -124,18 +121,14 @@ export default function GradeManagementPage() {
   const handleUploadStudentList = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileData: File = e.target.files[0];
-      console.log(fileData);
       if (fileData?.type == 'text/csv') {
-        console.log('Parse CSV File');
         Papa.parse(fileData, {
           header: true,
           complete: function (results) {
-            console.log(results.data);
             doUploadStudentList(results.data);
           },
         });
       } else {
-        console.log('Parse XLSX File');
         const data = await fileData.arrayBuffer();
         const workbook = XLSX.read(data);
         const wsName = workbook.SheetNames[0];
@@ -147,7 +140,6 @@ export default function GradeManagementPage() {
               studentId: `${row.studentId}`,
             };
           });
-        console.log(worksheet);
         doUploadStudentList(worksheet);
       }
     }
@@ -224,14 +216,26 @@ export default function GradeManagementPage() {
         });
         const exportData =
           formattedData.length <= 0 ? [templateData] : exportFormattedData;
-        console.log(exportData);
         downloadXLSX(exportData, `GradeBoard_Class${classId}`);
       },
     },
   ];
 
+  const exportOptions: MenuProps['items'] = [
+    {
+      key: 'studentList',
+      label: 'Student List',
+      children: exportStudentListOptions,
+    },
+    {
+      key: 'gradeBoard',
+      label: 'Grade Board',
+      children: exportGradeBoardListOptions,
+    },
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
@@ -264,31 +268,19 @@ export default function GradeManagementPage() {
                 className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
               >
                 <span className=" w-full h-full text-center flex justify-center items-center">
-                  Upload
+                  Upload Student List
                 </span>
                 <UploadOutlined />
               </label>
             </Button>
             <Dropdown
               menu={{
-                items: exportStudentListOptions,
+                items: exportOptions,
               }}
             >
               <Button>
                 <Space>
-                  Export Student List
-                  <DownloadOutlined />
-                </Space>
-              </Button>
-            </Dropdown>
-            <Dropdown
-              menu={{
-                items: exportGradeBoardListOptions,
-              }}
-            >
-              <Button>
-                <Space>
-                  Export Grade Board
+                  Download
                   <DownloadOutlined />
                 </Space>
               </Button>
@@ -311,7 +303,6 @@ export default function GradeManagementPage() {
             />
             <ColumnGroup title="Grade Structure">
               {gradeCompositionNames.map((gradeCompositionName: any) => {
-                console.log(gradeCompositionNames);
                 return (
                   <Column
                     key={gradeCompositionName}

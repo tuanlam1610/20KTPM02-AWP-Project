@@ -16,7 +16,6 @@ export default function RecoverPasswordPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const token = params.get('token');
-  console.log(token);
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,7 +24,6 @@ export default function RecoverPasswordPage() {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
       if (values.password == values.rePassword) {
-        console.log(values);
         await axios.post(
           `${
             import.meta.env.VITE_REACT_APP_SERVER_URL

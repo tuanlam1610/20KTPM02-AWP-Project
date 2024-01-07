@@ -70,7 +70,7 @@ export default function HomePage() {
   useEffect(() => {}, []);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <p className="text-4xl font-semibold mb-4">All Courses</p>

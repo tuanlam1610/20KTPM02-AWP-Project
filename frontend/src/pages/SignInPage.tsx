@@ -90,14 +90,16 @@ export default function SignInPage() {
       await getUserProfile();
       document.body.style.cursor = 'default';
     } catch (err: any) {
-      console.log(err.response.data.message);
+      const errMsg = err.response.data.message;
       if (
         err.response.data.statusCode == 401 &&
-        err.response.data.message == 'Email not confirmed'
+        errMsg == 'Email not confirmed'
       ) {
         await activateAccount({ email: values.email });
         setCurrentStep(1);
-      } else openNotification();
+      } else if (errMsg == 'User is locked') openLockNotification();
+      else if (errMsg == 'User is banned') openBanNotification();
+      else openNotification();
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     }
@@ -117,6 +119,21 @@ export default function SignInPage() {
     });
   };
 
+  const openBanNotification = () => {
+    api['error']({
+      message: t('text.signInPage.bannedNotificationTitle'),
+      description: t('text.signInPage.bannedNotificationDescription'),
+      duration: 5,
+    });
+  };
+  const openLockNotification = () => {
+    api['error']({
+      message: t('text.signInPage.lockedNotificationTitle'),
+      description: t('text.signInPage.lockedNotificationDescription'),
+      duration: 5,
+    });
+  };
+
   const handleSignInWithGG = async () => {
     setPersistence(auth, browserSessionPersistence);
     const result = await signInWithPopup(auth, googleAuthProvider);
@@ -130,8 +147,7 @@ export default function SignInPage() {
     );
     localStorage.setItem('refreshToken', signInResult.data.refreshToken);
     localStorage.setItem('accessToken', signInResult.data.accessToken);
-    console.log(signInResult.data);
-    navigate('/home');
+    navigate('/student/home');
     setIsSubmitting(false);
     document.body.style.cursor = 'default';
   };

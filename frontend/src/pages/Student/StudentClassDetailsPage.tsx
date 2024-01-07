@@ -63,7 +63,7 @@ export default function StudentClassDetailsPage() {
   }, [classId]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
@@ -97,13 +97,7 @@ export default function StudentClassDetailsPage() {
         </div>
         <p className="text-gray-500 italic mb-4">{classDetails?.description}</p>
 
-        <Tabs
-          defaultActiveKey="1"
-          items={tabItems}
-          onChange={(value) => {
-            console.log(value);
-          }}
-        />
+        <Tabs defaultActiveKey="1" items={tabItems} />
       </div>
     </div>
   );

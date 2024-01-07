@@ -104,13 +104,11 @@ export default function Navbar() {
           },
         },
       );
-      console.log(res);
+
       dispatch(setUserInfo(res.data));
       if (res.data.roles[0] == 'student' && !res.data.studentId) {
-        console.log('Show');
         showModal();
       }
-      console.log(userInfo);
     } catch (error) {
       console.log(error);
       localStorage.removeItem('accessToken');
@@ -121,11 +119,6 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-    console.log(
-      'effect',
-      !userInfo?.studentId,
-      userInfo?.roles[0] == 'student',
-    );
     const accessToken = localStorage.getItem('accessToken');
     if (!userInfo) {
       if (accessToken) {
@@ -133,7 +126,6 @@ export default function Navbar() {
       }
     } else if (!userInfo.studentId && userInfo.roles[0] == 'student') {
       if (accessToken) {
-        console.log('Recheck');
         getUserProfile();
       }
     }
@@ -144,7 +136,6 @@ export default function Navbar() {
       const res = await axios.get(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/unmapped`,
       );
-      console.log(res.data);
       let result = res?.data?.map((student: any) => {
         return { value: student.id, label: student.id };
       });
@@ -155,7 +146,6 @@ export default function Navbar() {
   };
 
   const showModal = () => {
-    console.log('Show');
     fetchUnmappedStudents();
     setOpen(true);
   };
@@ -174,14 +164,12 @@ export default function Navbar() {
     try {
       const values = await form.validateFields();
       form.resetFields();
-      console.log('Submit Values: ', values);
       const url = `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/${
         values.studentId
       }/mapStudentToUser`;
       const res = await axios.patch(url, {
         userId: userInfo?.id,
       });
-      console.log(res);
       messageApi.open({
         type: 'success',
         content: 'Student account mapped successfully',
@@ -201,7 +189,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="flex items-center justify-between h-12 shadow-lg">
+    <div className="flex items-center justify-between h-12 shadow-lg fixed top-0 left-0 right-0 bg-white z-10">
       {contextHolder}
       <Link
         to={!userInfo ? '/' : `${userInfo.roles[0]}/home`}
@@ -282,13 +270,7 @@ export default function Navbar() {
             name={'studentId'}
             className="w-full mb-4"
           >
-            <Select
-              style={{ width: 120 }}
-              onChange={(value) => {
-                console.log(value);
-              }}
-              options={unmappedStudent}
-            />
+            <Select style={{ width: 120 }} options={unmappedStudent} />
           </Form.Item>
         </Form>
       </Modal>

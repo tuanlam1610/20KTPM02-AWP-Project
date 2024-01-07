@@ -12,7 +12,6 @@ export default function RequestGradeReviewModal({
   gradeCompositionId,
   studentGradeId,
 }) {
-  console.log({ currentGrade, gradeCompositionId, studentGradeId });
   const [open, setOpen] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const userInfo = useAppSelector((state) => state.app.userInfo);
@@ -29,9 +28,7 @@ export default function RequestGradeReviewModal({
     setConfirmLoading(true);
     const values = await form.validateFields();
     form.resetFields();
-    console.log('Submit Values: ', values);
     const expectedGrade = Math.min(10, Math.max(0, values.expectedGrade));
-    console.log(expectedGrade);
     try {
       const studentId = userInfo?.studentId.id;
       const body = {
@@ -44,7 +41,6 @@ export default function RequestGradeReviewModal({
         classId,
         comment: [],
       };
-      console.log(body);
       const res = await axios.post(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/grade-reviews/notify`,
         body,

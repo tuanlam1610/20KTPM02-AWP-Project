@@ -22,6 +22,10 @@
     "sendEmailTo": "We've send a mail to",
     "activateAccountContent": "Please click the link in your email to activate your account.\nThe link in the mail will expire in 5 minutes.\nDon't forget to check your spam section!",
     "notRecieveMail": "Didn't receive a mail?",
-    "resend": "Resend"
+    "resend": "Resend",
+    "bannedNotificationTitle": "Account Banned",
+    "lockedNotificationTitle": "Account Locked",
+    "bannedNotificationDescription": "Your account is banned for some reasons. Please contact admin to recover your account.",
+    "lockedNotificationDescription": "Your account is locked for some reasons. Please contact admin to recover your account."
   }
 }

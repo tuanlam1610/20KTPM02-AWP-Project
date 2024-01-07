@@ -25,7 +25,6 @@ export default function JoinClassModal() {
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/students/${studentId}/getAllClassesOfstudent`,
       );
-      console.log(res.data);
       dispatch(setClasses(res.data));
     } catch (err) {
       console.log(err);
@@ -36,7 +35,6 @@ export default function JoinClassModal() {
     setConfirmLoading(true);
     const values = await form.validateFields();
     form.resetFields();
-    console.log('Submit Values: ', values);
     try {
       const studentId = userInfo?.studentId.id;
       console.log(

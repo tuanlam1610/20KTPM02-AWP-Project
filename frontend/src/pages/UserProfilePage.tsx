@@ -16,7 +16,6 @@ export default function UserProfilePage() {
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userInfo = useAppSelector((state) => state.app.userInfo);
-  console.log(userInfo);
   const navigate = useNavigate();
   const [unmappedStudent, setUnmappedStudent] = useState([]);
   const fetchUnmappedStudents = async () => {
@@ -24,7 +23,6 @@ export default function UserProfilePage() {
       const res = await axios.get(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/unmapped`,
       );
-      console.log(res.data);
       let result = res?.data?.map((student: any) => {
         return { value: student.id, label: student.id };
       });
@@ -35,7 +33,6 @@ export default function UserProfilePage() {
   };
 
   useEffect(() => {
-    console.log(userInfo);
     if (userInfo && userInfo.roles[0] == 'student') fetchUnmappedStudents();
   }, []);
 
@@ -48,7 +45,6 @@ export default function UserProfilePage() {
       setIsSubmitting(true);
       document.body.style.cursor = 'wait';
       values = { ...values, dob: dayjs(values.dob).toDate().toISOString() };
-      console.log(values);
       const res = await axios.patch(
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/users/${userInfo?.id}`,
         values,
@@ -157,13 +153,7 @@ export default function UserProfilePage() {
               ]}
               name={'studentId'}
             >
-              <Select
-                style={{ width: 120 }}
-                onChange={(value) => {
-                  console.log(value);
-                }}
-                options={unmappedStudent}
-              />
+              <Select style={{ width: 120 }} options={unmappedStudent} />
             </Form.Item>
           )}
 

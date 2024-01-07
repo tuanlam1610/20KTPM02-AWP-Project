@@ -12,7 +12,7 @@ export default function TeacherHomePage() {
   const dispatch = useAppDispatch();
   const classes = useAppSelector((state) => state.app.classes);
   const userInfo = useAppSelector((state) => state.app.userInfo);
-  console.log(userInfo?.teacherId.id);
+
   const navigate = useNavigate();
 
   const fetchClassList = async () => {
@@ -23,7 +23,6 @@ export default function TeacherHomePage() {
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/teachers/${teacherId}/getAllClasses`,
       );
-      console.log(res.data);
       dispatch(setClasses(res.data));
     } catch (err) {
       console.log(err);
@@ -35,7 +34,7 @@ export default function TeacherHomePage() {
   }, [userInfo]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="flex justify-between items-center">
