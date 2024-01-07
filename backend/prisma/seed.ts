@@ -142,6 +142,7 @@ async function main() {
   });
   const student1 = await prisma.student.create({
     data: {
+      id: '20127297',
       userId: user2.id,
       name: 'Nguyen Ngoc Quang',
       classMember: {
@@ -158,7 +159,8 @@ async function main() {
   });
   const student2 = await prisma.student.create({
     data: {
-      userId: user3.id,
+      id: '20127677',
+      // userId: user3.id,
       name: 'Ha Tuan Lam',
       classMember: {
         create: {
