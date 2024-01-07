@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateStudentDto } from './dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-students.dto';
@@ -221,6 +217,7 @@ export class StudentsService {
         successfulMappings.push(updatedStudent.id);
         studentMapping.set(updatedStudent.id, user.userId);
       } catch (error) {
+        console.log(error);
         failedMappings.push({ studentId: user.studentId, userId: user.userId });
       }
     }
@@ -320,11 +317,14 @@ export class StudentsService {
           },
         },
       },
+      orderBy: {
+        id: 'asc',
+      },
     });
     const modifiedStudents = students.map(({ user, ...rest }) => ({
       ...rest,
-      userId: user.id,
-      userName: user.name,
+      userId: user?.id || null,
+      userName: user?.name || null,
     }));
     return modifiedStudents;
   }

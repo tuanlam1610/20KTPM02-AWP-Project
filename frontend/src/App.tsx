@@ -27,9 +27,12 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import JoinClassByEmail from './pages/JoinClassByEmail';
 import StudentGradeBoardPage from './pages/Student/StudentGradeBoardPage';
 import AdminDashboard from './pages/Admin/AdminDashboard';
+import ClassesManagementPage from './pages/Admin/ClassesManagementPage';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import StudentsManagementPage from './pages/Admin/StudentsManagementPage';
+import AccountsManagementPage from './pages/Admin/AccountsManagementPage';
 
 dayjs.extend(relativeTime);
 
@@ -103,6 +106,14 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<ProtectedRoute allowedRole={'admin'} />}>
           <Route path="home" element={<AdminDashboard />} />
+          {/* Accounts Management */}
+          <Route path="accounts" element={<AccountsManagementPage />} />
+
+          {/* Classes Management */}
+          <Route path="classes" element={<ClassesManagementPage />} />
+
+          {/* Students Management */}
+          <Route path="students" element={<StudentsManagementPage />} />
         </Route>
 
         {/* Error */}

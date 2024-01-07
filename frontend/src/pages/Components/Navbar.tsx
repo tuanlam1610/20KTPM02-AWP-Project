@@ -92,6 +92,7 @@ export default function Navbar() {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [unmappedStudent, setUnmappedStudent] = useState([]);
 
   const getUserProfile = async () => {
     try {
@@ -138,8 +139,24 @@ export default function Navbar() {
     }
   }, [open]);
 
+  const fetchUnmappedStudents = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/unmapped`,
+      );
+      console.log(res.data);
+      let result = res?.data?.map((student: any) => {
+        return { value: student.id, label: student.id };
+      });
+      setUnmappedStudent(result || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const showModal = () => {
     console.log('Show');
+    fetchUnmappedStudents();
     setOpen(true);
   };
   const handleCancel = () => {
@@ -270,10 +287,7 @@ export default function Navbar() {
               onChange={(value) => {
                 console.log(value);
               }}
-              options={[
-                { value: '20127297', label: '20127297' },
-                { value: '20127677', label: '20127677' },
-              ]}
+              options={unmappedStudent}
             />
           </Form.Item>
         </Form>

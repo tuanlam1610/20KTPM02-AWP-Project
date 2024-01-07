@@ -16,7 +16,28 @@ export default function UserProfilePage() {
   const [form] = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const userInfo = useAppSelector((state) => state.app.userInfo);
+  console.log(userInfo);
   const navigate = useNavigate();
+  const [unmappedStudent, setUnmappedStudent] = useState([]);
+  const fetchUnmappedStudents = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_REACT_APP_SERVER_URL}/students/unmapped`,
+      );
+      console.log(res.data);
+      let result = res?.data?.map((student: any) => {
+        return { value: student.id, label: student.id };
+      });
+      setUnmappedStudent(result || []);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log(userInfo);
+    if (userInfo && userInfo.roles[0] == 'student') fetchUnmappedStudents();
+  }, []);
 
   const handleBackButton = () => {
     navigate(-1);
@@ -124,29 +145,27 @@ export default function UserProfilePage() {
           >
             <DatePicker format={'DD/MM/YYYY'} />
           </Form.Item>
-
-          <Form.Item
-            label="Student ID"
-            initialValue={userInfo?.studentId?.id || null}
-            rules={[
-              {
-                required: true,
-                message: 'Please enter your email!',
-              },
-            ]}
-            name={'studentId'}
-          >
-            <Select
-              style={{ width: 120 }}
-              onChange={(value) => {
-                console.log(value);
-              }}
-              options={[
-                { value: '20127297', label: '20127297' },
-                { value: '20127677', label: '20127677' },
+          {userInfo?.roles[0] == 'student' && (
+            <Form.Item
+              label="Student ID"
+              initialValue={userInfo?.studentId?.id || null}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your email!',
+                },
               ]}
-            />
-          </Form.Item>
+              name={'studentId'}
+            >
+              <Select
+                style={{ width: 120 }}
+                onChange={(value) => {
+                  console.log(value);
+                }}
+                options={unmappedStudent}
+              />
+            </Form.Item>
+          )}
 
           <Form.Item wrapperCol={{ offset: 9 }}>
             <div className="flex gap-4">
@@ -161,6 +180,10 @@ export default function UserProfilePage() {
                 className="border-gray-400 rounded-full px-8 flex justify-center items-center hover:bg-white "
                 onClick={() => {
                   setIsEditing(!isEditing);
+                  form.setFieldValue(
+                    'studentId',
+                    userInfo?.studentId?.id || null,
+                  );
                 }}
               >
                 <span>Cancel</span>
