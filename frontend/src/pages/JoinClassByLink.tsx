@@ -1,6 +1,6 @@
-import { Button, message } from 'antd';
+import { Button, Result, Spin, message } from 'antd';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import confirmImg from '../assets/imgs/Confirmed-amico.png';
 import wave from '../assets/imgs/wave.svg';
@@ -12,14 +12,19 @@ export default function JoinClassByLink() {
   const classId: string = params.id ? params.id : '';
   const userInfo = useAppSelector((state) => state.app.userInfo);
   const [messageApi, contextHolder] = message.useMessage();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSuccess, setIsSuccess] = useState(true);
 
   const joinClassByLink = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.patch(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
         }/classes/${classId}/linkJoin/${userInfo?.id}`,
       );
+      setIsSuccess(true);
+      setIsLoading(false);
       messageApi.open({
         type: 'success',
         content: 'Join class successfully',
@@ -27,6 +32,7 @@ export default function JoinClassByLink() {
       });
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
       if (userInfo?.teacherId?.id || userInfo?.adminId?.id)
         messageApi.open({
           type: 'error',
@@ -63,35 +69,41 @@ export default function JoinClassByLink() {
       {contextHolder}
       {/* Content */}
       <div className="flex flex-col w-1/2 h-2/3 rounded-xl bg-white border-2 border-gray-300 shadow-xl overflow-hidden">
-        {/* Right Section */}
-        <div className="flex flex-col flex-1 w-full justify-center items-center bg-white mt-4">
-          <div className="mt-4 w-full min-w-fit">
-            <h1 className="uppercase font-semibold text-xl text-center my-4">
-              Activate Account Successfully
-            </h1>
-            <div className="h-1/3 flex justify-center items-center">
-              <img
-                src={confirmImg}
-                alt="confirmSuccessImg"
-                className="object-contain box-border px-8 h-full"
-              />
-            </div>
-            <p className="text-sm text-gray-500 text-center">
-              Your account is activated successfully. Please sign in again to
-              join with us!
-            </p>
-            <div className="flex justify-center items-center my-4">
-              <Button
-                className="flex justify-center items-center rounded-full w-2/3 px-6 py-4 bg-indigo-500 text-white hover:bg-white"
-                onClick={() => {
-                  navigate('/login');
-                }}
-              >
-                Sign In
-              </Button>
+        {isLoading ? (
+          <div className=" flex justify-center items-center h-full">
+            <Spin />
+          </div>
+        ) : isSuccess ? (
+          <div className="flex flex-col flex-1 w-full justify-center items-center bg-white h-full">
+            <div className=" w-full min-w-fit h-full  flex flex-col justify-center items-center">
+              <h1 className="uppercase font-semibold text-xl text-center my-4">
+                Join Class Successfully
+              </h1>
+              <div className="h-1/3 flex justify-center items-center">
+                <img
+                  src={confirmImg}
+                  alt="confirmSuccessImg"
+                  className="object-contain box-border px-8 h-full"
+                />
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <Result
+            status="404"
+            title="404"
+            subTitle="Sorry, the page you visited does not exist."
+            extra={
+              <Button
+                onClick={() => {
+                  navigate('/');
+                }}
+              >
+                Back Home
+              </Button>
+            }
+          />
+        )}
       </div>
       <img
         src={wave}
