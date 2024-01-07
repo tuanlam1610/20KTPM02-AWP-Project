@@ -44,7 +44,7 @@ export default function AdminDashboard() {
     fetchUsersAndClassesNumber();
   }, []);
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col ">
       {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">

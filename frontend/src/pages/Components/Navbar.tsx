@@ -201,7 +201,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="flex items-center justify-between h-12 shadow-lg">
+    <div className="flex items-center justify-between h-12 shadow-lg fixed top-0 left-0 right-0 bg-white z-10">
       {contextHolder}
       <Link
         to={!userInfo ? '/' : `${userInfo.roles[0]}/home`}

@@ -32,6 +32,14 @@ export default function EditGradeCompositionModal(props: any) {
 
   const showModal = () => {
     setOpen(true);
+    setStudentGrade(
+      props?.record || {
+        id: '',
+        studentId: '',
+        name: '',
+        grade: 0,
+      },
+    );
     dispatch(setIsEditingGradeComposition(true));
   };
 

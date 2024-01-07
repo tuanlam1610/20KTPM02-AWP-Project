@@ -230,8 +230,21 @@ export default function GradeManagementPage() {
     },
   ];
 
+  const exportOptions: MenuProps['items'] = [
+    {
+      key: 'studentList',
+      label: 'Student List',
+      children: exportStudentListOptions,
+    },
+    {
+      key: 'gradeBoard',
+      label: 'Grade Board',
+      children: exportGradeBoardListOptions,
+    },
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {contextHolder}
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
@@ -264,31 +277,19 @@ export default function GradeManagementPage() {
                 className="px-6 py-2 w-full h-full flex gap-2 cursor-pointer"
               >
                 <span className=" w-full h-full text-center flex justify-center items-center">
-                  Upload
+                  Upload Student List
                 </span>
                 <UploadOutlined />
               </label>
             </Button>
             <Dropdown
               menu={{
-                items: exportStudentListOptions,
+                items: exportOptions,
               }}
             >
               <Button>
                 <Space>
-                  Export Student List
-                  <DownloadOutlined />
-                </Space>
-              </Button>
-            </Dropdown>
-            <Dropdown
-              menu={{
-                items: exportGradeBoardListOptions,
-              }}
-            >
-              <Button>
-                <Space>
-                  Export Grade Board
+                  Download
                   <DownloadOutlined />
                 </Space>
               </Button>

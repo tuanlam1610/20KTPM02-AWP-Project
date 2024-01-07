@@ -47,79 +47,84 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/landing" element={<LandingPage />} />
+      <div className="mt-12">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/landing" element={<LandingPage />} />
 
-        {/* Authentication */}
-        <Route path="/login" element={<SignInPage />} />
-        <Route path="/register" element={<SignUpPage />} />
-        <Route path="/register/teacher" element={<SignUpTeacherPage />} />
-        <Route path="/recover" element={<RecoverPasswordPage />} />
-        <Route path="/resetPassword" element={<ResetPasswordPage />} />
-        <Route path="/activateEmail" element={<ActivateEmailPage />} />
-        <Route path="/chooserole" element={<ChooseRolePage />} />
-        <Route path="/profile" element={<UserProfilePage />} />
-        {/* Join Class By Link */}
-        <Route path="/joinClass/:id" element={<JoinClassByLink />} />
-        {/* Join Class By Email */}
-        <Route path="/inviteJoinClass" element={<JoinClassByEmail />} />
+          {/* Authentication */}
+          <Route path="/login" element={<SignInPage />} />
+          <Route path="/register" element={<SignUpPage />} />
+          <Route path="/register/teacher" element={<SignUpTeacherPage />} />
+          <Route path="/recover" element={<RecoverPasswordPage />} />
+          <Route path="/resetPassword" element={<ResetPasswordPage />} />
+          <Route path="/activateEmail" element={<ActivateEmailPage />} />
+          <Route path="/chooserole" element={<ChooseRolePage />} />
+          <Route path="/profile" element={<UserProfilePage />} />
+          {/* Join Class By Link */}
+          <Route path="/joinClass/:id" element={<JoinClassByLink />} />
+          {/* Join Class By Email */}
+          <Route path="/inviteJoinClass" element={<JoinClassByEmail />} />
 
-        {/* Teacher Routes */}
-        <Route
-          path="/teacher"
-          element={<ProtectedRoute allowedRole={'teacher'} />}
-        >
-          <Route path="home" element={<TeacherHomePage />} />
-          <Route path="class/:id" element={<ClassDetailsPage />} />
+          {/* Teacher Routes */}
           <Route
-            path="class/:id/grademanagement"
-            element={<GradeManagementPage />}
-          />
+            path="/teacher"
+            element={<ProtectedRoute allowedRole={'teacher'} />}
+          >
+            <Route path="home" element={<TeacherHomePage />} />
+            <Route path="class/:id" element={<ClassDetailsPage />} />
+            <Route
+              path="class/:id/grademanagement"
+              element={<GradeManagementPage />}
+            />
+            <Route
+              path="class/:id/gradeReview/:gradeReviewId"
+              element={<GradeReviewDetailPage />}
+            />
+            <Route
+              path="class/:id/grademanagement/:gradeCompositionId"
+              element={<GradeCompositionPage />}
+            />
+          </Route>
+
+          {/* Student Routes */}
           <Route
-            path="class/:id/gradeReview/:gradeReviewId"
-            element={<GradeReviewDetailPage />}
-          />
+            path="/student"
+            element={<ProtectedRoute allowedRole={'student'} />}
+          >
+            <Route path="home" element={<StudentHomePage />} />
+            <Route path="class/:id" element={<StudentClassDetailsPage />} />
+            <Route
+              path="class/:id/gradeboard"
+              element={<StudentGradeBoardPage />}
+            />
+            <Route
+              path="class/:id/gradeReview/:gradeReviewId"
+              element={<StudentGradeReviewDetailPage />}
+            />
+          </Route>
+
+          {/* Admin Routes */}
           <Route
-            path="class/:id/grademanagement/:gradeCompositionId"
-            element={<GradeCompositionPage />}
-          />
-        </Route>
+            path="/admin"
+            element={<ProtectedRoute allowedRole={'admin'} />}
+          >
+            <Route path="home" element={<AdminDashboard />} />
+            {/* Accounts Management */}
+            <Route path="accounts" element={<AccountsManagementPage />} />
 
-        {/* Student Routes */}
-        <Route
-          path="/student"
-          element={<ProtectedRoute allowedRole={'student'} />}
-        >
-          <Route path="home" element={<StudentHomePage />} />
-          <Route path="class/:id" element={<StudentClassDetailsPage />} />
-          <Route
-            path="class/:id/gradeboard"
-            element={<StudentGradeBoardPage />}
-          />
-          <Route
-            path="class/:id/gradeReview/:gradeReviewId"
-            element={<StudentGradeReviewDetailPage />}
-          />
-        </Route>
+            {/* Classes Management */}
+            <Route path="classes" element={<ClassesManagementPage />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<ProtectedRoute allowedRole={'admin'} />}>
-          <Route path="home" element={<AdminDashboard />} />
-          {/* Accounts Management */}
-          <Route path="accounts" element={<AccountsManagementPage />} />
+            {/* Students Management */}
+            <Route path="students" element={<StudentsManagementPage />} />
+          </Route>
 
-          {/* Classes Management */}
-          <Route path="classes" element={<ClassesManagementPage />} />
-
-          {/* Students Management */}
-          <Route path="students" element={<StudentsManagementPage />} />
-        </Route>
-
-        {/* Error */}
-        <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* Error */}
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </div>
     </QueryClientProvider>
   );
 }

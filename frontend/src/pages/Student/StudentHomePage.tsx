@@ -36,7 +36,7 @@ export default function StudentHomePage() {
   }, [userInfo]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       {/* Content */}
       <div className="flex flex-col mx-8 my-8 gap-4">
         <div className="flex justify-between items-center">
