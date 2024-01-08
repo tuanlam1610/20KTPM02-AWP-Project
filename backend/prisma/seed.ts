@@ -3,6 +3,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import {} from '@prisma/client';
+import { TotalGradeDto } from 'src/classes/dto/total-grade.dto';
 
 // initialize Prisma Client
 const prisma = new PrismaClient();
@@ -39,6 +40,15 @@ async function main() {
       isActive: true,
     },
   });
+  const class4 = await prisma.class.create({
+    data: {
+      name: '100 - Introduction to University',
+      description: 'Introduce you to the law and the layer of university',
+      code: 'APDITU',
+      invitationLink: '$localhost:3000/invitation/APDITU',
+      isActive: true,
+    },
+  });
   const hashData = (data: string) => {
     return bcrypt.hash(data, 10);
   };
@@ -48,7 +58,7 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       name: 'Truong Gia Huy',
-      email: 'rexfury1211@gmail.com',
+      email: 'tghuy@student.com',
       hash: hashPass,
       roles: ['admin'],
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -58,7 +68,7 @@ async function main() {
   const user1 = await prisma.user.create({
     data: {
       name: 'Truong Gia Huy',
-      email: 'rexfury1212@gmail.com',
+      email: 'tghuy1@student.com',
       roles: ['admin'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -68,7 +78,7 @@ async function main() {
   const user2 = await prisma.user.create({
     data: {
       name: 'Nguyen Ngoc Quang',
-      email: 'nnquanglop96dt@gmail.com',
+      email: 'nnquanglop96dt@student.com',
       roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -78,7 +88,7 @@ async function main() {
   const user3 = await prisma.user.create({
     data: {
       name: 'Ha Tuan Lam',
-      email: 'tuanlam16102002@gmail.com',
+      email: 'tuanlam16102002@student.com',
       roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -88,7 +98,7 @@ async function main() {
   const userTeacher = await prisma.user.create({
     data: {
       name: 'Truong Gia Huy Teacher',
-      email: 'rexfury121TEACH@gmail.com',
+      email: 'rexfury121@teacher.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -98,7 +108,7 @@ async function main() {
   const userTeacher2 = await prisma.user.create({
     data: {
       name: 'Nguyen Ngoc Quang Teacher',
-      email: 'TEACH@gmail.com',
+      email: 'nnquanglop96dt@teacher.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -108,7 +118,7 @@ async function main() {
   const userTeacher3 = await prisma.user.create({
     data: {
       name: 'Ha Tuan Lam Teacher',
-      email: 'tuanlam16102002TEACH@gmail.com',
+      email: 'tuanlam16102002@teacher.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -118,8 +128,9 @@ async function main() {
   const bannedUser = await prisma.user.create({
     data: {
       name: 'bannedDummy',
-      email: 'bannedtuanlam16102002@gmail.com',
+      email: 'banned@gmail.com',
       hash: hashPass,
+      roles: ['student'],
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
       isBanned: true,
@@ -130,6 +141,7 @@ async function main() {
       name: 'lockedDummy',
       email: 'locked@gmail.com',
       hash: hashPass,
+      roles: ['student'],
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
       isLocked: true,
@@ -140,15 +152,54 @@ async function main() {
       userId: user1.id,
     },
   });
+  const student = await prisma.student.create({
+    data: {
+      id: '20127040',
+      userId: user1.id,
+      name: 'Truong Gia Huy',
+      classMember: {
+        create: [
+          {
+            class: { connect: { id: class4.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+        ],
+      },
+      classInvitationForStudent: {
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+          },
+          {
+            class: { connect: { id: class2.id } }, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class3.id } }, // Add more connections if needed
+          },
+        ],
+      },
+    },
+  });
   const student1 = await prisma.student.create({
     data: {
-      id: '20127297',
+      id: '20127296',
       userId: user2.id,
       name: 'Nguyen Ngoc Quang',
       classMember: {
-        create: {
-          class: { connect: { id: class1.id } },
-        },
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+            totalGrade: 0,
+          },
+          {
+            class: { connect: { id: class3.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class4.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+        ],
       },
       classInvitationForStudent: {
         create: {
@@ -159,18 +210,24 @@ async function main() {
   });
   const student2 = await prisma.student.create({
     data: {
-      id: '20127677',
-      // userId: user3.id,
+      id: '20127678',
+      userId: user3.id,
       name: 'Ha Tuan Lam',
       classMember: {
-        create: {
-          class: { connect: { id: class1.id } },
-        },
-      },
-      classInvitationForStudent: {
-        create: {
-          class: { connect: { id: class2.id } },
-        },
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+            totalGrade: 0,
+          },
+          {
+            class: { connect: { id: class2.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class3.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+        ],
       },
     },
   });
@@ -196,9 +253,17 @@ async function main() {
     data: {
       userId: userTeacher2.id,
       classTeacher: {
-        create: {
-          class: { connect: { id: class1.id } },
-        },
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+          },
+          {
+            class: { connect: { id: class3.id } }, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class4.id } }, // Add more connections if needed
+          },
+        ],
       },
       classInvitationForTeacher: {
         create: {
@@ -216,16 +281,24 @@ async function main() {
         },
       },
       classInvitationForTeacher: {
-        create: {
-          class: { connect: { id: class2.id } },
-        },
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+          },
+          {
+            class: { connect: { id: class3.id } }, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class2.id } }, // Add more connections if needed
+          },
+        ],
       },
     },
   });
   const GradeComposition1 = await prisma.gradeComposition.create({
     data: {
       name: 'Assignment 1',
-      percentage: 10,
+      percentage: 50,
       rank: 1,
       isFinalized: false,
       classId: class1.id,
@@ -234,29 +307,120 @@ async function main() {
   const GradeComposition2 = await prisma.gradeComposition.create({
     data: {
       name: 'Assignment 2',
-      percentage: 10,
+      percentage: 50,
       rank: 2,
       isFinalized: false,
       classId: class1.id,
     },
   });
+  await prisma.gradeComposition.createMany({
+    data: [
+      {
+        name: 'Assignment 1',
+        percentage: 20,
+        rank: 1,
+        isFinalized: false,
+        classId: class2.id,
+      },
+      {
+        name: 'Assignment 2',
+        percentage: 20,
+        rank: 2,
+        isFinalized: false,
+        classId: class2.id,
+      },
+      {
+        name: 'Assignment 3',
+        percentage: 50,
+        rank: 3,
+        isFinalized: false,
+        classId: class2.id,
+      },
+      {
+        name: 'Assignment 4',
+        percentage: 10,
+        rank: 4,
+        isFinalized: false,
+        classId: class2.id,
+      },
+    ],
+  });
+  const gcClass2 = await prisma.gradeComposition.findMany({
+    where: {
+      classId: class2.id,
+    },
+  });
+  await prisma.studentGrade.createMany({
+    data: [
+      {
+        studentId: student1.id,
+        gradeCompositionId: gcClass2[0].id,
+        grade: 0,
+      },
+      {
+        studentId: student1.id,
+        gradeCompositionId: gcClass2[1].id,
+        grade: 0,
+      },
+      {
+        studentId: student1.id,
+        gradeCompositionId: gcClass2[2].id,
+        grade: 0,
+      },
+      {
+        studentId: student1.id,
+        gradeCompositionId: gcClass2[3].id,
+        grade: 0,
+      },
+    ],
+    skipDuplicates: true,
+  });
+
   const StudentGrade1 = await prisma.studentGrade.create({
     data: {
       student: { connect: { id: student1.id } },
       gradeComposition: { connect: { id: GradeComposition1.id } },
-      grade: 5,
+      grade: 0,
     },
   });
   const StudentGrade2 = await prisma.studentGrade.create({
     data: {
       student: { connect: { id: student1.id } },
       gradeComposition: { connect: { id: GradeComposition2.id } },
-      grade: 5,
+      grade: 0,
+    },
+  });
+  const StudentGrade3 = await prisma.studentGrade.create({
+    data: {
+      student: { connect: { id: student2.id } },
+      gradeComposition: { connect: { id: GradeComposition1.id } },
+      grade: 0,
+    },
+  });
+  const StudentGrade4 = await prisma.studentGrade.create({
+    data: {
+      student: { connect: { id: student2.id } },
+      gradeComposition: { connect: { id: GradeComposition2.id } },
+      grade: 0,
+    },
+  });
+  await prisma.studentGrade.create({
+    data: {
+      student: { connect: { id: student.id } },
+      gradeComposition: { connect: { id: GradeComposition1.id } },
+      grade: 0,
+    },
+  });
+  await prisma.studentGrade.create({
+    data: {
+      student: { connect: { id: student.id } },
+      gradeComposition: { connect: { id: GradeComposition2.id } },
+      grade: 0,
     },
   });
   const GradeReview = await prisma.gradeReview.create({
     data: {
-      currentGrade: 5,
+      currentGrade: 0,
       expectedGrade: 10,
       finalGrade: 10,
       status: 'Accepted',
@@ -269,7 +433,7 @@ async function main() {
   });
   const GradeReview1 = await prisma.gradeReview.create({
     data: {
-      currentGrade: 5,
+      currentGrade: 0,
       expectedGrade: 10,
       finalGrade: null,
       status: 'Open',
@@ -277,6 +441,18 @@ async function main() {
       student: { connect: { id: student1.id } },
       class: { connect: { id: class1.id } },
       studentGrade: { connect: { id: StudentGrade2.id } },
+    },
+  });
+  const GradeReview2 = await prisma.gradeReview.create({
+    data: {
+      currentGrade: 0,
+      expectedGrade: 10,
+      finalGrade: 0,
+      status: 'Denied',
+      explanation: 'I am a good student',
+      student: { connect: { id: student2.id } },
+      class: { connect: { id: class1.id } },
+      studentGrade: { connect: { id: StudentGrade3.id } },
     },
   });
   const comment = await prisma.comment.create({
