@@ -88,7 +88,7 @@ async function main() {
   const user3 = await prisma.user.create({
     data: {
       name: 'Ha Tuan Lam',
-      email: 'tuanlam16102002@student.com',
+      email: 'tuanlam16102002@gmail.com',
       roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -108,7 +108,7 @@ async function main() {
   const userTeacher2 = await prisma.user.create({
     data: {
       name: 'Nguyen Ngoc Quang Teacher',
-      email: 'nnquanglop96dt@teacher.com',
+      email: 'halam5051@gmail.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -118,7 +118,7 @@ async function main() {
   const userTeacher3 = await prisma.user.create({
     data: {
       name: 'Ha Tuan Lam Teacher',
-      email: 'tuanlam16102002@teacher.com',
+      email: 'lam.ha@devsamurai.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -210,8 +210,7 @@ async function main() {
   });
   const student2 = await prisma.student.create({
     data: {
-      id: '20127678',
-      userId: user3.id,
+      id: '20127677',
       name: 'Ha Tuan Lam',
       classMember: {
         create: [
@@ -234,6 +233,7 @@ async function main() {
   const teacher1 = await prisma.teacher.create({
     data: {
       userId: userTeacher.id,
+      name: 'Truong Gia Huy Teacher',
       classOwned: {
         connect: { id: class1.id },
       },
@@ -252,6 +252,7 @@ async function main() {
   const teacher2 = await prisma.teacher.create({
     data: {
       userId: userTeacher2.id,
+      name: 'Nguyen Ngoc Quang Teacher',
       classTeacher: {
         create: [
           {
@@ -275,6 +276,7 @@ async function main() {
   const teacher3 = await prisma.teacher.create({
     data: {
       userId: userTeacher3.id,
+      name: 'Nguyen Ngoc Quang Teacher',
       classTeacher: {
         create: {
           class: { connect: { id: class1.id } },
