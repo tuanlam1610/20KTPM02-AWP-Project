@@ -58,7 +58,7 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       name: 'Truong Gia Huy',
-      email: 'tghuy@student.com',
+      email: 'admin@gmail.com',
       hash: hashPass,
       roles: ['admin'],
       dob: new Date('2002-12-06T23:00:00.000Z'),
