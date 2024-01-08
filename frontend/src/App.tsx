@@ -90,7 +90,7 @@ function App() {
           {/* Student Routes */}
           <Route
             path="/student"
-            element={<ProtectedRoute allowedRole={'student'} />}
+            // element={<ProtectedRoute allowedRole={'student'} />}
           >
             <Route path="home" element={<StudentHomePage />} />
             <Route path="class/:id" element={<StudentClassDetailsPage />} />
