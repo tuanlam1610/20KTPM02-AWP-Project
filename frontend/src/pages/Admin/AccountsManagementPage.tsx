@@ -23,7 +23,6 @@ export default function AccountsManagementPage() {
       const resAccounts = await axios.get(accountUrl);
       if (resAccounts.data) setAccounts(resAccounts.data);
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot fetch data`,
@@ -126,7 +125,6 @@ export default function AccountsManagementPage() {
       });
       fetchAccounts();
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot ${value ? 'ban' : 'unban'} selected account`,
@@ -151,7 +149,6 @@ export default function AccountsManagementPage() {
       });
       fetchAccounts();
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot ${value ? 'lock' : 'unlock'} selected account`,

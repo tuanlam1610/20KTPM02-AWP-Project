@@ -89,9 +89,7 @@ export default function GradeCompositionPage() {
         isFinalized: true,
       });
       setIsModalOpen(false);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const fetchGradeComposition = async () => {
@@ -105,7 +103,6 @@ export default function GradeCompositionPage() {
       setGradeComposition(res.data?.gradeComposition || {});
     } catch (err) {
       setData([...sampleGradeCompositionData]);
-      console.log(err);
     }
   };
 
@@ -156,7 +153,6 @@ export default function GradeCompositionPage() {
         duration: 1,
       });
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Something wrong when upload grade composition`,
@@ -302,7 +298,6 @@ export default function GradeCompositionPage() {
                 key="id"
                 dataIndex="id"
                 render={(value, record, index) => {
-                  // console.log(value, record, index);
                   return (
                     <EditGradeCompositionModal
                       record={data[index]}

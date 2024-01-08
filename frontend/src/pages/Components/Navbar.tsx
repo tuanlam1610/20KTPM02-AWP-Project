@@ -110,7 +110,6 @@ export default function Navbar() {
         showModal();
       }
     } catch (error) {
-      console.log(error);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       dispatch(setUserInfo(undefined));
@@ -140,9 +139,7 @@ export default function Navbar() {
         return { value: student.id, label: student.id };
       });
       setUnmappedStudent(result || []);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const showModal = () => {
@@ -178,7 +175,6 @@ export default function Navbar() {
       setConfirmLoading(false);
       setOpen(false);
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: 'Failed to map student account',

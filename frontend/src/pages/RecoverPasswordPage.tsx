@@ -42,14 +42,11 @@ export default function RecoverPasswordPage() {
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     } catch (err) {
-      console.log(err);
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     }
   };
-  const onFinishEmailFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+  const onFinishEmailFailed = (errorInfo) => {};
 
   const backHandler = () => {
     setCurrentStep(currentStep - 1);

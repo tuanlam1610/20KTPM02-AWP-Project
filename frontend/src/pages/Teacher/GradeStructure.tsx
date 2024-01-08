@@ -16,7 +16,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Button, Form, Modal } from 'antd';
+import { Button, Form, Modal, message } from 'antd';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
@@ -30,6 +30,7 @@ import { getGradeComposition } from '../../redux/classDetailThunks';
 import { debounce } from 'lodash';
 
 export default function GradeStructure() {
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isEditing, setIsEditing] = useState(false);
@@ -62,9 +63,19 @@ export default function GradeStructure() {
   });
 
   const onSubmit = async (data) => {
+    let totalGrade = 0;
     const body = data.grade.map((g, i) => {
+      totalGrade += g.percentage;
       return { ...g, rank: i };
     });
+    if (totalGrade !== 100) {
+      messageApi.open({
+        type: 'error',
+        content: `Total percentage must be 100%`,
+        duration: 3,
+      });
+      return;
+    }
     const result = await axios.patch(
       `${
         import.meta.env.VITE_REACT_APP_SERVER_URL
@@ -110,7 +121,7 @@ export default function GradeStructure() {
     setActiveId(null);
   };
 
-  const onFinishFailed = (error: any) => console.log(error);
+  const onFinishFailed = (error: any) => 
 
   const handleClick = debounce(() => {
     if (isEditing) {
@@ -133,6 +144,8 @@ export default function GradeStructure() {
 
   return (
     <FormProvider {...form}>
+      {contextHolder}
+
       <Form onFinish={handleSubmit(onSubmit)} onFinishFailed={onFinishFailed}>
         <div>
           <div className="flex justify-between items-center mb-2">

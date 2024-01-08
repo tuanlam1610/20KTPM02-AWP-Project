@@ -82,9 +82,7 @@ export default function StudentGradeBoardPage() {
 
       const formattedData = formatRawDataToTableData(res.data);
       setFormattedData(formattedData);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {

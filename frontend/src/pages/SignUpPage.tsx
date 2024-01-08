@@ -42,15 +42,12 @@ export default function SignUpPage() {
       document.body.style.cursor = 'default';
       setCurrentStep(1);
     } catch (err) {
-      console.log(err);
       setIsSubmitting(false);
       document.body.style.cursor = 'default';
     }
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+  const onFinishFailed = (errorInfo) => {};
 
   const steps = [
     {

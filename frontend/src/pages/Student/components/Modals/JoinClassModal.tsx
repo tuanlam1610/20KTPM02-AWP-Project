@@ -26,9 +26,7 @@ export default function JoinClassModal() {
         }/students/${studentId}/getAllClassesOfstudent`,
       );
       dispatch(setClasses(res.data));
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const handleOk = async () => {
@@ -37,12 +35,6 @@ export default function JoinClassModal() {
     form.resetFields();
     try {
       const studentId = userInfo?.studentId.id;
-      console.log(
-        `${
-          import.meta.env.VITE_REACT_APP_SERVER_URL
-        }/students/${studentId}/joinClassByCode`,
-        { code: values.code },
-      );
       const res = await axios.patch(
         `${
           import.meta.env.VITE_REACT_APP_SERVER_URL
@@ -58,7 +50,6 @@ export default function JoinClassModal() {
       setOpen(false);
       setConfirmLoading(false);
     } catch (err) {
-      console.log(err);
       messageApi.open({
         type: 'error',
         content: `Join Class Failed`,

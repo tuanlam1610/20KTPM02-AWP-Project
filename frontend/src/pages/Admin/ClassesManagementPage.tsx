@@ -23,7 +23,6 @@ export default function ClassesManagementPage() {
       const resClasses = await axios.get(classesUrl);
       if (resClasses.data) setClasses(resClasses.data);
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot fetch data`,
@@ -126,7 +125,6 @@ export default function ClassesManagementPage() {
       });
       fetchClasses();
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot ${value ? 'active' : 'inactive'} selected class`,

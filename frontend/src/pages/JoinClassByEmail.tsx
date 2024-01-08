@@ -37,7 +37,6 @@ export default function JoinClassByEmail() {
       });
       setTimeout(() => navigate('/'), 5000);
     } catch (error) {
-      console.log('ERROR', error);
       setIsLoading(false);
       messageApi.open({
         type: 'error',
