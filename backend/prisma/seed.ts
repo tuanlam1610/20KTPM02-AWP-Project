@@ -259,7 +259,6 @@ async function main() {
   const student3 = await prisma.student.create({
     data: {
       id: '20127297',
-      userId: user3.id,
       name: 'Nguyen Ngoc Quang (Unmapped)',
       classMember: {
         create: [
