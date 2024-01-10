@@ -70,7 +70,6 @@ export default function EditGradeCompositionModal(props: any) {
       });
       handleCancel();
     } catch (err) {
-      console.log(err);
       messageApi.open({
         type: 'error',
         content: 'Something wrong when update student grade',

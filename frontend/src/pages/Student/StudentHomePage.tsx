@@ -23,9 +23,7 @@ export default function StudentHomePage() {
         }/students/${studentId}/getAllClassesOfstudent`,
       );
       dispatch(setClasses(res.data));
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -76,7 +74,7 @@ export default function StudentHomePage() {
                     <Title level={4} className="truncate">
                       {course.name}
                     </Title>
-                    <p className="italic text-gray-500 text-sm">
+                    <p className="italic text-gray-500 text-sm line-clamp-4 text-justify">
                       {course.description}
                     </p>
                   </div>

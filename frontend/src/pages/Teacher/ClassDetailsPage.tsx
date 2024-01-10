@@ -53,9 +53,7 @@ export default function HomePage() {
         `${import.meta.env.VITE_REACT_APP_SERVER_URL}/classes/${classId}`,
       );
       setClassDetails(res.data);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {

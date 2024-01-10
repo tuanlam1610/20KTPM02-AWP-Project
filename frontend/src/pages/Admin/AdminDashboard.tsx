@@ -29,7 +29,6 @@ export default function AdminDashboard() {
       const resStudents = await axios.get(studentsUrl);
       if (resStudents.data) setStudents(resStudents.data);
     } catch (error) {
-      console.log(error);
       messageApi.open({
         type: 'error',
         content: `Cannot fetch data`,

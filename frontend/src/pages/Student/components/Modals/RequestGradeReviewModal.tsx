@@ -53,7 +53,6 @@ export default function RequestGradeReviewModal({
       setOpen(false);
       setConfirmLoading(false);
     } catch (err) {
-      console.log(err);
       messageApi.open({
         type: 'error',
         content: `Request a grade review failed`,
@@ -140,7 +139,7 @@ export default function RequestGradeReviewModal({
             className="w-full mb-4"
           >
             <Space.Compact className="w-full">
-              <TextArea rows={4} placeholder="maxLength is 6" />
+              <TextArea rows={4} placeholder="Your explanation..." />
             </Space.Compact>
           </Form.Item>
         </Form>

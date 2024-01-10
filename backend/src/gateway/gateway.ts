@@ -25,10 +25,7 @@ export class AppGateway implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', (socket) => {
-      console.log(socket.id, 'Connected');
       socket.on('disconnect', () => {
-        console.log(socket.id, 'Disconnected');
-
         // Remove the disconnected user from all rooms
         this.removeFromAllRooms(socket.id);
       });
@@ -45,17 +42,12 @@ export class AppGateway implements OnModuleInit {
       users.splice(index, 1);
       room.set(roomId, users);
     }
-    console.log(room);
   }
 
   private removeFromAllRooms(socketId: string) {
-    console.log(socketId);
     this.classRooms.forEach((users, roomId) => {
-      console.log(roomId, socketId);
       //delete from usersSocketMapping
       const index = users.indexOf(this.socketToUserMapping.get(socketId));
-      console.log(index);
-      console.log(users);
       if (index !== -1) {
         users.splice(index, 1);
         this.classRooms.set(roomId, users);
@@ -78,7 +70,6 @@ export class AppGateway implements OnModuleInit {
     @ConnectedSocket() client: Socket,
   ) {
     const { classId, userId } = body;
-    console.log(classId, userId);
     client.join(`classRoom-${classId}`); // Join a specific class room
     this.addToRoom(this.classRooms, `classRoom-${classId}`, userId, client.id);
   }
@@ -126,7 +117,6 @@ export class AppGateway implements OnModuleInit {
   onTeacherJoin(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
     const { classId, userId } = body;
     this.socketToUserMapping.set(client.id, userId);
-    console.log(this.socketToUserMapping);
   }
 
   private addToRoom(
@@ -140,7 +130,6 @@ export class AppGateway implements OnModuleInit {
     const users = roomMap.get(roomId) || [];
     users.push(userId);
     roomMap.set(roomId, users);
-    console.log(roomMap);
   }
 
   // private removeFromRoom(
@@ -163,25 +152,17 @@ export class AppGateway implements OnModuleInit {
   }
 
   emitNotification(roomId: string, notification: any) {
-    console.log(roomId, notification.action);
     this.server.to(roomId).emit(notification.action, notification);
   }
 
   sendNotificationToUser(userId: string, notification: any) {
-    console.log(this.socketToUserMapping);
-    console.log(Array.from(this.socketToUserMapping.keys())); // Display keys
-
     const socketKey = Array.from(this.socketToUserMapping.keys()).find(
       (key) => {
-        console.log(this.socketToUserMapping.get(key), userId);
         return this.socketToUserMapping.get(key) === userId;
       },
     );
 
-    console.log(socketKey);
-
     if (socketKey) {
-      console.log(socketKey, notification.action, notification);
       this.server.to(socketKey).emit(notification.action, notification);
     }
   }

@@ -78,7 +78,7 @@ function App() {
               element={<GradeManagementPage />}
             />
             <Route
-              path="class/:id/gradeReview/:gradeReviewId"
+              path="gradeReview/:gradeReviewId"
               element={<GradeReviewDetailPage />}
             />
             <Route
@@ -90,7 +90,7 @@ function App() {
           {/* Student Routes */}
           <Route
             path="/student"
-            element={<ProtectedRoute allowedRole={'student'} />}
+            // element={<ProtectedRoute allowedRole={'student'} />}
           >
             <Route path="home" element={<StudentHomePage />} />
             <Route path="class/:id" element={<StudentClassDetailsPage />} />
@@ -98,11 +98,11 @@ function App() {
               path="class/:id/gradeboard"
               element={<StudentGradeBoardPage />}
             />
+            <Route
+              path="gradeReview/:gradeReviewId"
+              element={<StudentGradeReviewDetailPage />}
+            />
           </Route>
-          <Route
-            path="gradeReview/:gradeReviewId"
-            element={<GradeReviewDetailPage />}
-          />
           {/* Admin Routes */}
           <Route
             path="/admin"

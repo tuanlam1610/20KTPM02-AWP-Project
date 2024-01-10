@@ -27,9 +27,7 @@ export default function CreateClassModal() {
         }/teachers/${teacherId}/getAllClasses`,
       );
       dispatch(setClasses(res.data));
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   const handleOk = async () => {
@@ -59,7 +57,6 @@ export default function CreateClassModal() {
       setOpen(false);
       setConfirmLoading(false);
     } catch (err) {
-      console.log(err);
       messageApi.open({
         type: 'error',
         content: 'Create class failed',
