@@ -309,7 +309,7 @@ async function main() {
   const teacher1 = await prisma.teacher.create({
     data: {
       userId: userTeacher.id,
-      name: 'Truong Gia Huy',
+      name: 'Truong Gia Huy TEACHER',
       classOwned: {
         connect: { id: class1.id },
       },
@@ -327,8 +327,8 @@ async function main() {
   });
   const teacher2 = await prisma.teacher.create({
     data: {
-      userId: userTeacher2.id,
-      name: 'Ha Tuan Lam',
+      userId: userTeacher3.id,
+      name: 'Ha Tuan Lam  TEACHER',
       classTeacher: {
         create: [
           {
@@ -351,8 +351,8 @@ async function main() {
   });
   const teacher3 = await prisma.teacher.create({
     data: {
-      userId: userTeacher3.id,
-      name: 'Nguyen Ngoc Quang',
+      userId: userTeacher2.id,
+      name: 'Nguyen Ngoc Quang  TEACHER',
       classTeacher: {
         create: {
           class: { connect: { id: class1.id } },
