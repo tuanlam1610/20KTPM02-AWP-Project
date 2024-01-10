@@ -82,6 +82,9 @@ export class ClassesService {
                 grade: true,
                 studentId: true,
               },
+              where: {
+                studentId: studentId,
+              },
             },
           },
           orderBy: {

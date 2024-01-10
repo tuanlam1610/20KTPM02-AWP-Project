@@ -42,6 +42,7 @@ export default function StudentGradeBoardPage() {
   const data: Grade[] = [];
 
   const formatRawDataToTableData = (rawData: any) => {
+    console.log(rawData);
     const students: any[] = rawData.students || [];
     const gradeCompositions: any[] = rawData.gradeCompositions || [];
     const gradeCompositionsMap = keyBy(gradeCompositions, 'name');
@@ -61,11 +62,14 @@ export default function StudentGradeBoardPage() {
           ? gradeCompositionItems[gradeName].grade
           : null;
       });
+      console.log(data);
+      console.log(gradeCompositionItems);
       const res = {
         ...data,
         ...gradeCompositionItems,
         ['totalGrade']: isAllFinalize ? data['totalGrade'] : null,
       };
+      console.log(res);
       return res;
     });
   };
