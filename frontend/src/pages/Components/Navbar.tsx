@@ -104,11 +104,7 @@ export default function Navbar() {
           },
         },
       );
-
       dispatch(setUserInfo(res.data));
-      if (res.data.roles[0] == 'student' && !res.data.studentId) {
-        showModal();
-      }
     } catch (error) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
@@ -129,6 +125,13 @@ export default function Navbar() {
       }
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!userInfo) return;
+    if (userInfo.roles[0] == 'student' && !userInfo.studentId) {
+      showModal();
+    }
+  }, [userInfo]);
 
   const fetchUnmappedStudents = async () => {
     try {
