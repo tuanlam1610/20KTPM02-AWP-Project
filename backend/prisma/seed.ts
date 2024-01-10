@@ -68,8 +68,8 @@ async function main() {
   const user1 = await prisma.user.create({
     data: {
       name: 'Truong Gia Huy',
-      email: 'tghuy1@student.com',
-      roles: ['admin'],
+      email: 'rexfury121@gmail.com',
+      roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
       isEmailConfirm: true,
@@ -78,7 +78,17 @@ async function main() {
   const user2 = await prisma.user.create({
     data: {
       name: 'Nguyen Ngoc Quang',
-      email: 'nnquanglop96dt@student.com',
+      email: 'nnquanglop96dt@gmail.com',
+      roles: ['student'],
+      hash: hashPass,
+      dob: new Date('2002-12-06T23:00:00.000Z'),
+      isEmailConfirm: false,
+    },
+  });
+  const user22 = await prisma.user.create({
+    data: {
+      name: 'Nguyen Ngoc Quang',
+      email: 'nnquang1792@gmail.com',
       roles: ['student'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -95,10 +105,20 @@ async function main() {
       isEmailConfirm: true,
     },
   });
+  const user4 = await prisma.user.create({
+    data: {
+      name: 'Truong Ta Huy',
+      email: 'tghuy201@clc.fitus.edu.vn',
+      roles: ['student'],
+      hash: hashPass,
+      dob: new Date('2002-12-06T23:00:00.000Z'),
+      isEmailConfirm: true,
+    },
+  });
   const userTeacher = await prisma.user.create({
     data: {
-      name: 'Truong Gia Huy Teacher',
-      email: 'rexfury121@teacher.com',
+      name: 'Truong Gia Huy',
+      email: 'giatruong0612@gmail.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -107,8 +127,8 @@ async function main() {
   });
   const userTeacher2 = await prisma.user.create({
     data: {
-      name: 'Nguyen Ngoc Quang Teacher',
-      email: 'halam5051@gmail.com',
+      name: 'Nguyen Ngoc Quang',
+      email: 'nnquang20@clc.fitus.edu.vn',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -117,8 +137,8 @@ async function main() {
   });
   const userTeacher3 = await prisma.user.create({
     data: {
-      name: 'Ha Tuan Lam Teacher',
-      email: 'lam.ha@devsamurai.com',
+      name: 'Ha Tuan Lam',
+      email: 'halam5051@gmail.com',
       roles: ['teacher'],
       hash: hashPass,
       dob: new Date('2002-12-06T23:00:00.000Z'),
@@ -149,7 +169,7 @@ async function main() {
   });
   const admin = await prisma.admin.create({
     data: {
-      userId: user1.id,
+      userId: user.id,
     },
   });
   const student = await prisma.student.create({
@@ -157,6 +177,34 @@ async function main() {
       id: '20127040',
       userId: user1.id,
       name: 'Truong Gia Huy',
+      classMember: {
+        create: [
+          {
+            class: { connect: { id: class4.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+        ],
+      },
+      classInvitationForStudent: {
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+          },
+          {
+            class: { connect: { id: class2.id } }, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class3.id } }, // Add more connections if needed
+          },
+        ],
+      },
+    },
+  });
+  const student4 = await prisma.student.create({
+    data: {
+      id: '20127041',
+      userId: user4.id,
+      name: 'Truong Ta Huy',
       classMember: {
         create: [
           {
@@ -208,6 +256,34 @@ async function main() {
       },
     },
   });
+  const student3 = await prisma.student.create({
+    data: {
+      id: '20127297',
+      userId: user3.id,
+      name: 'Nguyen Ngoc Quang (Unmapped)',
+      classMember: {
+        create: [
+          {
+            class: { connect: { id: class1.id } },
+            totalGrade: 0,
+          },
+          {
+            class: { connect: { id: class3.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+          {
+            class: { connect: { id: class4.id } },
+            totalGrade: 0, // Add more connections if needed
+          },
+        ],
+      },
+      classInvitationForStudent: {
+        create: {
+          class: { connect: { id: class2.id } },
+        },
+      },
+    },
+  });
   const student2 = await prisma.student.create({
     data: {
       id: '20127677',
@@ -233,7 +309,7 @@ async function main() {
   const teacher1 = await prisma.teacher.create({
     data: {
       userId: userTeacher.id,
-      name: 'Truong Gia Huy Teacher',
+      name: 'Truong Gia Huy',
       classOwned: {
         connect: { id: class1.id },
       },
@@ -252,7 +328,7 @@ async function main() {
   const teacher2 = await prisma.teacher.create({
     data: {
       userId: userTeacher2.id,
-      name: 'Nguyen Ngoc Quang Teacher',
+      name: 'Ha Tuan Lam',
       classTeacher: {
         create: [
           {
@@ -276,7 +352,7 @@ async function main() {
   const teacher3 = await prisma.teacher.create({
     data: {
       userId: userTeacher3.id,
-      name: 'Nguyen Ngoc Quang Teacher',
+      name: 'Nguyen Ngoc Quang',
       classTeacher: {
         create: {
           class: { connect: { id: class1.id } },
