@@ -142,6 +142,7 @@ export default function SignInPage() {
     );
     localStorage.setItem('refreshToken', signInResult.data.refreshToken);
     localStorage.setItem('accessToken', signInResult.data.accessToken);
+    await getUserProfile();
     navigate('/student/home');
     setIsSubmitting(false);
     document.body.style.cursor = 'default';
@@ -156,6 +157,7 @@ export default function SignInPage() {
     );
     localStorage.setItem('refreshToken', signInResult.data.refreshToken);
     localStorage.setItem('accessToken', signInResult.data.accessToken);
+    await getUserProfile();
     navigate('/student/home');
     setIsSubmitting(false);
     document.body.style.cursor = 'default';
